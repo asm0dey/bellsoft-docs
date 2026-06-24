@@ -1869,6 +1869,10 @@ git commit -m "build: validate internal links via starlight-links-validator"
 
 ## Refinements applied during execution
 
+- **How-To & Debugging are version-scoped (not shared pages).** Verified against bell-sw.com: the same how-to is served byte-identical at every version URL. So content is authored once in `src/partials/*.mdx` (frontmatter-free fragments) and each version gets a thin wrapper page (`title`+`description`+explicit `slug`, then `import Body from '@partials/…'; <Body/>`). Every page is therefore version-scoped and the selector swaps same-page everywhere. The `@partials/*` → `src/partials/*` alias is set in `tsconfig.json`. Each version's sidebar group nests Install Guide, Release Notes, How To, and Debugging; Security Advisory + Legal stay top-level shared links.
+- **Selector on product landing pages** (e.g. NIK `/liberica-nik/`, which has no version segment): the sidebar defaults to the latest version group and selecting a version enters that version's install guide (`productOf` matches the landing; `defaultVersionOf` supplies the latest).
+
+
 - **Sidebar shows only the active version.** `swapVersion.mjs` also exports `filterSidebarForVersion(sidebar, product, activeSlug)`, which drops the other versions' groups (a group whose label contains a non-active version label) while keeping shared groups and links. The `VersionSwitcher.astro` Sidebar override mutates `Astro.locals.starlightRoute.sidebar` with it before rendering. The dropdown still lists every version.
 - **The Sidebar override must render the topics product switcher.** Both `starlight-sidebar-topics` and this override target Starlight's `Sidebar` component, so the override imports `starlight-sidebar-topics/components/Sidebar.astro` and renders `<TopicsSwitcher />` before `<Default>`, or the product switcher (icons) disappears. Guarded by an e2e test.
 
