@@ -5,7 +5,7 @@ import { PRODUCT_VERSIONS, productOf, versionOf } from '../lib/swapVersion.mjs';
 const pathname = Astro.url.pathname;
 const active = versionOf(pathname);
 const product = productOf(pathname);
-const versions = active ? PRODUCT_VERSIONS[product] : [];
+const versions = active && product ? PRODUCT_VERSIONS[product] : [];
 ---
 
 {
