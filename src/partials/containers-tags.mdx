@@ -1,8 +1,15 @@
+import ContainerTagPicker from '../components/ContainerTagPicker.astro';
+
 Tags follow the pattern:
 
 ```
 [jdk type]-[java version]-[crac]-[cds]-[slim]-[libc type]
 ```
+
+Use the picker to build a valid tag for your needs — it checks your choice
+against the tags actually published on Docker Hub:
+
+<ContainerTagPicker />
 
 Images come in **musl** or **glibc** variants, with optional **CRaC** and
 **Class Data Sharing (CDS)** builds.
