@@ -1867,6 +1867,11 @@ git commit -m "build: validate internal links via starlight-links-validator"
 
 ---
 
+## Refinements applied during execution
+
+- **Sidebar shows only the active version.** `swapVersion.mjs` also exports `filterSidebarForVersion(sidebar, product, activeSlug)`, which drops the other versions' groups (a group whose label contains a non-active version label) while keeping shared groups and links. The `VersionSwitcher.astro` Sidebar override mutates `Astro.locals.starlightRoute.sidebar` with it before rendering. The dropdown still lists every version.
+- **The Sidebar override must render the topics product switcher.** Both `starlight-sidebar-topics` and this override target Starlight's `Sidebar` component, so the override imports `starlight-sidebar-topics/components/Sidebar.astro` and renders `<TopicsSwitcher />` before `<Default>`, or the product switcher (icons) disappears. Guarded by an e2e test.
+
 ## Notes / deliberate simplifications (ponytail)
 
 - **Version dropdown over `starlight-versions` plugin:** ~40 lines, no archival snapshots, exact "same page" control. Upgrade path: adopt `starlight-versions` only if you later need frozen historical doc sets.
