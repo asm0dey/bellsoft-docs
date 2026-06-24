@@ -21,6 +21,11 @@ Pick your platform below — your choice is remembered as you scroll and when yo
 
 ## Apple macOS
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.dmg)">
+
 ### Installing the DMG bundle on macOS
 
 <Steps>
@@ -40,6 +45,9 @@ Pick your platform below — your choice is remembered as you scroll and when yo
 </Steps>
 
 Liberica NIK 23.1.6 is installed to the `/Library/Java/LibericaNativeImageKit/liberica-vm-23.1.6-openjdk21/` directory, or another directory with a similar name in `/Library/Java/LibericaNativeImageKit`, depending on the selected version of the JDK and package type (core, standard, or full). You can use the `$NIK_HOME` environment variable to store the path to the installed package: `/Library/Java/LibericaNativeImageKit/liberica-vm-23.1.6-openjdk21/Contents/Home/`.
+
+</TabItem>
+<TabItem label="Archive (.zip)">
 
 ### Installing the ZIP bundle on macOS
 
@@ -63,6 +71,20 @@ Liberica NIK 23.1.6 is installed to the `/Library/Java/LibericaNativeImageKit/li
 </Steps>
 
 To uninstall Liberica NIK, simply remove its directory and unset the related environment variables.
+
+</TabItem>
+<TabItem label="SDKMAN!">
+
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix), on macOS and Linux. Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
+
+```bash
+sdk install java <identifier-from-the-list>
+```
+
+</TabItem>
+</Tabs>
 
 ### Installing language packages on macOS
 
@@ -105,14 +127,6 @@ $NIK_HOME/bin/gu -L install python-installable-openjdk21.0.6+10-23.1.6+1-macos-a
 If Liberica Native Image Kit was installed in `/Library/Java/LibericaNativeImageKit` or another location requiring root privileges, you might have to use `sudo` to perform administrative tasks, such as installing additional components or rebuilding the images.
 </Aside>
 
-### Installing with SDKMAN!
-
-[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix), on macOS and Linux. Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
-
-```bash
-sdk install java <identifier-from-the-list>
-```
-
 ### Liberica NIK dependencies on macOS
 
 <Aside type="caution">
@@ -129,6 +143,11 @@ xcode-select --install
 <TabItem label="Linux" icon="linux">
 
 ## Linux
+
+Choose an installation method:
+
+<Tabs>
+<TabItem label="DEB / RPM">
 
 ### Installing DEB and RPM packages
 
@@ -150,6 +169,9 @@ The package is installed to `/opt/bellsoft/liberica-vm-23.1.6-openjdk21/`.
 
 For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
 
+</TabItem>
+<TabItem label="Archive (.tar.gz)">
+
 ### Installing the standalone NIK package on GNU/Linux
 
 <Steps>
@@ -166,6 +188,20 @@ For scripting purposes, we recommend adding the `${NIK_HOME}` environment variab
 </Steps>
 
 To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
+
+</TabItem>
+<TabItem label="SDKMAN!">
+
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix). Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
+
+```bash
+sdk install java <identifier-from-the-list>
+```
+
+</TabItem>
+</Tabs>
 
 ### Installing language packages on Linux
 
@@ -206,14 +242,6 @@ $NIK_HOME/bin/gu -L install python-installable-openjdk21.0.6+10-23.1.6+1-linux-a
 If Liberica Native Image Kit was installed via a package manager or in a location requiring root privileges, you might have to use `sudo` to perform administrative tasks, such as installing additional components or rebuilding the images.
 </Aside>
 
-### Installing with SDKMAN!
-
-[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix). Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
-
-```bash
-sdk install java <identifier-from-the-list>
-```
-
 ### Liberica NIK dependencies on Linux
 
 Several libraries are required for Liberica Native Image Kit on Linux systems. Install these libraries on Debian-based systems with the following command:
@@ -239,6 +267,11 @@ Other types of Linux systems may require different packages.
 
 ## Alpine Linux
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="APK">
+
 ### Installing the APK package on Alpine Linux
 
 Download the `.apk` package, then install it using the appropriate package manager:
@@ -253,6 +286,9 @@ sudo apk add ./bellsoft-liberica-vm-openjdk21.0.6+10-23.1.6+1-linux-x64-musl.apk
 The package is installed to `/opt/bellsoft/liberica-vm-23.1.6-openjdk21/`.
 
 For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
+
+</TabItem>
+<TabItem label="Archive (.tar.gz)">
 
 ### Installing the standalone NIK package on Alpine Linux
 
@@ -276,6 +312,9 @@ For scripting purposes, we recommend adding the `${NIK_HOME}` environment variab
 </Steps>
 
 To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
+
+</TabItem>
+</Tabs>
 
 ### Installing language packages on Alpine Linux
 
@@ -333,6 +372,11 @@ Installed components also have additional library dependencies. For example, `Tr
 
 ## Microsoft Windows
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.msi)">
+
 ### Installing with the Microsoft Windows Installer package
 
 <Steps>
@@ -361,6 +405,9 @@ msiexec /quiet /i bellsoft-liberica-vm-openjdk21.0.6+10-23.1.6+1-windows-amd64.m
 
 Liberica NIK is installed to the `C:\Program Files\BellSoft\LibericaNIK-23-OpenJDK-21` directory by default. For scripting purposes, we recommend adding the `$NIK_HOME` environment variable that points to your Liberica Native Image Kit installation directory.
 
+</TabItem>
+<TabItem label="Archive (.zip)">
+
 ### Installing the standalone package on Microsoft Windows
 
 To install Liberica NIK as a standalone package on your computer, download the `.zip` package file and unpack it to a folder. You can also use Windows PowerShell to download and unpack the zip file as follows:
@@ -371,6 +418,22 @@ Expand-Archive bellsoft-liberica-vm-openjdk21.0.6+10-23.1.6+1-windows-amd64.zip 
 ```
 
 This unpacks Liberica NIK to the current directory. Either add the `bin` subdirectory to `PATH`, or remember this directory as the `$NIK_HOME` environment variable.
+
+</TabItem>
+<TabItem label="winget">
+
+### Installing with winget
+
+[winget](https://learn.microsoft.com/windows/package-manager/) carries Liberica NIK for JDK 21 (the NIK 23 line):
+
+```powershell
+winget install -e --id BellSoft.LibericaNIK.23.JDK21
+```
+
+Append `--version <build>` to pin a specific build; run `winget show BellSoft.LibericaNIK.23.JDK21` for available versions.
+
+</TabItem>
+</Tabs>
 
 ### Installing language packages on Windows
 
@@ -396,16 +459,6 @@ wasm           23.1.6   GraalWasm           Experimental download.bell-sw.com
 ```
 
 Execute `"%NIK_HOME%\bin\gu.cmd" install [language]` to install a specific language. For example, `"%NIK_HOME%\bin\gu.cmd" install nodejs`.
-
-### Installing with winget
-
-[winget](https://learn.microsoft.com/windows/package-manager/) carries Liberica NIK for JDK 21 (the NIK 23 line):
-
-```powershell
-winget install -e --id BellSoft.LibericaNIK.23.JDK21
-```
-
-Append `--version <build>` to pin a specific build; run `winget show BellSoft.LibericaNIK.23.JDK21` for available versions.
 
 ### Liberica NIK dependencies on Windows
 

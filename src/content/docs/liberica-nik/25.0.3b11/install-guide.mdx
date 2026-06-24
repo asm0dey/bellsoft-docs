@@ -21,6 +21,11 @@ Pick your platform below — your choice is remembered as you scroll and when yo
 
 ## Apple macOS
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.dmg)">
+
 ### Installing the DMG bundle on macOS
 
 <Steps>
@@ -40,6 +45,9 @@ Pick your platform below — your choice is remembered as you scroll and when yo
 </Steps>
 
 Liberica NIK 25.0.3 is installed to the `/Library/Java/LibericaNativeImageKit/liberica-vm-25.0.3-openjdk25/` directory, or another directory with a similar name in `/Library/Java/LibericaNativeImageKit`, depending on the selected version of the JDK and package type (core, standard, or full). You can use the `$NIK_HOME` environment variable to store the path to the installed package: `/Library/Java/LibericaNativeImageKit/liberica-vm-25.0.3-openjdk25/Contents/Home/`.
+
+</TabItem>
+<TabItem label="Archive (.zip)">
 
 ### Installing the ZIP bundle on macOS
 
@@ -64,6 +72,9 @@ Liberica NIK 25.0.3 is installed to the `/Library/Java/LibericaNativeImageKit/li
 
 To uninstall Liberica NIK, simply remove its directory and unset the related environment variables.
 
+</TabItem>
+<TabItem label="SDKMAN!">
+
 ### Installing with SDKMAN!
 
 [SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix), on macOS and Linux:
@@ -73,6 +84,9 @@ sdk install java 25.0.3.r25-nik
 ```
 
 SDKMAN exposes only the current NIK build; run `sdk list java | grep nik` for the available identifier. The `.fx` suffix (`25.0.3.fx-nik`) adds JavaFX support.
+
+</TabItem>
+</Tabs>
 
 ### Liberica NIK dependencies on macOS
 
@@ -90,6 +104,11 @@ xcode-select --install
 <TabItem label="Linux" icon="linux">
 
 ## Linux
+
+Choose an installation method:
+
+<Tabs>
+<TabItem label="DEB / RPM">
 
 ### Installing DEB and RPM packages
 
@@ -111,6 +130,9 @@ The package is installed to `/opt/bellsoft/liberica-vm-25.0.3-openjdk25/`.
 
 For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
 
+</TabItem>
+<TabItem label="Archive (.tar.gz)">
+
 ### Installing the standalone NIK package on GNU/Linux
 
 <Steps>
@@ -128,6 +150,9 @@ For scripting purposes, we recommend adding the `${NIK_HOME}` environment variab
 
 To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
 
+</TabItem>
+<TabItem label="SDKMAN!">
+
 ### Installing with SDKMAN!
 
 [SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix):
@@ -137,6 +162,9 @@ sdk install java 25.0.3.r25-nik
 ```
 
 SDKMAN exposes only the current NIK build; run `sdk list java | grep nik` for the available identifier.
+
+</TabItem>
+</Tabs>
 
 ### Liberica NIK dependencies on Linux
 
@@ -163,6 +191,11 @@ Other types of Linux systems may require different packages.
 
 ## Alpine Linux
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="APK">
+
 ### Installing the APK package on Alpine Linux
 
 Download the `.apk` package, then install it using the appropriate package manager:
@@ -177,6 +210,9 @@ sudo apk add ./bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-x64-musl.apk
 The package is installed to `/opt/bellsoft/liberica-vm-25.0.3-openjdk25/`.
 
 For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
+
+</TabItem>
+<TabItem label="Archive (.tar.gz)">
 
 ### Installing the standalone NIK package on Alpine Linux
 
@@ -201,6 +237,9 @@ For scripting purposes, we recommend adding the `${NIK_HOME}` environment variab
 
 To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
 
+</TabItem>
+</Tabs>
+
 ### Liberica NIK dependencies on Alpine Linux
 
 Several libraries are required for Liberica Native Image Kit on Alpine Linux. Install these libraries with the following command:
@@ -217,6 +256,11 @@ Installed components also have additional library dependencies. For example, `Tr
 <TabItem label="Windows" icon="seti:windows">
 
 ## Microsoft Windows
+
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.msi)">
 
 ### Installing with the Microsoft Windows Installer package
 
@@ -246,6 +290,9 @@ msiexec /quiet /i bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.m
 
 Liberica NIK is installed to the `C:\Program Files\BellSoft\LibericaNIK-25-OpenJDK-25` directory by default. For scripting purposes, we recommend adding the `$NIK_HOME` environment variable that points to your Liberica Native Image Kit installation directory.
 
+</TabItem>
+<TabItem label="Archive (.zip)">
+
 ### Installing the standalone package on Microsoft Windows
 
 To install Liberica NIK as a standalone package on your computer, download the `.zip` package file and unpack it to a folder. You can also use Windows PowerShell to download and unpack the zip file as follows:
@@ -256,6 +303,9 @@ Expand-Archive bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.zip 
 ```
 
 This unpacks Liberica NIK to the current directory. Either add the `bin` subdirectory to `PATH`, or remember this directory as the `$NIK_HOME` environment variable.
+
+</TabItem>
+</Tabs>
 
 ### Liberica NIK dependencies on Windows
 
