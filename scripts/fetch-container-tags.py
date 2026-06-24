@@ -14,7 +14,12 @@ import urllib.request
 from pathlib import Path
 
 REPO = "bellsoft/liberica-runtime-container"
-OUT = Path(__file__).resolve().parent.parent / "src" / "data" / "container-tags.json"
+ROOT = Path(__file__).resolve().parent.parent
+# Small index (dimensions + version lists) imported into the widget at build:
+INDEX = ROOT / "src" / "data" / "container-tags.json"
+# One file per major Java line, served statically and fetched on demand so the
+# page stays light — each holds that line's full set of real, pullable tags:
+PER_MAJOR_DIR = ROOT / "public" / "container-tags"
 
 TYPES = ["jdk-all", "jre-all", "jdk", "jre"]  # longest match first
 FLAGS = ["crac", "cds", "slim", "stream"]
@@ -36,9 +41,16 @@ def fetch_tags() -> list[str]:
     return json.load(urllib.request.urlopen(req))["tags"]
 
 
+def version_sort_key(v: str):
+    # "21.0.6_10" -> (21, 0, 6, 10); bare "21" sorts before its minors.
+    return [int(p) for p in re.split(r"[._]", v)]
+
+
 def main() -> None:
     tags = fetch_tags()
-    image_types, majors, libcs, flagset, canonical = set(), set(), set(), set(), set()
+    image_types, libcs, flagset = set(), set(), set()
+    versions_by_major: dict[str, set] = {}
+    tags_by_major: dict[str, set] = {}
     for tag in tags:
         typ = next((t for t in TYPES if tag == t or tag.startswith(t + "-")), None)
         if not typ:
@@ -54,24 +66,39 @@ def main() -> None:
             elif VERSION_TOKEN.match(tok):
                 version = tok
         image_types.add(typ)
-        if version and BARE_MAJOR.match(version):  # keep bare-major tags only
-            majors.add(version)
-            if libc:
-                libcs.add(libc)
-            flagset.update(flags)
-            canonical.add(tag)
+        if not version:
+            continue
+        major = re.split(r"[._]", version)[0]
+        versions_by_major.setdefault(major, set()).add(version)
+        tags_by_major.setdefault(major, set()).add(tag)
+        if libc:
+            libcs.add(libc)
+        flagset.update(flags)
 
-    data = {
+    majors = sorted(versions_by_major, key=int, reverse=True)
+    index = {
         "repo": REPO,
         "fetchedCount": len(tags),
         "imageTypes": [t for t in TYPES if t in image_types],
-        "javaVersions": sorted(majors, key=int, reverse=True),
+        "javaVersions": majors,
+        "versionsByMajor": {
+            m: sorted(versions_by_major[m], key=version_sort_key) for m in majors
+        },
         "libc": [l for l in LIBC if l in libcs],
         "flags": [f for f in FLAGS if f in flagset],
-        "canonicalTags": sorted(canonical),
     }
-    OUT.write_text(json.dumps(data, separators=(",", ":")))
-    print(f"wrote {OUT} — {len(data['canonicalTags'])} tags, {OUT.stat().st_size} bytes")
+    INDEX.write_text(json.dumps(index, separators=(",", ":")))
+    print(f"wrote {INDEX} — index, {INDEX.stat().st_size} bytes")
+
+    PER_MAJOR_DIR.mkdir(parents=True, exist_ok=True)
+    for m in majors:
+        path = PER_MAJOR_DIR / f"{m}.json"
+        path.write_text(json.dumps(sorted(tags_by_major[m]), separators=(",", ":")))
+    biggest = max(majors, key=lambda m: (PER_MAJOR_DIR / f"{m}.json").stat().st_size)
+    print(
+        f"wrote {len(majors)} per-major files to {PER_MAJOR_DIR} "
+        f"(largest: {biggest}.json = {(PER_MAJOR_DIR / f'{biggest}.json').stat().st_size} bytes)"
+    )
 
 
 if __name__ == "__main__":
