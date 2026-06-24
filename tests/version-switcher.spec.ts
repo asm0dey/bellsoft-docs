@@ -7,14 +7,21 @@ test('switching JDK version lands on the same page', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('21'); // URL above proves the exact slug
 });
 
-test('shared pages show the selector and entering a version goes to its install guide', async ({
-  page,
-}) => {
-  await page.goto('/liberica-jdk/how-to/ide/');
-  // Selector is present, defaulting to the latest version.
+test('how-to pages are version-scoped: switching stays on the same page', async ({ page }) => {
+  await page.goto('/liberica-jdk/25.0.3b11/how-to/crac/');
   await expect(page.locator('#version-select')).toHaveValue('25.0.3b11');
   await page.selectOption('#version-select', '21.0.6b10');
-  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/install-guide\/?$/);
+  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/how-to\/crac\/?$/);
+  await expect(page.locator('h1')).toContainText('CRaC');
+});
+
+test('product landing (no active version) defaults to latest and entering a version goes to its install guide', async ({
+  page,
+}) => {
+  await page.goto('/liberica-nik/');
+  await expect(page.locator('#version-select')).toHaveValue('25.0.3b11');
+  await page.selectOption('#version-select', '21.0.6b10');
+  await expect(page).toHaveURL(/\/liberica-nik\/21\.0\.6b10\/install-guide\/?$/);
 });
 
 test('the selector is absent on non-versioned products', async ({ page }) => {
