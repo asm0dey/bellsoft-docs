@@ -34,6 +34,10 @@ export default defineConfig({
         // Shared partials render under multiple version URLs, so in-content
         // links to sibling pages are relative (`../../install-guide/`) and
         // resolve per-version. Allow them instead of forcing absolute links.
+        // Relative links off: shared partials resolve per-version. Local links off:
+        // docs intentionally cite localhost/127.0.0.1 example URLs (remote-debug etc.).
+        // Note: withBase() JS-expression hrefs on landing pages are skipped by the
+        // validator (not statically analyzable) — check those by hand.
         starlightLinksValidator({ errorOnRelativeLinks: false, errorOnLocalLinks: false }),
         starlightSidebarTopics([
           {
