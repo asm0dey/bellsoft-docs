@@ -21,6 +21,7 @@
   - **Liberica NIK**: `25.0.3b11`, `21.0.6b10` → `/liberica-nik/25.0.3b11/...`, `/liberica-nik/21.0.6b10/...` (ponytail: NIK's real scheme is GraalVM-based; we reuse the bundled-Java full versions so the dropdown is uniform).
   - Containers (Docker tags) and Alpaquita (streams) are NOT path-versioned.
 - The single source of truth for versions is the `PRODUCT_VERSIONS` registry in `src/lib/swapVersion.mjs` (Task 3): `{ 'liberica-jdk': [{slug,label}…], 'liberica-nik': [{slug,label}…] }`. The sidebar config, the dropdown, and the content dir names all use these exact slugs.
+- **CRITICAL — every versioned content page MUST declare an explicit `slug:` in its frontmatter** matching its full path, e.g. `slug: liberica-jdk/25.0.3b11/install-guide`. Astro strips the dots from auto-generated slugs (`25.0.3b11` → would not match), so without the explicit `slug` the `starlight-sidebar-topics` config fails at build with `The slug "…" does not exist`. This applies to all JDK and NIK install-guide/release-notes pages. Shared (non-versioned) pages do NOT need it.
 - Only **Installation Guide** and **Release Notes** are per-version. How-To / Debugging pages are shared and live at `/liberica-jdk/how-to/...`, `/liberica-jdk/debugging/...` (no version segment).
 - **Search:** Starlight's built-in Pagefind search is enabled by default and must stay on — do not disable it.
 - Real product/package facts (use verbatim, do not invent):
@@ -681,6 +682,7 @@ Overwrite `src/content/docs/liberica-jdk/25.0.3b11/install-guide.mdx` (`.mdx` is
 ````mdx
 ---
 title: "Liberica JDK 25: Installation Guide"
+slug: liberica-jdk/25.0.3b11/install-guide
 description: Download and install Liberica JDK 25 (LTS) on Windows, macOS, and Linux.
 ---
 
@@ -802,6 +804,7 @@ Overwrite `src/content/docs/liberica-jdk/25.0.3b11/release-notes.md`:
 ```md
 ---
 title: "Liberica JDK 25: Release Notes"
+slug: liberica-jdk/25.0.3b11/release-notes
 description: Release notes for Liberica JDK 25.0.3+11 (LTS).
 ---
 
@@ -869,6 +872,7 @@ Overwrite `src/content/docs/liberica-jdk/21.0.6b10/install-guide.mdx`:
 ````mdx
 ---
 title: "Liberica JDK 21: Installation Guide"
+slug: liberica-jdk/21.0.6b10/install-guide
 description: Download and install Liberica JDK 21 (LTS) on Windows, macOS, and Linux.
 ---
 
@@ -990,6 +994,7 @@ Overwrite `src/content/docs/liberica-jdk/21.0.6b10/release-notes.md`:
 ```md
 ---
 title: "Liberica JDK 21: Release Notes"
+slug: liberica-jdk/21.0.6b10/release-notes
 description: Release notes for Liberica JDK 21.0.6+10 (LTS).
 ---
 
@@ -1212,6 +1217,7 @@ compilation cuts startup time and memory use — ideal for cloud and containers.
 ````md
 ---
 title: "Liberica NIK 25: Installation Guide"
+slug: liberica-nik/25.0.3b11/install-guide
 description: Install Liberica Native Image Kit (bundles Java 25) and build your first native image.
 ---
 
@@ -1247,6 +1253,7 @@ native-image HelloWorld
 ````md
 ---
 title: "Liberica NIK 21: Installation Guide"
+slug: liberica-nik/21.0.6b10/install-guide
 description: Install Liberica Native Image Kit (bundles Java 21) and build your first native image.
 ---
 
@@ -1284,6 +1291,7 @@ native-image HelloWorld
 ```md
 ---
 title: "Liberica NIK 25: Release Notes"
+slug: liberica-nik/25.0.3b11/release-notes
 description: Release notes for Liberica Native Image Kit bundling Java 25.
 ---
 
@@ -1303,6 +1311,7 @@ description: Release notes for Liberica Native Image Kit bundling Java 25.
 ```md
 ---
 title: "Liberica NIK 21: Release Notes"
+slug: liberica-nik/21.0.6b10/release-notes
 description: Release notes for Liberica Native Image Kit bundling Java 21.
 ---
 
