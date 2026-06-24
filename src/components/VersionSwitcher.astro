@@ -1,0 +1,62 @@
+---
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import { PRODUCT_VERSIONS, productOf, versionOf } from '../lib/swapVersion.mjs';
+
+const pathname = Astro.url.pathname;
+const active = versionOf(pathname);
+const product = productOf(pathname);
+const versions = active ? PRODUCT_VERSIONS[product] : [];
+---
+
+{
+  active && (
+    <div class="version-switcher">
+      <label for="version-select">Version</label>
+      <select id="version-select" data-path={pathname}>
+        {versions.map((v) => (
+          <option value={v.slug} selected={v.slug === active}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+<Default><slot /></Default>
+
+<script>
+  import { swapVersion } from '../lib/swapVersion.mjs';
+  const select = document.getElementById('version-select');
+  if (select instanceof HTMLSelectElement) {
+    select.addEventListener('change', () => {
+      const from = select.dataset.path ?? location.pathname;
+      location.pathname = swapVersion(from, select.value);
+    });
+  }
+</script>
+
+<style>
+  .version-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  .version-switcher label {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .version-switcher select {
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--sl-color-black);
+    color: var(--sl-color-white);
+    border: 1px solid var(--sl-color-gray-5);
+    font-size: var(--sl-text-sm);
+  }
+</style>

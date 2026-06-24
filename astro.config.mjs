@@ -14,6 +14,9 @@ export default defineConfig({
     starlight({
       title: 'BellSoft Docs',
       customCss: ['./src/styles/custom.css'],
+      components: {
+        Sidebar: './src/components/VersionSwitcher.astro',
+      },
       plugins: [
         starlightLinksValidator(),
         starlightSidebarTopics([
