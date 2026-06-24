@@ -38,3 +38,21 @@ export function swapVersion(pathname, slug) {
   if (!versionOf(pathname)) return pathname;
   return pathname.replace(PREFIX, `/$1/${slug}$3`);
 }
+
+// Given a Starlight sidebar entry array, keep only the ACTIVE version's group
+// (plus all shared groups and links), dropping the other versions' groups — so
+// the sidebar shows one version at a time and the dropdown switches between
+// them. A "version group" is a group whose label contains one of the product's
+// version labels (e.g. "25.0.3+11 (LTS)"). Pure, so it is unit-tested.
+export function filterSidebarForVersion(sidebar, product, activeSlug) {
+  const versions = PRODUCT_VERSIONS[product];
+  if (!versions || !activeSlug) return sidebar;
+  const labels = versions.map((v) => v.label);
+  const activeLabel = versions.find((v) => v.slug === activeSlug)?.label;
+  if (!activeLabel) return sidebar;
+  return sidebar.filter((entry) => {
+    if (entry.type !== 'group') return true;
+    const isVersionGroup = labels.some((l) => entry.label.includes(l));
+    return !isVersionGroup || entry.label.includes(activeLabel);
+  });
+}

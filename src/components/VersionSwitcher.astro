@@ -1,11 +1,22 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
-import { PRODUCT_VERSIONS, productOf, versionOf } from '../lib/swapVersion.mjs';
+import {
+  PRODUCT_VERSIONS,
+  productOf,
+  versionOf,
+  filterSidebarForVersion,
+} from '../lib/swapVersion.mjs';
 
 const pathname = Astro.url.pathname;
 const active = versionOf(pathname);
 const product = productOf(pathname);
 const versions = active && product ? PRODUCT_VERSIONS[product] : [];
+
+// Show only the active version's pages in the sidebar; the dropdown switches.
+const route = Astro.locals.starlightRoute;
+if (active && product) {
+  route.sidebar = filterSidebarForVersion(route.sidebar, product, active);
+}
 ---
 
 {

@@ -5,7 +5,37 @@ import {
   versionOf,
   productOf,
   PRODUCT_VERSIONS,
+  filterSidebarForVersion,
 } from '../src/lib/swapVersion.mjs';
+
+// A sidebar shaped like Starlight's: two version groups + a shared group + a link.
+const SIDEBAR = [
+  { type: 'group', label: '25.0.3+11 (LTS)', entries: [] },
+  { type: 'group', label: '21.0.6+10 (LTS)', entries: [] },
+  { type: 'group', label: 'How To', entries: [] },
+  { type: 'link', label: 'Security Advisory', href: 'https://x' },
+];
+
+test('filterSidebarForVersion keeps only the active version group + shared entries', () => {
+  const out = filterSidebarForVersion(SIDEBAR, 'liberica-jdk', '25.0.3b11');
+  assert.deepEqual(
+    out.map((e) => e.label),
+    ['25.0.3+11 (LTS)', 'How To', 'Security Advisory']
+  );
+});
+
+test('filterSidebarForVersion switches which version group survives', () => {
+  const out = filterSidebarForVersion(SIDEBAR, 'liberica-jdk', '21.0.6b10');
+  assert.deepEqual(
+    out.map((e) => e.label),
+    ['21.0.6+10 (LTS)', 'How To', 'Security Advisory']
+  );
+});
+
+test('filterSidebarForVersion is a no-op for unknown product or slug', () => {
+  assert.equal(filterSidebarForVersion(SIDEBAR, 'containers', '25.0.3b11'), SIDEBAR);
+  assert.equal(filterSidebarForVersion(SIDEBAR, 'liberica-jdk', null), SIDEBAR);
+});
 
 test('swaps the full-version segment on JDK paths, keeping the rest', () => {
   assert.equal(
