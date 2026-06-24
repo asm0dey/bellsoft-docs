@@ -1,5 +1,6 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
 // The product switcher (icons) from starlight-sidebar-topics. We override
 // Starlight's `Sidebar`, which is also what that plugin overrides — so we must
 // render its switcher ourselves, or the product list disappears.
@@ -22,6 +23,10 @@ if (active && product) {
   route.sidebar = filterSidebarForVersion(route.sidebar, product, active);
 }
 ---
+
+<div class="sidebar-search">
+  <Search />
+</div>
 
 <TopicsSwitcher />
 
@@ -54,6 +59,9 @@ if (active && product) {
 </script>
 
 <style>
+  .sidebar-search {
+    margin-bottom: 1rem;
+  }
   .version-switcher {
     display: flex;
     flex-direction: column;
