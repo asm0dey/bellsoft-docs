@@ -89,9 +89,24 @@ export default defineConfig({
             icon: 'rocket',
             items: [
               'liberica-nik',
-              'liberica-nik/install-guide',
-              'liberica-nik/release-notes',
-              'liberica-nik/how-to-spring-boot',
+              {
+                label: '25.0.3+11 (LTS)',
+                items: [
+                  'liberica-nik/25.0.3b11/release-notes',
+                  'liberica-nik/25.0.3b11/install-guide',
+                ],
+              },
+              {
+                label: '21.0.6+10 (LTS)',
+                items: [
+                  'liberica-nik/21.0.6b10/release-notes',
+                  'liberica-nik/21.0.6b10/install-guide',
+                ],
+              },
+              {
+                label: 'How To',
+                items: ['liberica-nik/how-to-spring-boot'],
+              },
             ],
           },
           {

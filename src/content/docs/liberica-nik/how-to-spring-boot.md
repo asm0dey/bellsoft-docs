@@ -1,5 +1,14 @@
 ---
-title: Using Liberica NIK with Spring Boot
+title: Building a native image from a Spring Boot app
+description: Use the Spring Boot AOT tooling with Liberica NIK.
 ---
 
-Content in Task 6.
+With Liberica NIK on your `PATH`, build a native Spring Boot app:
+
+```bash
+./mvnw -Pnative native:compile
+./target/myapp
+```
+
+The Spring Boot `native` profile drives GraalVM AOT; NIK provides the
+`native-image` toolchain it calls.
