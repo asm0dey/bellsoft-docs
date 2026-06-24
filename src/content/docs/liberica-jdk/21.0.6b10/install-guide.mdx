@@ -1,6 +1,115 @@
 ---
 title: "Liberica JDK 21: Installation Guide"
 slug: liberica-jdk/21.0.6b10/install-guide
+description: Download and install Liberica JDK 21 (LTS) on Windows, macOS, and Linux.
 ---
 
-Content in Task 5.
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Introduction
+
+Liberica JDK 21 is a long-term support (LTS) release. Pick your platform below —
+your choice is remembered as you scroll and when you switch Java versions. The
+Linux package name is `bellsoft-java21`.
+
+<Tabs syncKey="os">
+  <TabItem label="Windows" icon="seti:windows">
+
+Install with the `.msi` installer:
+
+```powershell
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi
+```
+
+Silent (unattended) install:
+
+```powershell
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi /qn /quiet /norestart
+```
+
+Standalone archive:
+
+```powershell
+Invoke-WebRequest "https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-windows-amd64.zip" -OutFile jdk.zip
+Expand-Archive jdk.zip -DestinationPath .
+```
+
+  </TabItem>
+  <TabItem label="macOS" icon="apple">
+
+Download the `.dmg`, mount it, and run `Install Liberica JDK 21.0.6+10.pkg`.
+
+Standalone archive:
+
+```bash
+wget https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-macos-amd64.zip
+unzip bellsoft-jdk21.0.6+10-macos-amd64.zip
+```
+
+  </TabItem>
+  <TabItem label="Linux" icon="linux">
+
+Pick your distribution:
+
+<Tabs syncKey="distro">
+  <TabItem label="Debian / Ubuntu (APT)">
+
+```bash
+wget -qO - https://download.bell-sw.com/pki/GPG-KEY-bellsoft | sudo apt-key add -
+echo "deb [arch=amd64] https://apt.bell-sw.com/ stable main" | sudo tee /etc/apt/sources.list.d/bellsoft.list
+sudo apt-get update
+sudo apt-get install bellsoft-java21
+```
+
+  </TabItem>
+  <TabItem label="RHEL / CentOS / Fedora (YUM)">
+
+```bash
+sudo yum install bellsoft-java21
+```
+
+  </TabItem>
+  <TabItem label="Alpine (apk)">
+
+```bash
+apk add bellsoft-java21
+```
+
+  </TabItem>
+  <TabItem label="Other (archive)">
+
+```bash
+tar -zxvf bellsoft-jdk21.0.6+10-linux-amd64.tar.gz
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+</Tabs>
+
+## Verifying your installation
+
+```bash
+java -version
+```
+
+Expected output:
+
+```
+openjdk version "21.0.6" 2025-01-21 LTS
+OpenJDK Runtime Environment (build 21.0.6+10-LTS)
+```
+
+## Uninstalling Liberica JDK
+
+<Tabs syncKey="os">
+  <TabItem label="Windows" icon="seti:windows">Control Panel → Programs and Features → Liberica JDK → Uninstall.</TabItem>
+  <TabItem label="macOS" icon="apple">Mount the `.dmg` and run the Uninstall icon.</TabItem>
+  <TabItem label="Linux" icon="linux">`sudo apt-get remove bellsoft-java21` or `sudo yum remove bellsoft-java21`.</TabItem>
+</Tabs>
+
+## Troubleshooting
+
+If `java -version` reports the wrong version, ensure `JAVA_HOME` points to the
+Liberica JDK 21 directory and that its `bin` is first on your `PATH`.
