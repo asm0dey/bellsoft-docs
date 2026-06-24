@@ -13,6 +13,14 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'BellSoft Docs',
+      logo: {
+        src: './src/assets/bellsoft-logo.svg',
+        replacesTitle: false,
+        alt: 'BellSoft',
+      },
+      social: [
+        { icon: 'external', label: 'bell-sw.com', href: 'https://bell-sw.com/' },
+      ],
       customCss: ['./src/styles/custom.css'],
       components: {
         Sidebar: './src/components/VersionSwitcher.astro',

@@ -1,1 +1,13 @@
-/* Brand tokens filled in Task 10. */
+:root {
+  --sl-color-accent-low: #3a0c0c;
+  --sl-color-accent: #c8202f;
+  --sl-color-accent-high: #f1a7ad;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #f7d4d7;
+  --sl-color-accent: #b81c2a;
+  --sl-color-accent-high: #5a0d14;
+}
+.version-switcher select:hover {
+  border-color: var(--sl-color-accent);
+}

@@ -2,14 +2,33 @@
 title: BellSoft Documentation
 description: Developer documentation for Liberica JDK, NIK, container images, and Alpaquita Linux.
 template: splash
-sidebar:
-  exclude: true
 hero:
-  tagline: Liberica JDK, Native Image Kit, container images, and Alpaquita Linux — in one place.
+  tagline: Everything you need to download, install, and run BellSoft's Java runtimes.
   actions:
-    - text: Liberica JDK 25 install
+    - text: Install Liberica JDK 25
       link: /liberica-jdk/25.0.3b11/install-guide/
       icon: right-arrow
+      variant: primary
+    - text: Native Image Kit
+      link: /liberica-nik/
+      icon: rocket
+      variant: minimal
 ---
 
-Pick a product from the sidebar to get started.
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Liberica JDK" icon="seti:java">
+    Per-version docs for JDK 25 and 21. Switch versions on any page with the
+    sidebar dropdown.
+  </Card>
+  <Card title="Native Image Kit" icon="rocket">
+    Compile Java apps into fast, lightweight native executables.
+  </Card>
+  <Card title="Container Images" icon="seti:docker">
+    Ready-to-run JDK/JRE images built on Alpaquita Linux.
+  </Card>
+  <Card title="Alpaquita Linux" icon="linux">
+    A small, secure Linux base for Java workloads.
+  </Card>
+</CardGrid>

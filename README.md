@@ -1,49 +1,28 @@
-# Starlight Starter Kit: Basics
+# BellSoft Liberica Developer Docs
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+Astro + Starlight documentation showcase.
 
-```
-npm create astro@latest -- --template starlight
-```
+## Requirements
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Node.js 18.17.1+ (or 20.3.0+) and Bun 1.1+.
 
-## 🚀 Project Structure
+## Develop
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```bash
+bun install
+bun run dev      # http://localhost:4321
+bun run build    # production build (also the CI gate)
+bun run test:unit
+bun run test:e2e
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+## Structure
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
-
-Static assets, like favicons, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+- Products are sidebar "topics" (`starlight-sidebar-topics`) with icons.
+- Liberica JDK and NIK have per-version pages (full versions, e.g. `25.0.3b11`);
+  the sidebar version dropdown (`src/components/VersionSwitcher.astro`) keeps you
+  on the same page across versions via `src/lib/swapVersion.mjs`.
+- Add a version: create `src/content/docs/<product>/<version-slug>/{install-guide,release-notes}.md`
+  (slug = full version with `+`→`b`, e.g. `25.0.4b7`), add `{slug,label}` to that
+  product's array in `PRODUCT_VERSIONS` in `src/lib/swapVersion.mjs`, and add a
+  group to the product's topic in `astro.config.mjs`.
