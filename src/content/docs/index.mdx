@@ -4,31 +4,29 @@ description: Developer documentation for Liberica JDK, Native Image Kit, and Alp
 template: splash
 hero:
   tagline: Everything you need to download, install, and run BellSoft's Java runtimes.
-  actions:
-    - text: Install Liberica JDK 25
-      link: /liberica-jdk/25.0.3b11/install-guide/
-      icon: right-arrow
-      variant: primary
 ---
 
 import logoJdk from '../../assets/logo-liberica-jdk.svg?url';
 import logoNik from '../../assets/logo-nik.svg?url';
 import logoAlpaquita from '../../assets/logo-alpaquita.svg?url';
+import { withBase } from '../../lib/swapVersion.mjs';
+
+export const base = import.meta.env.BASE_URL;
 
 <div class="product-tiles">
-  <a class="product-tile" href="/liberica-jdk/25.0.3b11/install-guide/">
+  <a class="product-tile" href={withBase('/liberica-jdk/25.0.3b11/install-guide/', base)}>
     <img src={logoJdk} alt="" width="56" height="56" />
     <span class="product-tile-title">Liberica JDK</span>
     <span class="product-tile-desc">Per-version docs for JDK 25 and 21 — installation, release notes,
     how-to, and container images. Switch versions on any page.</span>
   </a>
-  <a class="product-tile" href="/liberica-nik/25.0.3b11/install-guide/">
+  <a class="product-tile" href={withBase('/liberica-nik/25.0.3b11/install-guide/', base)}>
     <img src={logoNik} alt="" width="56" height="56" />
     <span class="product-tile-title">Native Image Kit</span>
     <span class="product-tile-desc">Compile Java applications into fast, lightweight native
     executables ahead of time.</span>
   </a>
-  <a class="product-tile" href="/alpaquita/">
+  <a class="product-tile" href={withBase('/alpaquita/', base)}>
     <img src={logoAlpaquita} alt="" width="56" height="56" />
     <span class="product-tile-title">Alpaquita Linux</span>
     <span class="product-tile-desc">A small, secure Linux base for Java workloads, in musl and
@@ -41,7 +39,7 @@ import logoAlpaquita from '../../assets/logo-alpaquita.svg?url';
     <h2>Security</h2>
     <ul>
       <li>
-        <a href="https://docs.bell-sw.com/liberica-jdk/latest/general/security-advisory/" target="_blank" rel="noopener">Security Advisory</a>
+        <a href="https://docs.bell-sw.com/security/search/" target="_blank" rel="noopener">Security Advisory</a>
         — fixed CVEs and advisories
       </li>
     </ul>

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const TAGS = '/liberica-jdk/25.0.3b11/containers/tags/';
+const TAGS = 'liberica-jdk/25.0.3b11/containers/tags/';
 
 async function pickJavaVersion(page, value: string) {
   await page.locator('.tpv-current').click();

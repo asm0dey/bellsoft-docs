@@ -92,6 +92,7 @@ const FLAG_LABELS = {
 </figure>
 
 <script>
+  import { withBase } from '../lib/swapVersion.mjs';
   const root = document.querySelector('.tag-picker');
   if (root instanceof HTMLElement) {
     const repo = root.dataset.repo;
@@ -108,7 +109,7 @@ const FLAG_LABELS = {
       if (!cache.has(major)) {
         cache.set(
           major,
-          fetch(`/container-tags/${major}.json`)
+          fetch(withBase(`/container-tags/${major}.json`, import.meta.env.BASE_URL))
             .then((r) => (r.ok ? r.json() : []))
             .then((list) => new Set(list))
             .catch(() => null)

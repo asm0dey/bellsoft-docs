@@ -6,6 +6,8 @@ import starlightLinksValidator from 'starlight-links-validator';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
 
 export default defineConfig({
+  site: 'https://asm0dey.github.io',
+  base: '/bellsoft-docs',
   markdown: {
     // starlight-links-validator requires the unified processor (not the Astro 7 Sätteri default)
     processor: unified(),

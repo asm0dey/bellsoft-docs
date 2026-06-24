@@ -2,9 +2,12 @@
 title: Alpaquita Linux
 description: A small, secure Linux base for containers, VMs, and bare metal.
 ---
+import { withBase } from '@lib/swapVersion.mjs';
+
+export const base = import.meta.env.BASE_URL;
 
 Alpaquita Linux is a lightweight, secure Linux distribution optimized for Java
 workloads. It ships in two libc flavors — **musl** (smallest footprint) and
 **glibc** (broad compatibility) — and is the base for Liberica container images.
 
-See [Get started](/alpaquita/get-started/).
+See <a href={withBase('/alpaquita/get-started/', base)}>Get started</a>.

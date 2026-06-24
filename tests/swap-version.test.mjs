@@ -7,7 +7,20 @@ import {
   defaultVersionOf,
   PRODUCT_VERSIONS,
   filterSidebarForVersion,
+  stripBase,
+  withBase,
 } from '../src/lib/swapVersion.mjs';
+
+test('stripBase / withBase round-trip and handle base with or without trailing slash', () => {
+  for (const base of ['/bellsoft-docs', '/bellsoft-docs/']) {
+    assert.equal(stripBase('/bellsoft-docs/liberica-jdk/x/', base), '/liberica-jdk/x/');
+    assert.equal(withBase('/liberica-jdk/x/', base), '/bellsoft-docs/liberica-jdk/x/');
+    assert.equal(stripBase('/bellsoft-docs', base), '/');
+  }
+  // Root base is a no-op.
+  assert.equal(stripBase('/liberica-jdk/x/', '/'), '/liberica-jdk/x/');
+  assert.equal(withBase('/liberica-jdk/x/', '/'), '/liberica-jdk/x/');
+});
 
 // A sidebar shaped like Starlight's: two version groups + a shared group + a link.
 const SIDEBAR = [

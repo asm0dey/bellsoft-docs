@@ -5,11 +5,14 @@ slug: liberica-jdk/25.0.3b11/containers
 ---
 import Body from '@partials/containers-index.mdx';
 import ContainerTagPicker from '@components/ContainerTagPicker.astro';
+import { withBase } from '@lib/swapVersion.mjs';
+
+export const base = import.meta.env.BASE_URL;
 
 <Body />
 
-See [Tags](/liberica-jdk/25.0.3b11/containers/tags/) for the full naming scheme and
-[Usage](/liberica-jdk/25.0.3b11/containers/usage/) for `docker` commands. Or build a
-tag for your needs right here:
+See <a href={withBase('/liberica-jdk/25.0.3b11/containers/tags/', base)}>Tags</a> for the
+full naming scheme and <a href={withBase('/liberica-jdk/25.0.3b11/containers/usage/', base)}>Usage</a>
+for `docker` commands. Or build a tag for your needs right here:
 
 <ContainerTagPicker />

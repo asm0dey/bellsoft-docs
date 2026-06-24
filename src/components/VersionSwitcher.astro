@@ -13,6 +13,7 @@ import {
   versionOf,
   defaultVersionOf,
   filterSidebarForVersion,
+  stripBase,
 } from '../lib/swapVersion.mjs';
 
 // Map each product topic to its real logo; Container Images has none and
@@ -24,7 +25,9 @@ const TOPIC_LOGOS = {
 };
 const { topics } = Astro.locals.starlightSidebarTopics;
 
-const pathname = Astro.url.pathname;
+// Astro.url.pathname includes the configured base — strip it so the version
+// logic sees base-relative paths. data-path is stored stripped too.
+const pathname = stripBase(Astro.url.pathname, import.meta.env.BASE_URL);
 const active = versionOf(pathname);
 const product = productOf(pathname);
 
@@ -104,11 +107,13 @@ if (product && displaySlug) {
 <Default><slot /></Default>
 
 <script>
-  import { swapVersion } from '../lib/swapVersion.mjs';
+  import { swapVersion, stripBase, withBase } from '../lib/swapVersion.mjs';
+  const BASE = import.meta.env.BASE_URL;
   const picker = document.querySelector('.version-picker');
   if (picker instanceof HTMLElement) {
     const product = picker.dataset.product ?? '';
-    const fromPath = picker.dataset.path ?? location.pathname;
+    // data-path is base-relative (set server-side); fall back to the live path.
+    const fromPath = picker.dataset.path ?? stripBase(location.pathname, BASE);
     const button = picker.querySelector('.version-current');
     const panel = picker.querySelector('.version-panel');
     const search = picker.querySelector('.version-search');
@@ -138,9 +143,10 @@ if (product && displaySlug) {
     const navigate = (slug) => {
       const swapped = swapVersion(fromPath, slug);
       // Version page: same page, new version. Shared/landing page: enter the
-      // chosen version at its install guide.
-      location.pathname =
+      // chosen version at its install guide. Re-add the base before navigating.
+      const target =
         swapped !== fromPath ? swapped : `/${product}/${slug}/install-guide/`;
+      location.pathname = withBase(target, BASE);
     };
 
     button.addEventListener('click', () => setOpen(panel.hidden));

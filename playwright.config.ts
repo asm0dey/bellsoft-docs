@@ -5,9 +5,11 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   webServer: {
     command: 'bun run build && bun run preview',
-    url: 'http://localhost:4321/',
+    url: 'http://localhost:4321/bellsoft-docs/',
     timeout: 120_000,
     reuseExistingServer: false,
   },
-  use: { baseURL: 'http://localhost:4321' },
+  // The site is served under the configured base; tests use base-relative
+  // (no-leading-slash) goto paths, so this base is honored.
+  use: { baseURL: 'http://localhost:4321/bellsoft-docs/' },
 });

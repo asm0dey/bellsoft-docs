@@ -1,3 +1,19 @@
+// --- Base-path helpers (the site is served under a base, e.g. /bellsoft-docs) ---
+// Strip the configured base off a full pathname so the version logic below can
+// reason about base-relative paths; add it back when navigating.
+export function stripBase(pathname, base = '/') {
+  if (!base || base === '/') return pathname;
+  const b = base.endsWith('/') ? base.slice(0, -1) : base;
+  if (pathname === b) return '/';
+  if (pathname.startsWith(b + '/')) return pathname.slice(b.length);
+  return pathname;
+}
+export function withBase(pathname, base = '/') {
+  if (!base || base === '/') return pathname;
+  const b = base.endsWith('/') ? base.slice(0, -1) : base;
+  return b + pathname;
+}
+
 // Single source of truth for path-versioned products. Order = dropdown order.
 // slug = URL segment (bell-sw.com style: `+` -> `b`); label = display string.
 // Containers (Docker tags) and Alpaquita (streams) are intentionally absent —
