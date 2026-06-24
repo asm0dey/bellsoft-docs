@@ -1,10 +1,13 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import Search from '@astrojs/starlight/components/Search.astro';
-// The product switcher (icons) from starlight-sidebar-topics. We override
-// Starlight's `Sidebar`, which is also what that plugin overrides — so we must
-// render its switcher ourselves, or the product list disappears.
-import TopicsSwitcher from 'starlight-sidebar-topics/components/Sidebar.astro';
+import { Icon } from '@astrojs/starlight/components';
+// Real BellSoft product logos for the switcher. The starlight-sidebar-topics
+// plugin only renders built-in icon names, so we render the topic list
+// ourselves (reading its locals) to use the real logos.
+import logoJdk from '../assets/logo-liberica-jdk.svg?url';
+import logoNik from '../assets/logo-nik.svg?url';
+import logoAlpaquita from '../assets/logo-alpaquita.svg?url';
 import {
   PRODUCT_VERSIONS,
   productOf,
@@ -12,6 +15,15 @@ import {
   defaultVersionOf,
   filterSidebarForVersion,
 } from '../lib/swapVersion.mjs';
+
+// Map each product topic to its real logo; Container Images has none and
+// falls back to its built-in icon.
+const TOPIC_LOGOS = {
+  'Liberica JDK': logoJdk,
+  'Native Image Kit': logoNik,
+  'Alpaquita Linux': logoAlpaquita,
+};
+const { topics } = Astro.locals.starlightSidebarTopics;
 
 const pathname = Astro.url.pathname;
 const active = versionOf(pathname);
@@ -33,7 +45,29 @@ if (product && displaySlug) {
   <Search />
 </div>
 
-<TopicsSwitcher />
+<nav class="product-switcher" aria-label="Products">
+  <ul>
+    {
+      topics.map((topic) => (
+        <li>
+          <a
+            href={topic.link}
+            class:list={['product-link', { current: topic.isCurrent }]}
+          >
+            <span class="product-logo">
+              {TOPIC_LOGOS[topic.label] ? (
+                <img src={TOPIC_LOGOS[topic.label]} alt="" width="24" height="24" />
+              ) : (
+                topic.icon && <Icon name={topic.icon} size="1.25rem" />
+              )}
+            </span>
+            <span>{topic.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 
 {
   product && (
@@ -72,6 +106,50 @@ if (product && displaySlug) {
 <style>
   .sidebar-search {
     margin-bottom: 1rem;
+  }
+  .product-switcher {
+    margin-bottom: 1rem;
+  }
+  .product-switcher ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .product-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    font-size: var(--sl-text-sm);
+    line-height: 1.2;
+  }
+  .product-link:hover {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+  .product-link.current {
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .product-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+  }
+  .product-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
   .version-switcher {
     display: flex;
