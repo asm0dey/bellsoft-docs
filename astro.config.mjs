@@ -19,21 +19,21 @@ export default defineConfig({
         starlightSidebarTopics([
           {
             label: 'Liberica JDK',
-            link: '/liberica-jdk/25/install-guide/',
+            link: '/liberica-jdk/25.0.3b11/install-guide/',
             icon: 'seti:java',
             items: [
               {
-                label: 'Version 25 (LTS)',
+                label: '25.0.3+11 (LTS)',
                 items: [
-                  'liberica-jdk/25/release-notes',
-                  'liberica-jdk/25/install-guide',
+                  'liberica-jdk/25.0.3b11/release-notes',
+                  'liberica-jdk/25.0.3b11/install-guide',
                 ],
               },
               {
-                label: 'Version 21 (LTS)',
+                label: '21.0.6+10 (LTS)',
                 items: [
-                  'liberica-jdk/21/release-notes',
-                  'liberica-jdk/21/install-guide',
+                  'liberica-jdk/21.0.6b10/release-notes',
+                  'liberica-jdk/21.0.6b10/install-guide',
                 ],
               },
               {
