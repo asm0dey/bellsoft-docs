@@ -1,14 +1,21 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { unified } from '@astrojs/markdown-remark';
+import starlightLinksValidator from 'starlight-links-validator';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
 
 export default defineConfig({
+  markdown: {
+    // starlight-links-validator requires the unified processor (not the Astro 7 Sätteri default)
+    processor: unified(),
+  },
   integrations: [
     starlight({
       title: 'BellSoft Docs',
       customCss: ['./src/styles/custom.css'],
       plugins: [
+        starlightLinksValidator(),
         starlightSidebarTopics([
           {
             label: 'Liberica JDK',

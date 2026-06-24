@@ -6,12 +6,12 @@
 
 **Architecture:** Astro + Starlight provides the docs shell, search, and theming. The `starlight-sidebar-topics` plugin gives the product switcher with icons (Liberica JDK, NIK, Container images, Alpaquita Linux), each product owning its own sidebar. A small custom `VersionSwitcher` component (Starlight `Sidebar` override) renders a `<select>` on version-scoped JDK pages; on change it rewrites the version segment of the current URL via a pure `swapVersion()` function. Only the per-version pages (Installation Guide, Release Notes) are duplicated across JDK 25 and 21 — exactly matching the real site, where shared How-To content is version-agnostic. This keeps the showcase small (two versions) while demonstrating the full mechanism.
 
-**Tech Stack:** Node 18+, Astro, @astrojs/starlight, starlight-sidebar-topics, MDX. Package manager: npm. Test gate: `npm run build` (Astro type-checks + builds all routes) plus a Node-based unit test for `swapVersion()` and a Playwright smoke check for the dropdown.
+**Tech Stack:** Node 18+, Astro, @astrojs/starlight, starlight-sidebar-topics, MDX. Package manager: bun. Test gate: `bun run build` (Astro type-checks + builds all routes) plus a Node-based unit test for `swapVersion()` and a Playwright smoke check for the dropdown.
 
 ## Global Constraints
 
 - Node.js **18.17.1+ or 20.3.0+** (Starlight requirement). Copy verbatim into README.
-- Package manager: **npm** (use `package-lock.json`; do not introduce pnpm/yarn).
+- Package manager: **bun** (use `bun.lock`; do not introduce npm/pnpm/yarn).
 - Docs content lives under `src/content/docs/`. Route = file path. Trailing-slash URLs.
 - Product slugs (URL roots, fixed — the version dropdown and topics config depend on them):
   `liberica-jdk`, `liberica-nik`, `containers`, `alpaquita`.
@@ -76,20 +76,20 @@ Each file has one responsibility. The only file with real logic is `src/lib/swap
 Run in the project root (`/home/finkel/work_self/bellsoft-docs`):
 
 ```bash
-npm create astro@latest -- --template starlight --no-install --no-git --yes .
+bun create astro@latest -- --template starlight --no-install --no-git --yes .
 ```
 
 If the directory-not-empty prompt blocks (the plan dir exists), scaffold in a temp dir and move:
 
 ```bash
-npm create astro@latest -- --template starlight --no-install --no-git --yes ./.scaffold \
+bun create astro@latest -- --template starlight --no-install --no-git --yes ./.scaffold \
   && cp -rn ./.scaffold/. . && rm -rf ./.scaffold
 ```
 
 - [ ] **Step 2: Install dependencies**
 
 ```bash
-npm install
+bun install
 ```
 
 - [ ] **Step 3: Pin Node engines and a clean dev/build script set in `package.json`**
@@ -131,7 +131,7 @@ Pick a product from the sidebar to get started.
 
 - [ ] **Step 5: Run the build to verify the scaffold is valid**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: exits 0, prints `Complete!` and a list of built pages including `/index.html`.
 
 - [ ] **Step 6: Commit**
@@ -160,7 +160,7 @@ git commit -m "chore: scaffold Astro + Starlight docs site"
 - [ ] **Step 1: Install the topics plugin**
 
 ```bash
-npm i starlight-sidebar-topics
+bun add starlight-sidebar-topics
 ```
 
 - [ ] **Step 2: Create stub pages so all topic links resolve (build fails otherwise)**
@@ -315,7 +315,7 @@ export default defineConfig({
 });
 ```
 
-Note: icon names must be valid Starlight built-ins. `seti:java`, `seti:docker`, `rocket`, `linux` are all in the built-in set. If `npm run build` reports an unknown icon, swap to a valid one from the Starlight icons reference (https://starlight.astro.build/reference/icons/) — do not leave an invalid name.
+Note: icon names must be valid Starlight built-ins. `seti:java`, `seti:docker`, `rocket`, `linux` are all in the built-in set. If `bun run build` reports an unknown icon, swap to a valid one from the Starlight icons reference (https://starlight.astro.build/reference/icons/) — do not leave an invalid name.
 
 - [ ] **Step 4: Create the (empty for now) custom CSS referenced above**
 
@@ -327,7 +327,7 @@ Note: icon names must be valid Starlight built-ins. `seti:java`, `seti:docker`, 
 
 - [ ] **Step 5: Build — only the stub pages exist, so expect "missing page" errors for not-yet-created slugs**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: FAIL. The plugin references slugs (`liberica-jdk/21/...`, `liberica-nik/install-guide`, etc.) that have no file yet, so Starlight errors with `The slug "..." does not exist`. This confirms the config is being read.
 
 - [ ] **Step 6: Create minimal stubs for every remaining referenced slug so the build passes**
@@ -349,12 +349,12 @@ Content in Task 5.
 
 - [ ] **Step 7: Build to verify all topics resolve**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS. Output includes all the routes above.
 
 - [ ] **Step 8: Eyeball the switcher**
 
-Run: `npm run dev`, open `http://localhost:4321/liberica-jdk/25/install-guide/`.
+Run: `bun run dev`, open `http://localhost:4321/liberica-jdk/25/install-guide/`.
 Expected: top-of-sidebar shows four product entries with icons; JDK sidebar shows the Version 25 / Version 21 / How To groups. Stop the dev server.
 
 - [ ] **Step 9: Commit**
@@ -422,7 +422,7 @@ test('KNOWN_VERSIONS is the showcase set', () => {
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `npm run test:unit`
+Run: `bun run test:unit`
 Expected: FAIL with `Cannot find module '../src/lib/swapVersion.mjs'`.
 
 - [ ] **Step 3: Implement the pure logic**
@@ -450,7 +450,7 @@ export function swapVersion(pathname, version) {
 
 - [ ] **Step 4: Run the test to verify it passes**
 
-Run: `npm run test:unit`
+Run: `bun run test:unit`
 Expected: PASS (5 tests, 0 failures).
 
 - [ ] **Step 5: Build the dropdown component**
@@ -534,10 +534,10 @@ Inside the `starlight({ ... })` options (sibling of `plugins`), add:
 
 - [ ] **Step 7: Build, then verify the dropdown only appears on version pages**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
-Run: `npm run dev`, then check:
+Run: `bun run dev`, then check:
 - `http://localhost:4321/liberica-jdk/25/install-guide/` → dropdown shows "JDK 25" selected.
 - `http://localhost:4321/liberica-jdk/how-to/ide/` → no dropdown.
 - `http://localhost:4321/containers/` → no dropdown.
@@ -546,7 +546,7 @@ Stop the dev server.
 - [ ] **Step 8: Add a Playwright smoke test for the switch behavior**
 
 ```bash
-npm i -D @playwright/test && npx playwright install chromium
+bun add -d @playwright/test && bunx playwright install chromium
 ```
 
 `playwright.config.ts`:
@@ -556,7 +556,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: 'bun run build && bun run preview',
     url: 'http://localhost:4321/',
     timeout: 120_000,
     reuseExistingServer: false,
@@ -585,7 +585,7 @@ test('no version dropdown on shared how-to pages', async ({ page }) => {
 
 - [ ] **Step 9: Run the e2e smoke test**
 
-Run: `npm run test:e2e`
+Run: `bun run test:e2e`
 Expected: PASS (2 tests). The first relies on `21/install-guide` having an `<h1>` containing "21" — the stub from Task 2 satisfies this; Task 5 keeps it true.
 
 - [ ] **Step 10: Commit**
@@ -773,7 +773,7 @@ See the upstream OpenJDK 25.0.3 changelog for the full list of backported fixes.
 
 - [ ] **Step 3: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 4: Commit**
@@ -961,12 +961,12 @@ See the upstream OpenJDK 21.0.6 changelog for the full list of backported fixes.
 
 - [ ] **Step 3: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 4: Re-run the e2e smoke test now that both versions are real**
 
-Run: `npm run test:e2e`
+Run: `bun run test:e2e`
 Expected: PASS (2 tests). Switching 25 → 21 lands on `/liberica-jdk/21/install-guide/` with an `<h1>` containing "21".
 
 - [ ] **Step 5: Commit**
@@ -1181,7 +1181,7 @@ The Spring Boot `native` profile drives GraalVM AOT; NIK provides the
 
 - [ ] **Step 5: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
@@ -1273,7 +1273,7 @@ JDK Mission Control, or run `jcmd` over `kubectl exec` / `docker exec`.
 
 - [ ] **Step 3: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 4: Commit**
@@ -1377,7 +1377,7 @@ ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 
 - [ ] **Step 4: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1441,7 +1441,7 @@ java -version
 
 - [ ] **Step 3: Build to verify**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS.
 
 - [ ] **Step 4: Commit**
@@ -1527,17 +1527,17 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 - [ ] **Step 3: Full build**
 
-Run: `npm run build`
+Run: `bun run build`
 Expected: PASS, all product/version routes emitted.
 
 - [ ] **Step 4: Run all tests (unit + e2e)**
 
-Run: `npm run test:unit && npm run test:e2e`
+Run: `bun run test:unit && bun run test:e2e`
 Expected: unit 5 PASS; e2e 2 PASS.
 
 - [ ] **Step 5: Manual developer-experience pass**
 
-Run: `npm run dev` and verify:
+Run: `bun run dev` and verify:
 - Sidebar shows four product icons; clicking each swaps the sidebar.
 - On `/liberica-jdk/25/install-guide/`, the version dropdown switches to 21 and stays on the install guide.
 - On the install guide, picking the **Linux → Alpine (apk)** tab, then switching to JDK 21 via the dropdown, keeps Linux/Alpine selected (synced tabs).
@@ -1557,16 +1557,16 @@ Astro + Starlight documentation showcase.
 
 ## Requirements
 
-Node.js 18.17.1+ (or 20.3.0+), npm.
+Node.js 18.17.1+ (or 20.3.0+) and Bun 1.1+.
 
 ## Develop
 
 ```bash
-npm install
-npm run dev      # http://localhost:4321
-npm run build    # production build (also the CI gate)
-npm run test:unit
-npm run test:e2e
+bun install
+bun run dev      # http://localhost:4321
+bun run build    # production build (also the CI gate)
+bun run test:unit
+bun run test:e2e
 ```
 
 ## Structure
@@ -1585,6 +1585,56 @@ npm run test:e2e
 ```bash
 git add -A
 git commit -m "feat: branding, landing cards, README, and final verification"
+```
+
+---
+
+### Task 11: Internal link validation (build-time)
+
+**Files:**
+- Modify: `astro.config.mjs` (add `starlight-links-validator` to `plugins`)
+
+**Interfaces:**
+- Consumes: the full content tree and topics config from all prior tasks.
+- Produces: `bun run build` now fails on any broken **internal** link (dead `/path/` references, missing heading anchors), so the build gate also guards link integrity. External links (bell-sw.com, docs.bell-sw.com) are not checked by default — correct, since they live off-site.
+
+- [ ] **Step 1: Install the plugin**
+
+```bash
+bun add -d starlight-links-validator
+```
+
+- [ ] **Step 2: Register it as the FIRST Starlight plugin**
+
+In `astro.config.mjs`, import and add it ahead of the topics plugin so it sees the resolved routes:
+
+```js
+import starlightLinksValidator from 'starlight-links-validator';
+```
+
+```js
+      plugins: [
+        starlightLinksValidator(),
+        starlightSidebarTopics([
+          // ...unchanged...
+        ]),
+      ],
+```
+
+- [ ] **Step 3: Build to prove it runs and passes on the current (correct) tree**
+
+Run: `bun run build`
+Expected: PASS, with a links-validator pass line in the output (e.g. "All internal links are valid"). Internal cross-links authored in Tasks 6–9 (e.g. the NIK landing's links to `/liberica-nik/install-guide/`) are validated here.
+
+- [ ] **Step 4: Prove it actually catches a broken link (sanity check, then revert)**
+
+Temporarily add a bad link to `src/content/docs/index.mdx` (e.g. `[broken](/liberica-jdk/99/install-guide/)`), run `bun run build`, confirm it FAILS naming that link, then remove the bad link and rebuild to green. Do not commit the bad link.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add -A
+git commit -m "build: validate internal links via starlight-links-validator"
 ```
 
 ---
