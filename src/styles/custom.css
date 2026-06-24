@@ -52,13 +52,25 @@
   line-height: 1.5;
 }
 
+/* Compact the splash hero so the product tiles and Security/Legal links sit
+   above the fold (Starlight's default hero adds up to 10rem of block padding). */
+.hero {
+  padding-block: 1.5rem;
+}
+.hero h1 {
+  font-size: clamp(var(--sl-text-2xl), calc(0.25rem + 3vw), var(--sl-text-4xl));
+}
+.product-tiles {
+  margin-top: 1.5rem;
+}
+
 /* Security & Legal links below the product tiles on the landing page. */
 .meta-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 1rem 2rem;
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--sl-color-gray-5);
 }
 .meta-links-group h2 {
