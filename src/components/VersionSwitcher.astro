@@ -1,6 +1,5 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
-import Search from '@astrojs/starlight/components/Search.astro';
 import { Icon } from '@astrojs/starlight/components';
 // Real BellSoft product logos for the switcher. The starlight-sidebar-topics
 // plugin only renders built-in icon names, so we render the topic list
@@ -33,6 +32,7 @@ const product = productOf(pathname);
 // landing page it reflects the version whose group the sidebar shows (latest).
 const displaySlug = product ? active ?? defaultVersionOf(product) : null;
 const versions = product ? PRODUCT_VERSIONS[product] : [];
+const currentLabel = versions.find((v) => v.slug === displaySlug)?.label ?? '';
 
 // Show only that one version's group in the sidebar.
 const route = Astro.locals.starlightRoute;
@@ -40,10 +40,6 @@ if (product && displaySlug) {
   route.sidebar = filterSidebarForVersion(route.sidebar, product, displaySlug);
 }
 ---
-
-<div class="sidebar-search">
-  <Search />
-</div>
 
 <nav class="product-switcher" aria-label="Products">
   <ul>
@@ -70,16 +66,37 @@ if (product && displaySlug) {
 </nav>
 
 {
-  product && (
-    <div class="version-switcher">
-      <label for="version-select">Version</label>
-      <select id="version-select" data-path={pathname} data-product={product}>
-        {versions.map((v) => (
-          <option value={v.slug} selected={v.slug === displaySlug}>
-            {v.label}
-          </option>
-        ))}
-      </select>
+  active && (
+    <div class="version-picker" data-path={pathname} data-product={product}>
+      <span class="version-picker-label">Version</span>
+      <button type="button" class="version-current" aria-haspopup="listbox" aria-expanded="false">
+        <span class="version-current-label">{currentLabel}</span>
+        <Icon name="down-caret" size="1rem" />
+      </button>
+      <div class="version-panel" hidden>
+        <input
+          type="text"
+          class="version-search"
+          placeholder="Search version…"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Search version"
+        />
+        <ul class="version-list" role="listbox">
+          {versions.map((v) => (
+            <li
+              role="option"
+              class:list={['version-option', { selected: v.slug === displaySlug }]}
+              data-slug={v.slug}
+              data-label={v.label}
+              aria-selected={v.slug === displaySlug}
+            >
+              {v.label}
+            </li>
+          ))}
+        </ul>
+        <p class="version-empty" hidden>No matching version</p>
+      </div>
     </div>
   )
 }
@@ -88,25 +105,66 @@ if (product && displaySlug) {
 
 <script>
   import { swapVersion } from '../lib/swapVersion.mjs';
-  const select = document.getElementById('version-select');
-  if (select instanceof HTMLSelectElement) {
-    select.addEventListener('change', () => {
-      const from = select.dataset.path ?? location.pathname;
-      const product = select.dataset.product ?? '';
-      const swapped = swapVersion(from, select.value);
-      // On a version page swapVersion changes the path (same page, new version).
-      // On a shared/landing page it returns unchanged, so enter that version
-      // at its install guide.
+  const picker = document.querySelector('.version-picker');
+  if (picker instanceof HTMLElement) {
+    const product = picker.dataset.product ?? '';
+    const fromPath = picker.dataset.path ?? location.pathname;
+    const button = picker.querySelector('.version-current');
+    const panel = picker.querySelector('.version-panel');
+    const search = picker.querySelector('.version-search');
+    const list = picker.querySelector('.version-list');
+    const empty = picker.querySelector('.version-empty');
+    const options = Array.from(picker.querySelectorAll('.version-option'));
+
+    const setOpen = (open) => {
+      panel.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+      if (open) {
+        search.value = '';
+        filter('');
+        search.focus();
+      }
+    };
+    const filter = (q) => {
+      const needle = q.trim().toLowerCase();
+      let shown = 0;
+      for (const li of options) {
+        const match = li.dataset.label.toLowerCase().includes(needle);
+        li.hidden = !match;
+        if (match) shown++;
+      }
+      empty.hidden = shown > 0;
+    };
+    const navigate = (slug) => {
+      const swapped = swapVersion(fromPath, slug);
+      // Version page: same page, new version. Shared/landing page: enter the
+      // chosen version at its install guide.
       location.pathname =
-        swapped !== from ? swapped : `/${product}/${select.value}/install-guide/`;
+        swapped !== fromPath ? swapped : `/${product}/${slug}/install-guide/`;
+    };
+
+    button.addEventListener('click', () => setOpen(panel.hidden));
+    search.addEventListener('input', () => filter(search.value));
+    list.addEventListener('click', (event) => {
+      const li = event.target.closest('.version-option');
+      if (li) navigate(li.dataset.slug);
+    });
+    search.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        const first = options.find((li) => !li.hidden);
+        if (first) navigate(first.dataset.slug);
+      } else if (event.key === 'Escape') {
+        setOpen(false);
+        button.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!picker.contains(event.target)) setOpen(false);
     });
   }
 </script>
 
 <style>
-  .sidebar-search {
-    margin-bottom: 1rem;
-  }
   .product-switcher {
     margin-bottom: 1rem;
   }
@@ -151,26 +209,100 @@ if (product && displaySlug) {
     height: 100%;
     object-fit: contain;
   }
-  .version-switcher {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+  .version-picker {
+    position: relative;
     padding: 0.75rem 0;
     margin-bottom: 0.5rem;
     border-bottom: 1px solid var(--sl-color-gray-5);
   }
-  .version-switcher label {
+  .version-picker-label {
+    display: block;
     font-size: var(--sl-text-xs);
     color: var(--sl-color-gray-3);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
   }
-  .version-switcher select {
+  .version-current {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
     padding: 0.4rem 0.5rem;
     border-radius: 0.5rem;
     background: var(--sl-color-black);
     color: var(--sl-color-white);
     border: 1px solid var(--sl-color-gray-5);
     font-size: var(--sl-text-sm);
+    cursor: pointer;
+  }
+  .version-current:hover,
+  .version-current[aria-expanded='true'] {
+    border-color: var(--sl-color-accent);
+  }
+  .version-panel {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    padding: 0.4rem;
+    background: var(--sl-color-black);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+  .version-panel[hidden] {
+    display: none;
+  }
+  .version-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.35rem 0.5rem;
+    margin-bottom: 0.4rem;
+    border-radius: 0.375rem;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    border: 1px solid var(--sl-color-gray-5);
+    font-size: var(--sl-text-sm);
+  }
+  .version-search:focus {
+    outline: none;
+    border-color: var(--sl-color-accent);
+  }
+  .version-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 14rem;
+    overflow-y: auto;
+  }
+  .version-option {
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+  }
+  .version-option:hover {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+  .version-option.selected {
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .version-option[hidden] {
+    display: none;
+  }
+  .version-empty {
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-4);
+  }
+  .version-empty[hidden] {
+    display: none;
   }
 </style>

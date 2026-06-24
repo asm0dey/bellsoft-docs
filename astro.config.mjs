@@ -12,7 +12,7 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'BellSoft Docs',
+      title: 'Docs',
       logo: {
         light: './src/assets/bellsoft-logo.svg',
         dark: './src/assets/bellsoft-logo-white.svg',
@@ -48,6 +48,11 @@ export default defineConfig({
                     'liberica-jdk/25.0.3b11/debugging/jfr-mission-control',
                     'liberica-jdk/25.0.3b11/debugging/jcmd',
                   ]},
+                  { label: 'Container Images', items: [
+                    'liberica-jdk/25.0.3b11/containers',
+                    'liberica-jdk/25.0.3b11/containers/tags',
+                    'liberica-jdk/25.0.3b11/containers/usage',
+                  ]},
                 ],
               },
               {
@@ -63,6 +68,11 @@ export default defineConfig({
                   { label: 'Debugging and Optimization', items: [
                     'liberica-jdk/21.0.6b10/debugging/jfr-mission-control',
                     'liberica-jdk/21.0.6b10/debugging/jcmd',
+                  ]},
+                  { label: 'Container Images', items: [
+                    'liberica-jdk/21.0.6b10/containers',
+                    'liberica-jdk/21.0.6b10/containers/tags',
+                    'liberica-jdk/21.0.6b10/containers/usage',
                   ]},
                 ],
               },
@@ -118,12 +128,6 @@ export default defineConfig({
                 ],
               },
             ],
-          },
-          {
-            label: 'Container Images',
-            link: '/containers/',
-            icon: 'seti:docker',
-            items: ['containers', 'containers/tags', 'containers/usage'],
           },
           {
             label: 'Alpaquita Linux',

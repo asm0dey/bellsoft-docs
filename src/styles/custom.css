@@ -11,3 +11,43 @@
 .version-switcher select:hover {
   border-color: var(--sl-color-accent);
 }
+
+/* Landing-page product tiles — clickable cards with real product logos. */
+.product-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.product-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: var(--sl-color-black);
+  text-decoration: none;
+  color: var(--sl-color-white);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.product-tile:hover {
+  border-color: var(--sl-color-accent);
+  transform: translateY(-2px);
+}
+.product-tile img {
+  height: 3.5rem;
+  width: auto;
+  object-fit: contain;
+  align-self: flex-start;
+}
+.product-tile-title {
+  font-size: var(--sl-text-h4);
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+.product-tile-desc {
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+  line-height: 1.5;
+}

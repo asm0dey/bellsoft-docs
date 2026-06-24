@@ -1,6 +1,6 @@
 ---
 title: BellSoft Documentation
-description: Developer documentation for Liberica JDK, NIK, container images, and Alpaquita Linux.
+description: Developer documentation for Liberica JDK, Native Image Kit, and Alpaquita Linux.
 template: splash
 hero:
   tagline: Everything you need to download, install, and run BellSoft's Java runtimes.
@@ -9,26 +9,29 @@ hero:
       link: /liberica-jdk/25.0.3b11/install-guide/
       icon: right-arrow
       variant: primary
-    - text: Native Image Kit
-      link: /liberica-nik/
-      icon: rocket
-      variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import logoJdk from '../../assets/logo-liberica-jdk.svg?url';
+import logoNik from '../../assets/logo-nik.svg?url';
+import logoAlpaquita from '../../assets/logo-alpaquita.svg?url';
 
-<CardGrid>
-  <Card title="Liberica JDK" icon="seti:java">
-    Per-version docs for JDK 25 and 21. Switch versions on any page with the
-    sidebar dropdown.
-  </Card>
-  <Card title="Native Image Kit" icon="rocket">
-    Compile Java apps into fast, lightweight native executables.
-  </Card>
-  <Card title="Container Images" icon="seti:docker">
-    Ready-to-run JDK/JRE images built on Alpaquita Linux.
-  </Card>
-  <Card title="Alpaquita Linux" icon="linux">
-    A small, secure Linux base for Java workloads.
-  </Card>
-</CardGrid>
+<div class="product-tiles">
+  <a class="product-tile" href="/liberica-jdk/25.0.3b11/install-guide/">
+    <img src={logoJdk} alt="" width="56" height="56" />
+    <span class="product-tile-title">Liberica JDK</span>
+    <span class="product-tile-desc">Per-version docs for JDK 25 and 21 — installation, release notes,
+    how-to, and container images. Switch versions on any page.</span>
+  </a>
+  <a class="product-tile" href="/liberica-nik/25.0.3b11/install-guide/">
+    <img src={logoNik} alt="" width="56" height="56" />
+    <span class="product-tile-title">Native Image Kit</span>
+    <span class="product-tile-desc">Compile Java applications into fast, lightweight native
+    executables ahead of time.</span>
+  </a>
+  <a class="product-tile" href="/alpaquita/">
+    <img src={logoAlpaquita} alt="" width="56" height="56" />
+    <span class="product-tile-title">Alpaquita Linux</span>
+    <span class="product-tile-desc">A small, secure Linux base for Java workloads, in musl and
+    glibc flavors.</span>
+  </a>
+</div>
