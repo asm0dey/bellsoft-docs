@@ -1,0 +1,451 @@
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+## Introduction
+
+Hunting down code hotspots is probably the most common task for Java profilers. JDK Flight Recorder (JFR) and Mission Control (MC) are free and open source performance/profiling products available with Liberica JDK. They have a few powerful tools for code execution profiling.
+
+Usually, you start a profiler when there is a performance problem, or you want to optimize code to meet specific performance goals. Performance is most commonly expressed as execution time (time needed to execute operation) or throughput (number of operations executed per time unit).
+
+If you want to reduce the time spent on a request, it is obvious to focus on code that takes the longest to run. This is what we call "hot code" or "code hotspots." Profilers are optimal tools for identifying "code hotspots" and JFR + Mission Control can be used together for that purpose. In this document, we will overview the code profiling features they offer.
+
+## Starting profiling with Mission Control
+
+We will work with Liberica JDK 11 and Mission Control 7.1. JDK Flight Recorder is integrated into Liberica JDK 11. The Liberica JDK binaries are available in [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/#jdk-17-lts), and Mission Control binaries — In [Mission Control Download Center](https://bell-sw.com/liberica-mission-control/#downloads).
+
+<Aside type="note">
+Flight Recorder support is also available with Liberica JDK 8u262 and later.
+</Aside>
+
+You can use Mission Control with either a locally running JVM or a remote one. In the latter case, you need a JMX port configured on a remote JVM.
+
+You also need an application you will profile and some load to keep it busy.
+
+### Working with Local JVM
+
+Locally running JVM processes are listed in the **JVM Browser** view. You need to identify the JVM you want to profile. Besides, you can either open the JMX console for that JVM or the control flight recorder.
+
+![JVM Browser view](https://assets.bell-sw.com/docs.bell-sw.com/static/9265b17f7dd7025c151a362a37df328fd8748cbb0db6eb02bb48771468c30829/43fa5/jvm-browser.png)
+
+### Working with remote JVM
+
+With OpenJDK, Flight Recorder is available remotely via JMX. You need a JMX socket configured on the JVM that you would like to profile.
+
+There are two ways to make the JMX socket available:
+
+- JMX can be enabled via JVM command-line arguments. You can find the required configuration options in the [official documentation](https://docs.oracle.com/en/java/javase/11/management/monitoring-and-management-using-jmx-technology.html).
+
+- Using the `jcmd` command, you can start the JMX socket on JVM with no up-front configuration and no restart necessary.
+
+The following is an example of a command to start JMX with minimal configuration. You need to know the `PID` of a process and be logged under the same user as the target JVM.
+
+```bash
+jcmd PID ManagementAgent.start \
+  jmxremote.authenticate=false \
+  jmxremote.ssl=false \
+  jmxremote.port=5555
+```
+
+Once the command is executed, you can connect to your JVM via port 5555 using the instruction in the following pages.
+
+<Aside type="note">
+If the JVM you want to profile is behind NAT/firewall (e.g., it is running within Kubernetes), you may need to use port forwarding and additional [configuration tweaks](https://github.com/aragozin/jvm-tools/blob/master/JMX-CONFIG.md#jmx-via-port-forwarding) to make JMX work.
+</Aside>
+
+Having configured the JMX socket, you need to add a remote JVM to it in the **JVM Browser** view. Click the following button on the toolbar of that view.
+
+![JMX connection](https://assets.bell-sw.com/docs.bell-sw.com/static/e8f697f21dfee05f3be8587b497ebcc27270f4f5b8ce4c3de82091a926d3ea68/37511/toolbar-button.png)
+
+You will be prompted to enter JMX connection details. Once you finish JMX configuration, nodes for your remote JVM will appear in the view. Now, you can see either a JMX Console or control flight recorder.
+
+![JVM Browser after configuring JMX connection details](https://assets.bell-sw.com/docs.bell-sw.com/static/85365f342101d7658d166976b6b8d7dd7f9472527b83492855331f2f86199b10/43fa5/jvm-browser-arrows.png)
+
+## Before starting the profiler
+
+Before starting profiling and focusing on code, it is recommended to get an overall CPU usage picture on the host where your JVM is running.
+
+- Is the CPU overutilized?
+
+- Do other processes compete for CPU resources?
+
+- How much CPU is the JVM process consuming?
+
+- Which Java threads account for the highest CPU usage?
+
+Answers to these questions will help you to choose the right reports in Mission Control later.
+
+These questions can be resolved with standard system tools such as `top` and `pidstats`, but it is also possible to use the JMX console in Mission Control.
+
+## Mission Control JMX Console and Thread monitor
+
+Before starting Flight Recorder, we recommend looking at the JMX console built into Mission Control.
+
+With the JMX console, you can monitor the system and process CPU usage. These metrics are available on the **Overview** tab.
+
+![Overview tab](https://assets.bell-sw.com/docs.bell-sw.com/static/b667c05e8a8b50780e8ed6ca301b838aed1719a20c3947a3ab53067f4fc79e3a/c15e7/overview-tab.png)
+
+You can observe CPU usage per thread as well, which is useful for code execution profiling. Open the **Threads** tab and check the **CPU Profiling** box above the table of threads. After this, you will see values in the **Total CPU Usage** column.
+
+<Aside type="note" title="What if JMX is not an option?">
+What if you have console access to JVM, but no way to connect to it via JMX?
+
+You can still record JFR files using `jcmd`, then copy them to your machine and open them in Mission Control.
+
+The JMX Console provided by Mission Control won't be useful in this case, but you can use console tools such as `pidstat` or `sjk` to monitor per-thread CPU usage.
+</Aside>
+
+![Threads tab](https://assets.bell-sw.com/docs.bell-sw.com/static/3d23460e3ad3ef213c0c45341d9405f737158342923dcc41d472dd5ed0a07232/c15e7/threads-tab.png)
+
+## Starting JDK Flight Recorder session
+
+Let's start the Flight Recorder.
+
+<Steps>
+
+1. Right-click the **Flight Recorder** node in the tree on the **JVM Browser** view and select **Start Flight Recording**.
+
+   You will see a dialog box with options to start the Flight Recorder session. The options on the following screenshot instruct to start Flight Recorder for 2 minutes, with **Profiling - on server** event settings.
+
+   Press **Next**.
+
+   ![Start Flight Recording dialog box](https://assets.bell-sw.com/docs.bell-sw.com/static/361d62e17b8b15f88fcff66c896c02db62511d99c24374c0000d7c7dbd6a3790/c15e7/start-flight-recording.png)
+
+2. In the **Event Options for Profiling** dialog box tweak the most common Flight Recorder options for the next recording session. Some of the following options affect the reports explained later in this document.
+
+   - **Method Sampling** — this option controls the frequency of stack trace sampling. **Maximum** means 100 samples per second, which is a good trade-off between performance and data quality.
+
+   - **Exceptions** — you can choose whenever to record all `Throwables` or just `Errors`. Recording all `Throwables` may be expensive but useful to pinpoint excessive exception usage in an application.
+
+   - **Synchronization Threshold**, **File I/O Threshold**, **Socket I/O Threshold** — for detailed analysis of "cold" hotspots, we recommend to set these thresholds to zero. They may increase overhead significantly, so enable them only if you need this information.
+
+   ![Event Options for Profiling](https://assets.bell-sw.com/docs.bell-sw.com/static/06619291b8d4ce87e78e0413f6a277e009d01f7e440c2a849f8536a3defc9df2/c15e7/event-options.png)
+
+3. Press **Finish** to start the Flight Recording session. You can click **Next** to view and edit the Flight Recorder configuration at a lower level.
+
+</Steps>
+
+After starting the Flight Recording session, Mission Control will wait for the specified time, then stop Flight Recorder, dump the data file, open it, and present several reports.
+
+<details>
+<summary>Making JFR recording without Mission Control</summary>
+
+JFR recording can be produced without Mission Control, too. You can use `jcmd` to create JFR files, then copy them to the desktop and open them in Mission Control.
+
+Here is an instruction to capture JFR recording. You need to know the `PID` of the target JVM and execute `jcmd` under the same user account.
+
+<Steps>
+
+1. Start JFR recording with the command below:
+
+   ```bash
+   jcmd JFR.start settings=profile
+   ```
+
+   The result of this command should be a message similar to the following. You need to remember the number of the recording for later.
+
+   ```
+   Started recording 1. No limit (duration/maxsize/maxage) in use.
+   ```
+
+2. Use `JFR.dump recording=1 filename=FILEPATH` to copy recording data to file.
+
+3. Wait a little for data to be collected.
+
+4. Use the command suggested in step 1 to dump the JFR data.
+
+   ```bash
+   jcmd JFR.dump recording= filename=
+   ```
+
+   This action creates a JFR file.
+
+5. Stop the recording session with the following command.
+
+   ```bash
+   jcmd JFR.stop recording=
+   ```
+
+</Steps>
+
+Now that you have a JFR file, you can open it in Mission Control later.
+
+</details>
+
+## Method profiling report
+
+Flight Recorder collects various types of events and Mission Control builds a number of reports from that data.
+
+We want to identify areas of code that have contributed most to the execution time of our request. The usual profiling method for such tasks is a stack trace sampling.
+
+During execution at regular intervals, Flight Recorder records a trace for each thread. Taking samples from a single thread and observing that method X is present on a stack in 50% of the sample, you can assume that the sum of all method X invocation time is 50% of profiling session time.
+
+While the idea is simple, in practice, you have to deal with multiple threads and non-ideal sample distribution. Still, this approach remains extremely useful in practice.
+
+Let's open the **Method Profiling** report.
+
+![Method Profiling report](https://assets.bell-sw.com/docs.bell-sw.com/static/28c0de8655556b461314ea15342f390fed33e733acd7ae0acc3df1469c806be2/c15e7/method-profiling-report.png)
+
+The report itself is pretty basic, and if you used a different Java profiler before, it feels lacking details, which are hidden in a **Stack Trace** view (panel below).
+
+### Stack Trace view
+
+Stack view allows visualizing a set of stack traces as a tree.
+
+How do stack traces become a tree?
+
+We know how Java stack traces look like (be it exception stack trace or stack trace from thread dump). Data produced by sampling profiling is just a number of stack traces.
+
+Here are steps on how this data is transformed into a tree.
+
+<Steps>
+
+1. Convert each stack trace into a string by concatenating frames.
+
+2. Now that you have a multiset of strings, calculate each one's occurrences and compile a histogram.
+
+3. You've got a histogram, a table with two columns "trace" and "count." If you sort this table and group by common prefix, it will become a tree.
+
+</Steps>
+
+In the context menu, you have the following **Stack Trace** view customization options.
+
+#### Group Stacktraces From
+
+This option controls how frames are concatenated in step 1 of the algorithm above and what root nodes will be in the tree.
+
+- Last Frame — aka the "hot methods" mode.
+
+- Thread Root — aka the "call tree" mode.
+
+![Group Stacktraces From menu](https://assets.bell-sw.com/docs.bell-sw.com/static/59aeadc055c36ae630eec9a74f453921b0ddfcfcde45d4e297e2852ed394ef6a/bbe96/group-stacktraces-from-menu.png)
+
+#### Distinguish Frames By
+
+This option controls which information is stripped from the frame description in step 1.
+
+Take note of the **Line Number** option. Line Numbers add clutter to the tree, but sometimes you want them to be visible to get the exact reference at source code.
+
+![Distinguish Frames By menu](https://assets.bell-sw.com/docs.bell-sw.com/static/5646b49d6daaed6ea695ea0acdf5bb69ef133ccd475642be0d0478f8f238bb69/9319d/distinguish-frames-by-menu.png)
+
+#### Layout Options
+
+The default tree is horizontally compressed, which is good but can confuse. Here, you can switch back to a classic tree presentation.
+
+Stack view will work for all reports based on events that incorporate stack trace (including method profiling).
+
+Mission Control can even mix different types of events in the same stack view, but be aware that mixing events sampled by different rules, such as method profiling and IO traces, does not make much sense.
+
+![Layout Options menu](https://assets.bell-sw.com/docs.bell-sw.com/static/2e68b9d61814addb0e41adb7f22fc1c59b654e23290a3c0b8e7d73addd49b76e/06261/layout-oprions-menu.png)
+
+### Why CPU usage is important
+
+If we look at Java thread at any given time, it could be
+
+1. running on CPU in Java code;
+
+2. ready to run in Java code but waiting in OS queue to get CPU;
+
+3. running on CPU in native (non-Java) code;
+
+4. ready to run in native code but waiting in OS queue to get CPU;
+
+5. waiting to do something in native non-Java code;
+
+6. waiting/blocked at the Java level.
+
+JFR samples only threads in categories 1 or 2. There is also separate sampling for 3, 4 and 5.
+
+So, if your server is "starving" on CPU, JFR will show you a particular picture, but it will be skewed due to mixing 1 and 2 categories. The sampling picture will not accurately reflect real code computation cost in this situation.
+
+If the server is not CPU "starved" and threads you are profiling are actively consuming CPU, method sampling is the right tool for you to start with.
+
+If the server is not CPU "starved" and threads you are profiling are low on CPU, you are likely to have a "cold" hotspot, falling into categories 5 and 6.
+
+Category 5 code can be analyzed with the "Native method sampling" event.
+
+Category 6 is either contention or IO, examined with separate reports.
+
+So by looking at the CPU, you get an idea which report will be most useful.
+
+### Retrospective thread CPU usage in Mission Control
+
+What if you have a JFR recording and have no idea of CPU usage by threads at runtime? That data is recorded in a JFR file as well.
+
+Open the **Event Browser** and find the **Thread CPU Load** event under the **Operating System** \> **Processor** category as in the following image.
+
+![Thread CPU usage in Mission Control](https://assets.bell-sw.com/docs.bell-sw.com/static/9c4ea19baf33d308194a1ca8117cebd77a87480ffdbd7910870aac2dfc373c71/c15e7/thread-cpu-load.png)
+
+CPU usage for each thread is recorded with 10-second intervals. Remember that the percentage is taken from the total number of cores. In the screenshot, 25% means 100% of a single CPU core.
+
+JVM and host OS CPU usages are also recorded. Click the **CPU Load** event type in the same category.
+
+![CPU load](https://assets.bell-sw.com/docs.bell-sw.com/static/53777eda1ee91fb8f39daf4e76714a385046022e3243fe46bf5b358532566a31/c15e7/cpu-load.png)
+
+### Limit scope to a subset of threads
+
+You can now find CPU hungry threads, but the **Method Profiling** report shows all threads. You can filter by a subset of threads if necessary.
+
+Mission Control has very flexible but non-obvious filtering features.
+
+To filter by a subset of threads in the **Method Profiling** report, perform the following steps.
+
+- Open the **Threads** view.
+
+- Select one or more threads in a list of threads on the left.
+
+- Right click and choose **Store Selection** on the context menu.
+
+- Go back to **Method Profiling**.
+
+- In the **Focus** list, select **Threads Histogram Selection** and in the **Aspect**, select **Thread Name is**.
+
+Now, the report includes events only for threads you have chosen.
+
+![Showing selected threads](https://assets.bell-sw.com/docs.bell-sw.com/static/d86344301099d2e0ef3881bf6a9c0d3c3c9c26ac7a1ded165c3088eb6938b94a/c15e7/method-profiling-selected.png)
+
+<Aside type="caution">
+Any filter is shared across all reports, so do not forget to reset it when switching reports.
+</Aside>
+
+### The "Stack Trace" view of the "Threads" report
+
+While completing the steps above, you may notice that the **Stack Trace** view is available in **Threads**. Moreover, it was reacting to selection in the thread list.
+
+How is the **Stack Trace** on the **Threads** report different from the **Method Profiling** report?
+
+Each report has a scope: a set of events (usually certain types of events) used to calculate the report. When you work with report UI, a focused subset of events in scope is maintained behind the scene.
+
+A filter can narrow the scope, and this is what we did in the previous section.
+
+Any event may include the stack trace, and many do. The **Stack Trace** view visualizes all stack traces of the focused set of events in an active report.
+
+In **Method Profiling**, only method profiling samples are in scope.
+
+The **Threads** report includes almost every event bound to some thread (both sampled and non-sampled). So, while technically they can be aggregated together, it makes little sense.
+
+Nevertheless, you can use filters to fix this to make the **Threads** report show the same picture as **Method Profiling**.
+
+<Steps>
+
+1. Open the **Event Browser**.
+
+2. Right-click the **Method Profiling Sample** in the event types tree and choose **Store Selection** in the context menu.
+
+3. Go back to the **Threads** report.
+
+4. In the **Focus** list, select source **Event Types Tree Selection** and aspect **Event Type is Method Profiling Sample**.
+
+</Steps>
+
+Now, your **Stack Trace** tab includes only method profiling data, and you can change selected threads without switching reports.
+
+![Method profiling data on the Stack Trace tab](https://assets.bell-sw.com/docs.bell-sw.com/static/60cc9f75870e92be0eb5a1b8d3006eee361f42ae84f2c9e444de672a48db7c52/c15e7/threads-method-profiling.png)
+
+### Caveats of JFR method profiling
+
+The way JFR takes stack traces during profiling is precise. The majority of Java profilers use a JVM wide thread dump to get traces of all threads at once.
+
+A thread dump is a Stop-the-World operation, and doing it 100 times per second can be expensive. JFR manages to avoid Stop-the-World. Instead of stopping all threads at once, JFR stops them individually (using OS facilities) and captures stack traces from individual threads.
+
+Entering/leaving Stop-the-World state involves sophisticated protocol between application and system threads in JVM, and JFR skips this overhead altogether.
+
+Yet, this optimization introduces certain nuances of data captured by JFR. Only stack traces ending up in Java code (not the native code) are recorded and visible in the **Method Profiling** report. Thus, unless threads you are looking at the active CPU consumers, the picture in **Method Profiling** will be skewed.
+
+Besides the "Method Profiling Sample," there is the "Method Profiling Sample Native" event type that captures threads in states 4, 5 and 6 (see the list mentioned earlier). However, this event type is available only in the **Event Browser** not in the **Method Profiling** or the **Threads** reports. The good news is that the **Stack Trace** view also works in the **Event Browser** report.
+
+<Aside type="caution">
+Another important caveat for all types of Java sampling profilers is the "safepoint bias." In short, due to various effects of JVM runtime and JIT compiler, profilers can incorrectly identify the exact hot method or code line. In some edge cases, profilers can be very inaccurate.
+
+Technically, JFR avoids the "safepoint" part of the problem, though it is still biased due to the way Java JIT compiler works.
+
+While the edge case of the "safepoint bias" effect could make you lose your trust in the profiler, it is rarely a problem in actuality. A profiler's job is to narrow the scope of search; it does not need to be 100% accurate to be useful. But do not trust it blindly either.
+</Aside>
+
+## "Cold" code hotspots
+
+A hotspot is a portion of code (e.g., method or line of the source file) responsible for a considerable part of execution time during request processing (or other kinds of workload) related to other code involved.
+
+But how was that time spent? Was that code burning CPU cycles or sitting cold off the CPU waiting for something?
+
+"Cold" hotspot is a kind of code that consumes time, but does not consume CPU resources. Most typical kinds of "cold" hotspots are
+
+- blocking IO calls;
+
+- contention points in multi-threaded applications;
+
+- waiting for completions of async tasks.
+
+The method sampling approach used by JFR is not suitable for identifying "cold" hotspots (it can see only the "CPU hot" code). There are separate reports for blocking IO and contention.
+
+How to find out that you are dealing with a "cold" hot spot?
+
+<Aside type="tip">
+Low thread CPU usage for a thread supposed to process requests is a symptom that should trigger your attention.
+</Aside>
+
+### "File I/O" report
+
+This report is composed of "File Read" and "File Write" events, capturing blocking file IO operations. Since events include file names, this report shows at the file level how many bytes were read/written to each file and how much time it has taken.
+
+An important caveat here is to consider the JFR recording session's threshold. Only operations exceeding it will be visible here.
+
+The report is relatively simple but can be quite powerful if combined with the filtering capabilities of Mission Control.
+
+![File I/O report](https://assets.bell-sw.com/docs.bell-sw.com/static/4781d2d886c976dd53a952b4a653bc981ceb1a7c7ed72dd660622bcd8fa4f3e8/c15e7/file-io.png)
+
+You can filter by focus and aspect. The **Stack Trace** view is also available here.
+
+### "Socket I/O" report
+
+The "Socket I/O" report is quite similar to File I/O, but aggregation is shown by remote address and port.
+
+![Socket I/O report](https://assets.bell-sw.com/docs.bell-sw.com/static/d8d363c63cac1511c9c2bec8ebc0f836f659453fa420c444663beca60c7bee4b/c15e7/socket-io.png)
+
+The taskbar lists three aggregation options available.
+
+- By Host;
+
+- By Port;
+
+- By Host and Port.
+
+### "Lock Instances" report
+
+**Lock Instances** reports are based on the "Java Monitor Blocked" event type. These events are produced when a Java thread is blocking, trying to acquire the semaphore.
+
+This report is only useful with synchronized keyword-based thread coordination.
+
+![Lock Instances report](https://assets.bell-sw.com/docs.bell-sw.com/static/bfe5086b5bd09f800027d784bc894e3c788ae3b98750c23ce66490d72e60c10d/c15e7/lock-instances-report.png)
+
+What about java.util.concurrent-based contention?
+
+JFR also has events related to "new style" synchronization "Java Thread Park," but there are no dedicated reports in Mission Control yet.
+
+### "Threads" report
+
+We've already had a brief interaction with the **Threads** report. It consists of a thread list and a timeline area.
+
+![Threads report](https://assets.bell-sw.com/docs.bell-sw.com/static/fd249ed35bf87432237498c431010809ad497c714b7b2af86f4a81a7daf32c3b/c15e7/threads-treport.png)
+
+The thread list is simply a list of threads, but the timeline is more interesting.
+
+It has lanes for each thread and could visualize a wide range of JFR events. By default, they are so-called "Java Latency" events, but you can customize that via the context menu (see the **Edit Thread Activity Lanes** option).
+
+Typically, individual events on the timeline will be tiny. You can hover to get the details under the mouse pointer, but it is not very useful if events are subpixel sized.
+
+![img](https://assets.bell-sw.com/docs.bell-sw.com/static/e082c9a51991edef6ccdeb0dc03fc1ffb9a3fd411a6920e0fa503cc339b9bfdb/c1cfc/thread-activity-lanes.png)
+
+To zoom in, drag the rectangle over the timeline and hit **Zoom to Selected Range** on the context menu.
+
+You can use the time range selected in the **Threads** report as a filter on other reports, too.
+
+## Considerations
+
+One should keep in mind a few fundamental principles to use Mission Control efficiently.
+
+- Flight Recorder can be started from the command line, which is very helpful in environments where JMX access is impossible or complicated. In addition, it does not require any upfront JVM configuration.
+
+- CPU usage is a crucial metric. It is essential to know what kind of hotspot you are looking for. If you cannot monitor CPU usage in real time, you can find this information in the Flight Recorder file.
+
+- CPU consuming "hot" hotspots are very different from "cold" ones caused by code spending time in idle state. For a former, traditional stack trace sampling (the **Method Profiling** report) works fairly well. "Cold" hotspots are more sophisticated. You may need to enable zero thresholds for I/O and contention events to fully picture idle state events in Mission Control.
+
+- **Stack Trace** view is a potent tool that works for a wide range of events. For sampled events, you are most likely to use "hot methods" mode, whereas "call tree" is more informative for traced ones.

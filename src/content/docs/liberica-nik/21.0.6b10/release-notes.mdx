@@ -1,0 +1,121 @@
+---
+title: "Liberica NIK 21: Release Notes"
+slug: liberica-nik/21.0.6b10/release-notes
+description: Release notes for Liberica Native Image Kit 23.1.6+1 (21.0.6+10), based on Liberica JDK 21.0.6+10 (LTS) — supported platforms, language and framework versions, fixed CVEs, and resolved issues.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This document provides information about the Liberica NIK release.
+
+This particular version of Liberica NIK 23.1.6+1 is based on Liberica JDK 21.0.6+10.
+
+<Aside type="note">
+For more information about the Liberica JDK release, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/21.0.6b10/general/release-notes/).
+</Aside>
+
+[Liberica Native Image Kit](https://bell-sw.com/liberica-native-image-kit/) is a utility based on [GraalVM Open Source](https://www.graalvm.org/community/opensource/) that is capable of converting your JVM-based application into a fully compiled native executable ahead-of-time under the closed-world assumption, with an almost instant startup time.
+
+Liberica NIK supports the following platforms:
+
+- Linux x86_64 (glibc)
+- Linux Alpine x86_64 (musl)
+- Linux AArch64 (glibc)
+- Linux Alpine AArch64 (musl)
+- Mac OS x86_64
+- Mac OS AArch64
+- Windows x86_64
+
+### Liberica NIK distribution
+
+Liberica NIK is distributed as `.apk`, `.deb`, `.dmg`, `.msi`, `.pkg`, `.rpm`, `.tar.gz`, and `.zip` packages. Please [select the most appropriate](https://bell-sw.com/pages/downloads/native-image-kit/) for your purposes.
+
+## What's New
+
+This release contains the following updates and new features.
+
+### Notable Issues
+
+This release does not contain any notable issues. For the list of Liberica JDK notable issues, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/latest/general/release-notes/).
+
+### Language and framework versions
+
+Liberica NIK 23.1.6 supports the following languages and frameworks:
+
+| Component     | Version                                              |
+|---------------|------------------------------------------------------|
+| LLVM          | 16.0.1 (GraalVM CE Native 23.1.6)                    |
+| Python        | 3.10.8 (GraalVM CE Native 23.1.6)                    |
+| Node.js       | 18.20.4                                              |
+| Java          | Liberica JDK 21.0.6+10                               |
+| JavaScript    | GraalVM JavaScript (GraalVM CE Native 23.1.6)        |
+| R             | 4.0.3 (FastR)                                        |
+| TruffleRuby   | 23.1.6 (Ruby 3.2.2)                                  |
+| Native Image  | GraalVM version 23.1.6 (Liberica JDK 21.0.6+10, LTS) |
+| Wasm          | WebAssembly (GraalVM CE Native 23.1.6)               |
+
+## Known Issues
+
+This release does not contain any known issues. For the list of Liberica JDK known issues, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/latest/general/release-notes/).
+
+## CVEs
+
+This is the list of the security issues fixed in this release. CVSS scores are provided using the CVSS version 3.1 scoring system.
+
+| CVE ID | CVSS score | Component | Module | Attack Vector | Complexity | Privileges | User Interaction | Scope | Confidentiality | Integrity | Availability |
+|--------|-----------|-----------|--------|---------------|------------|------------|------------------|-------|-----------------|-----------|--------------|
+| CVE-2025-21502 | 4.8 | hotspot | compiler | network | high | none | none | unchanged | low | low | none |
+
+## Resolved Issues
+
+This is the list of Liberica NIK issues fixed in this release.
+
+<details>
+<summary>Resolved Liberica NIK issues (38)</summary>
+
+| Issue ID | Summary |
+|----------|---------|
+| GR-53718 | Add missing ImportValue in CanonicalizeLocaleList operation. |
+| GR-53718 | Add regression test. |
+| GR-53718 | Handle long values larger than int32 in JSToInt32Node. |
+| GR-53718 | Work around DSL evaluation order issue with `@CachedLibrary(value="args[0]")`. |
+| GR-53724 | Add regression test. |
+| GR-53724 | Lexer: Check for missing exponent and improve error message for missing start digit. |
+| GR-53727 | Add regression tests. |
+| GR-53897 | Add regression test. |
+| GR-54238 | Fix `this` frame slot access via super() in arrow function. |
+| GR-56524 | Correctly handle source array transitions in `%TypedArray%.prototype.set`. |
+| GR-56550 | Fix sorting contiguous int and double arrays with holes at the end. |
+| GR-58501 | Backport to 23.1: Make js.webassembly option stable. |
+| GR-58647 | Backport to 23.1: GraalJSScriptEngine: NPE when setting empty engine bindings (#840). |
+| GR-58687 | Add regression test for Polyglot.eval returning a java.lang.String. |
+| GR-58687 | Fix missing return value conversion in Polyglot.eval[File]. |
+| GR-58724 | Backport to 23.1: Fix missing return value conversion in Polyglot.eval[File]. |
+| GR-58963 | Backport to 23.1: Make js.load option stable and allowed in sandboxed mode. |
+| GR-59078 | Backport to 23.1: Broken for await of in the body of a module |
+| GR-59105 | Backport to 23.1: GC does not work on WASM modules. |
+| GR-59334 | Backport to 23.1: Handle mixing overloaded operators with non-numeric primitives. |
+| GR-59461 | Backport to 23.1: Correction of the handling of long and foreign values. |
+| GR-59520 | Backport to 23.1: Ensure missing number exponent results in early SyntaxError. |
+| GR-59604 | [GR-59605] [GR-59606] [GR-59607] [GR-59608] [GR-59609] [GR-59610] [GR-59611] [GR-59612] [GR-59613] [GR-59614] [GR-59615] [GR-59616] [GR-59617] [GR-59618] Backport multiple PRs to 23.1. |
+| GR-59605 | Backport to 23.1: Do not pass SafeInteger to NumberFormatter. |
+| GR-59606 | Backport to 23.1: Internal array should not start with a hole after removeRangeHoles(). |
+| GR-59607 | Backport to 23.1: Do not read array type before ToArrayIndex(). |
+| GR-59608 | Backport to 23.1: Correction of the handling of very large RegExp lastIndex values. |
+| GR-59609 | Backport to 23.1: Fix handling of large bits in BigInt.asUintN and asIntN. |
+| GR-59610 | Backport to 23.1: Improve TypedArray.prototype.toSorted,sort. |
+| GR-59611 | Backport to 23.1: Avoiding a potential internal error in addRange[Grow](). |
+| GR-59612 | Backport to 23.1: Fix `this` frame slot access via super() in arrow function. |
+| GR-59613 | Backport to 23.1: Do not use SimpleFormatter in Intl.ListFormat.prototype.formatToParts(). |
+| GR-59614 | Backport to 23.1: Correctly handle source array transitions in `%TypedArray%.prototype.set`. |
+| GR-59615 | Backport to 23.1: Fix sorting contiguous int and double arrays. |
+| GR-59616 | Backport to 23.1: Avoiding a potential ArrayIndexOutOfBoundsException in addRangeGrow(). |
+| GR-59617 | Backport to 23.1: Do not use blockwise splice when the new length exceeds Integer.MAX_VALUE. |
+| GR-59618 | Backport to 23.1: Do not use BigDecimal when comparing a huge BigInt and a Number. |
+| GR-59636 | Backport to 23.1: Make js.locale option stable and allowed in sandboxed mode. |
+
+</details>
+
+## Upgrading to the New Version
+
+To keep your Liberica NIK up-to-date and secure, always upgrade to the newest available version once it is released. To upgrade, install the new version over the previous one. For the installation instructions, see the [Liberica NIK Installation Guide](/bellsoft-docs/liberica-nik/21.0.6b10/install-guide/).

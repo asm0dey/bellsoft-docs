@@ -1,0 +1,106 @@
+---
+title: "Liberica NIK 25: Release Notes"
+slug: liberica-nik/25.0.3b11/release-notes
+description: Release notes for Liberica Native Image Kit 25.0.3-1 (25.0.3+12), based on Liberica JDK 25.0.3+12 (LTS) — supported platforms, language and framework versions, fixed CVEs, and resolved issues.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This document provides information about the Liberica NIK release.
+
+This particular version of Liberica NIK 25.0.3-1 is based on Liberica JDK 25.0.3+12.
+
+<Aside type="note">
+For more information about the Liberica JDK release, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/25.0.3b12/general/release-notes/).
+</Aside>
+
+[Liberica Native Image Kit](https://bell-sw.com/liberica-native-image-kit/) is a utility based on [GraalVM Open Source](https://www.graalvm.org/community/opensource/) that is capable of converting your JVM-based application into a fully compiled native executable ahead-of-time under the closed-world assumption, with an almost instant startup time.
+
+Liberica NIK supports the following platforms:
+
+- Linux x86_64 (glibc)
+- Linux Alpine x86_64 (musl)
+- Linux AArch64 (glibc)
+- Linux Alpine AArch64 (musl)
+- Mac OS x86_64
+- Mac OS AArch64
+- Windows x86_64
+
+### Liberica NIK distribution
+
+Liberica NIK is distributed as `.apk`, `.deb`, `.dmg`, `.msi`, `.pkg`, `.rpm`, `.tar.gz`, and `.zip` packages. Please [select the most appropriate](https://bell-sw.com/pages/downloads/native-image-kit/) for your purposes.
+
+## What's New
+
+This release contains the following updates and new features.
+
+### Notable Issues
+
+This release does not contain any notable issues. For the list of Liberica JDK notable issues, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/latest/general/release-notes/).
+
+### Language and framework versions
+
+Liberica NIK 25.0.3 supports the following languages and frameworks:
+
+| Component     | Version                                              |
+|---------------|------------------------------------------------------|
+| LLVM          | 20.1.4 (GraalVM CE Native 25.0.3)                    |
+| Python        | 3.12.8 (GraalVM CE Native 25.0.3)                    |
+| Node.js       | 22.22.0                                              |
+| Java          | Liberica JDK 25.0.3+12                               |
+| JavaScript    | GraalVM JavaScript (GraalVM CE Native 25.0.3)        |
+| TruffleRuby   | 25.0.3 (Ruby 3.3.7)                                  |
+| Native Image  | GraalVM version 25.0.3 (Liberica JDK 25.0.3+12, LTS) |
+| Wasm          | WebAssembly (GraalVM CE Native 25.0.3)               |
+
+## Known Issues
+
+This release does not contain any known issues. For the list of Liberica JDK known issues, see the [Liberica JDK Release Notes](https://docs.bell-sw.com/liberica-jdk/latest/general/release-notes/).
+
+## CVEs
+
+This is the list of the security issues fixed in this release. CVSS scores are provided using the CVSS version 3.1 scoring system.
+
+| CVE ID | CVSS score | Component | Module | Attack Vector | Complexity | Privileges | User Interaction | Scope | Confidentiality | Integrity | Availability |
+|--------|-----------|-----------|--------|---------------|------------|------------|------------------|-------|-----------------|-----------|--------------|
+| CVE-2026-22007 | 2.9 | security-libs | java.security | local | high | none | none | unchanged | low | none | none |
+| CVE-2026-22008 | 3.7 | core-libs | java.lang | network | high | none | none | unchanged | none | low | none |
+| CVE-2026-22013 | 5.3 | security-libs | org.ietf.jgss | network | high | none | required | unchanged | high | none | none |
+| CVE-2026-22016 | 7.5 | xml | jaxp | network | low | none | none | unchanged | high | none | none |
+| CVE-2026-22018 | 3.7 | core-libs | java.util | network | high | none | none | unchanged | none | none | low |
+| CVE-2026-22021 | 5.3 | security-libs | java.security | network | low | none | none | unchanged | none | none | low |
+| CVE-2026-23865 | 5.3 | client-libs | 2d | local | low | none | required | unchanged | low | low | low |
+| CVE-2026-34268 | 2.9 | security-libs | java.security | local | high | none | none | unchanged | low | none | none |
+| CVE-2026-34282 | 7.5 | core-libs | java.net | network | low | none | none | unchanged | none | none | high |
+
+## Resolved Issues
+
+This is the list of Liberica NIK issues fixed in this release.
+
+<details>
+<summary>Resolved Liberica NIK issues (16)</summary>
+
+| Issue ID | Summary |
+|----------|---------|
+| GR-70732 | Backport to 25.0: Fix `PyMapping_(Items\|Keys\|Values)` with dict subclasses |
+| GR-70900 | Backport to 25.0.1: Ensurepip should not patch pip. |
+| GR-71946 | Add `polyglot.with_gil_locked_during_interop` context manager |
+| GR-72123 | [Native Image] fix update ASM to 9.8 |
+| GR-72133 | Backport to 25.0: Add missing `O_*` posix constants |
+| GR-72135 | Backport to 25.0: Unify and fix codec error handlers |
+| GR-72395 | Release GraalVM 25.0.2 and new dev cycle GraalVM 25.0.3 |
+| GR-72571 | Backport to 25.0: Transient aux-engine-cache test failure. |
+| GR-72639 | Backport to 25.0: Support fast copies from interop-backed TypedArrays. |
+| GR-72939 | Backport to 25.0.3: Upgrading Node.js version used by graal-nodejs to 22.22.0. |
+| GR-73311 | [GR-73316] Backport to 25.0: Interop improvements. |
+| GR-73316 | Flush faulthandler traceback dumps all at once per thread so we do not interleave stack frames across threads |
+| GR-73399 | Backport to 25.0: Remove infrequent fast paths from list creation |
+| GR-73523 | Backport to 25.0: Fix PE bailout in `eval()`. |
+| GR-73891 | Backport to 25.0: Fix complex add/sub handling of negative zero |
+| GR-74224 | Backport to 25.0: Restrict Chrome Inspector to localhost. |
+
+</details>
+
+## Upgrading to the New Version
+
+To keep your Liberica NIK up-to-date and secure, always upgrade to the newest available version once it is released. To upgrade, install the new version over the previous one. For the installation instructions, see the [Liberica NIK Installation Guide](/bellsoft-docs/liberica-nik/25.0.3b11/install-guide/).

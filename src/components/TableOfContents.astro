@@ -1,0 +1,56 @@
+---
+// Collapsible override of Starlight's desktop "On this page" ToC.
+// Same markup + scroll-spy as the default, wrapped in a native <details>.
+import TableOfContentsList from './TableOfContentsList.astro';
+
+const { toc } = Astro.locals.starlightRoute;
+---
+
+{
+  toc && (
+    <starlight-toc-collapsible data-min-h={toc.minHeadingLevel} data-max-h={toc.maxHeadingLevel}>
+      <nav aria-labelledby="starlight__on-this-page">
+        <details open class="sl-toc-collapse">
+          <summary>
+            <h2 id="starlight__on-this-page">{Astro.locals.t('tableOfContents.onThisPage')}</h2>
+          </summary>
+          <TableOfContentsList toc={toc.items} />
+        </details>
+      </nav>
+    </starlight-toc-collapsible>
+  )
+}
+
+<script>
+  import './starlight-toc';
+</script>
+
+<style>
+  .sl-toc-collapse > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  .sl-toc-collapse > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Disclosure triangle that rotates when open. */
+  .sl-toc-collapse > summary::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    flex-shrink: 0;
+    background-color: currentColor;
+    transition: transform 0.15s ease;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center / contain;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center / contain;
+  }
+  .sl-toc-collapse[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  .sl-toc-collapse > summary h2 {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,322 @@
+---
+title: "Liberica NIK 25: Installation Guide"
+slug: liberica-nik/25.0.3b11/install-guide
+description: Install Liberica Native Image Kit 25.0.3-1 (25.0.3+12, bundling Java 25 LTS) on macOS, Linux, Alpine Linux, and Windows — DMG/PKG/MSI installers, DEB/RPM/APK packages, standalone archives, language packages, and checksum verification.
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+This document provides installation instructions for Liberica Native Image Kit (NIK) 25.0.3-1 (25.0.3+12) on different operating systems.
+
+You can download Liberica NIK from either the [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/) or, as a support-plan customer, via a link on the [support portal](https://bell-sw.com/support/). After you log in to the support portal, you can see a direct link to the version of the Liberica product you requested under **Technologies**. If you use the Liberica Download Center page, scroll down and select the NIK version, OS, and [package type](https://docs.bell-sw.com/liberica-jdk/latest/how-to/choosing-flavor/). After the download is finished, you can [verify](#verifying-downloaded-files) the downloaded file by comparing its size on your drive to the size on the Downloads page.
+
+<Aside type="note">
+The installer screens are provided for information purposes only and may vary in different releases.
+</Aside>
+
+Pick your platform below — your choice is remembered as you scroll and when you switch versions.
+
+<Tabs syncKey="os">
+<TabItem label="macOS" icon="apple">
+
+## Apple macOS
+
+### Installing the DMG bundle on macOS
+
+<Steps>
+
+1. To run the installer, double-click the file you have downloaded.
+
+2. Double-click the pkg icon to open the **Install Liberica NIK** Wizard.
+
+3. Click **Continue** on the **Welcome** screen.
+
+4. Optionally, you can change the installation location. Press **Install** to proceed.
+
+5. Confirm the new software installation. The files will start copying immediately.
+
+6. Once the installation is complete, press **Close** to exit the installation wizard.
+
+</Steps>
+
+Liberica NIK 25.0.3 is installed to the `/Library/Java/LibericaNativeImageKit/liberica-vm-25.0.3-openjdk25/` directory, or another directory with a similar name in `/Library/Java/LibericaNativeImageKit`, depending on the selected version of the JDK and package type (core, standard, or full). You can use the `$NIK_HOME` environment variable to store the path to the installed package: `/Library/Java/LibericaNativeImageKit/liberica-vm-25.0.3-openjdk25/Contents/Home/`.
+
+### Installing the ZIP bundle on macOS
+
+<Steps>
+
+1. To install Liberica NIK, download the `.zip` package.
+
+   ```bash
+   curl -O https://download.bell-sw.com/vm/25.0.3/bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-macos-amd64.zip
+   ```
+
+2. After the download is finished, unpack the file.
+
+   ```bash
+   unzip bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-macos-amd64.zip
+   sudo mv bellsoft-liberica-vm-openjdk25-25.0.3 /Library/Java/LibericaNativeImageKit/
+   ```
+
+   This unpacks Liberica NIK to `/Library/Java/LibericaNativeImageKit/`. Either add the `Contents/Home/bin` subdirectory to `$PATH`, or remember `/Library/Java/LibericaNativeImageKit/bellsoft-liberica-vm-openjdk25-25.0.3/Contents/Home/` as the `$NIK_HOME` environment variable.
+
+</Steps>
+
+To uninstall Liberica NIK, simply remove its directory and unset the related environment variables.
+
+### Liberica NIK dependencies on macOS
+
+<Aside type="caution">
+`xcode` is required for Liberica Native Image Kit.
+</Aside>
+
+Install the necessary tools with the following command:
+
+```bash
+xcode-select --install
+```
+
+</TabItem>
+<TabItem label="Linux" icon="linux">
+
+## Linux
+
+### Installing DEB and RPM packages
+
+Download either the `.rpm` or `.deb` package, then install it using the appropriate package manager.
+
+For an Apt-based system:
+
+```bash
+sudo apt install ./bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-amd64.deb
+```
+
+Or for an RPM-based system:
+
+```bash
+sudo yum install ./bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-amd64.rpm
+```
+
+The package is installed to `/opt/bellsoft/liberica-vm-25.0.3-openjdk25/`.
+
+For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
+
+### Installing the standalone NIK package on GNU/Linux
+
+<Steps>
+
+1. To install Liberica NIK, download the `.tar.gz` package and unpack it with the following commands:
+
+   ```bash
+   export INSTALL_DIR=<your directory>
+   tar -C $INSTALL_DIR -xzf bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-amd64.tar.gz
+   ```
+
+2. This unpacks Liberica NIK to the selected directory. Either add `$INSTALL_DIR/bellsoft-liberica-vm-openjdk25-25.0.3/bin` to `$PATH`, or remember `$INSTALL_DIR/bellsoft-liberica-vm-openjdk25-25.0.3` as the `$NIK_HOME` environment variable.
+
+</Steps>
+
+To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
+
+### Liberica NIK dependencies on Linux
+
+Several libraries are required for Liberica Native Image Kit on Linux systems. Install these libraries on Debian-based systems with the following command:
+
+```bash
+sudo apt install g++ make zlib1g-dev
+```
+
+<Aside type="note">
+Installed components also have additional library dependencies. For example, `Truffleruby` depends on `libssl-dev`.
+</Aside>
+
+You can use a similar command to install dependencies on RPM-based systems. See this example for Rocky Linux:
+
+```bash
+sudo yum install gcc-c++ make zlib-devel
+```
+
+Other types of Linux systems may require different packages.
+
+</TabItem>
+<TabItem label="Alpine Linux" icon="linux">
+
+## Alpine Linux
+
+### Installing the APK package on Alpine Linux
+
+Download the `.apk` package, then install it using the appropriate package manager:
+
+```bash
+# Add public key to check signature
+wget -P /etc/apk/keys/ https://apk.bell-sw.com/[email protected]
+# Install package
+sudo apk add ./bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-x64-musl.apk
+```
+
+The package is installed to `/opt/bellsoft/liberica-vm-25.0.3-openjdk25/`.
+
+For scripting purposes, we recommend adding the `${NIK_HOME}` environment variable that points to your Liberica Native Image Kit installation directory.
+
+### Installing the standalone NIK package on Alpine Linux
+
+<Steps>
+
+1. To install Liberica NIK, download the `.tar.gz` package:
+
+   ```bash
+   wget https://download.bell-sw.com/vm/25.0.3/bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-x64-musl.tar.gz
+   ```
+
+2. Unpack it with the following command:
+
+   ```bash
+   export INSTALL_DIR=<your directory>
+   tar -C $INSTALL_DIR -xzf bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-x64-musl.tar.gz
+   ```
+
+   This unpacks Liberica NIK to the selected directory. Either add `$INSTALL_DIR/bellsoft-liberica-vm-openjdk25-25.0.3/bin` to `$PATH`, or remember `$INSTALL_DIR/bellsoft-liberica-vm-openjdk25-25.0.3` as the `$NIK_HOME` environment variable.
+
+</Steps>
+
+To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
+
+### Liberica NIK dependencies on Alpine Linux
+
+Several libraries are required for Liberica Native Image Kit on Alpine Linux. Install these libraries with the following command:
+
+```bash
+sudo apk add bash g++ make zlib-static
+```
+
+<Aside type="note">
+Installed components also have additional library dependencies. For example, `Truffleruby` depends on `openssl-dev`.
+</Aside>
+
+</TabItem>
+<TabItem label="Windows" icon="seti:windows">
+
+## Microsoft Windows
+
+### Installing with the Microsoft Windows Installer package
+
+<Steps>
+
+1. Double-click the Windows installation file you downloaded. The **Liberica NIK Setup** Wizard opens.
+
+2. Click **Next** on the **Welcome** screen.
+
+3. On the **Custom Setup** window, choose the features you need. Select a feature to see its description. In most cases, you can use the default setup. Click **Disk Usage** to see the available and required space on your disk. Click **Next**.
+
+4. The package is ready to install. Press **Install**. If you see the User Account Control warning, verify the publisher (BELLSOFT) and click **Yes**.
+
+5. After the installation is complete, click **Finish** to quit the **Liberica NIK Setup** Wizard.
+
+</Steps>
+
+<Aside type="note">
+The installer screens above may vary in different releases.
+</Aside>
+
+If you want to install Liberica NIK silently, open the command line and run the following command:
+
+```powershell
+msiexec /quiet /i bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.msi
+```
+
+Liberica NIK is installed to the `C:\Program Files\BellSoft\LibericaNIK-25-OpenJDK-25` directory by default. For scripting purposes, we recommend adding the `$NIK_HOME` environment variable that points to your Liberica Native Image Kit installation directory.
+
+### Installing the standalone package on Microsoft Windows
+
+To install Liberica NIK as a standalone package on your computer, download the `.zip` package file and unpack it to a folder. You can also use Windows PowerShell to download and unpack the zip file as follows:
+
+```powershell
+Invoke-WebRequest "https://download.bell-sw.com/vm/25.0.3/bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.zip"
+Expand-Archive bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.zip -DestinationPath .
+```
+
+This unpacks Liberica NIK to the current directory. Either add the `bin` subdirectory to `PATH`, or remember this directory as the `$NIK_HOME` environment variable.
+
+### Liberica NIK dependencies on Windows
+
+<Aside type="caution">
+Microsoft Visual Studio 2017 with Microsoft Visual C++ (MSVC) 15 or later is required for Liberica Native Image Kit.
+</Aside>
+
+Start the `x64 Native Tools Command Prompt` to allow `native-image` and other utilities to find the development tools and work from the command prompt.
+
+</TabItem>
+</Tabs>
+
+## Installing language packages
+
+Language packages, such as JS, Python, Wasm, and others, can be downloaded from the [Liberica Native Image Kit Download Center](https://bell-sw.com/pages/downloads/native-image-kit/) and installed as standalone components. To download a package:
+
+<Steps>
+
+1. Scroll down the page to the required OS.
+
+2. Click the **Package** list and then click **Additional Packages**.
+
+3. Click the language package you want to install.
+
+4. Click the download link to the right of the **Package** list.
+
+</Steps>
+
+Once the download is complete, extract the package from the zip or tar.gz archive to install it as a standalone component. You can also add the `<PACKAGE_DIR>/bin` path to your `PATH` environment variable, where `PACKAGE_DIR` is the language package directory created after extraction.
+
+For example, to install the Node.js package on a Linux OS, download it first and then extract it using the following command:
+
+```bash
+tar -zxf nodejs-java-openjdk25.0.3+12-25.0.3+1-linux-amd64.tar.gz
+```
+
+The `nodejs-openjdk25-25.0.3` directory is created. You can use the extracted language pack by providing the path to its directory in commands as follows:
+
+```bash
+nodejs-openjdk25-25.0.3/bin/node --version
+v22.22.0
+```
+
+You can also add the path to the `nodejs-openjdk25-25.0.3/bin` subdirectory to the `$PATH` variable for the current terminal session if necessary:
+
+```bash
+export PATH=$<NODEJS_PACKAGE_DIR>/bin:$PATH
+```
+
+## Verifying downloaded files
+
+It is a good practice to verify the downloaded installation file by comparing its size on your drive to the size on the [Downloads](https://bell-sw.com/pages/downloads/) page.
+
+A more advanced approach is to obtain the checksum of the downloaded file in a command-line interface and compare it to the one you can find next to the Liberica NIK link on the [Downloads](https://bell-sw.com/pages/downloads/) page. Check the OS-specific commands below.
+
+<Tabs syncKey="os">
+<TabItem label="macOS" icon="apple">
+
+To get the checksum of the downloaded file, use the following command:
+
+```bash
+shasum -a 1 bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-macos-amd64.dmg
+```
+
+</TabItem>
+<TabItem label="Linux" icon="linux">
+
+To get the checksum of the downloaded file, use the following command. The installation file extension depends on the Linux version.
+
+```bash
+shasum -a 1 bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-linux-amd64.deb
+```
+
+</TabItem>
+<TabItem label="Windows" icon="seti:windows">
+
+To get the checksum of the downloaded file in the command line, run the following command in Windows PowerShell. To run PowerShell, open the **Start** menu or press the Windows key + R, type `powershell` in the **Run** dialog box, and click **OK**.
+
+```powershell
+(Get-FileHash .\bellsoft-liberica-vm-openjdk25.0.3+12-25.0.3+1-windows-amd64.msi -Algorithm SHA1).Hash
+```
+
+</TabItem>
+</Tabs>

@@ -1,0 +1,34 @@
+import { Aside } from '@astrojs/starlight/components';
+
+## Liberica NIK container images
+
+`bellsoft/liberica-native-image-kit-container` ships Liberica Native Image Kit
+(NIK) 23, 24, and 25 preinstalled, on an Alpaquita Linux base. Tag pattern:
+
+```text
+jdk-<java_version>-nik-<nik_version>[-debug]-<libc>
+```
+
+where:
+
+- `<nik_version>` and `<java_version>` specify the Liberica NIK and Java versions.
+  Supported combinations:
+  - Liberica NIK 23 — Java 17 and 21
+  - Liberica NIK 24 — Java 24
+  - Liberica NIK 25 — Java 25
+- `<libc>` is `glibc` or `musl`.
+- `-debug` images add Apache Maven and the GDB debugger.
+
+Additional rolling tags: `glibc` (latest NIK with glibc), `musl` (latest NIK with musl).
+
+Tag examples: `jdk-17-nik-23-musl`, `jdk-25-nik-25-debug-glibc`.
+
+```shell
+docker run --rm bellsoft/liberica-native-image-kit-container:jdk-21-nik-23-musl native-image --version
+native-image 21.0.11 2026-04-21
+GraalVM Runtime Environment Liberica-NIK-23.1.11-1 (build 21.0.11+12-LTS)
+Substrate VM Liberica-NIK-23.1.11-1 (build 21.0.11+12-LTS, serial gc)
+```
+
+
+For near-zero-CVE nonroot and distroless NIK images, see [Hardened Images](./hardened/).

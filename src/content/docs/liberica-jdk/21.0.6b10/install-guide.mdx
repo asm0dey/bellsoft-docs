@@ -1,115 +1,815 @@
 ---
 title: "Liberica JDK 21: Installation Guide"
 slug: liberica-jdk/21.0.6b10/install-guide
-description: Download and install Liberica JDK 21 (LTS) on Windows, macOS, and Linux.
+description: Download and install Liberica JDK 21.0.6+10 (LTS) on Windows, macOS, and Linux — MSI/silent install, OpenWebStart, archives, APT/YUM/Zypper/Alpine repos, checksum verification, and troubleshooting.
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
-## Introduction
+This guide describes how to install Liberica JDK 21.0.6+10 (LTS) on Microsoft Windows, Linux, and macOS computers. The type of installation you choose depends on your requirements and the platform you use.
 
-Liberica JDK 21 is a long-term support (LTS) release. Pick your platform below —
-your choice is remembered as you scroll and when you switch Java versions. The
-Linux package name is `bellsoft-java21`.
+There are several Liberica distribution variants:
+
+- **JDK Standard** — use it to run, compile, and debug applications or create your own Java Runtime with a subset of Java modules;
+- **JDK Full** — includes Liberica FX and an extended set of VMs;
+- **JDK Lite** — install it if you are looking for a smaller footprint, yet fully functional JDK;
+- **JRE Standard** — use it to run Java applications;
+- **JRE Full** — includes Liberica FX and an extended set of VMs.
+
+Some Liberica JDK 21 distributions are also available with the following additional API and components:
+
+- Liberica JDK with CRaC
+- Liberica JDK with OpenWebStart
+
+You can download Liberica from either the [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/) or, as a support-plan customer, via a link on the [support portal](https://bell-sw.com/support/). On the Download Center page, scroll down and select the OS, package type, and the distribution variant (JDK/JRE). After the download completes, you can [verify](#verifying-downloaded-files) the downloaded file. You can also use the command line to download the installation packages, as described below.
+
+The Linux package name for this release is `bellsoft-java21`. Liberica JDK is used in all examples below, but you can substitute it with Liberica JRE if necessary.
+
+<Aside type="note">
+The installer screens are provided for information purposes only and may vary in different releases.
+</Aside>
+
+Pick your platform below — your choice is remembered as you scroll and when you switch Java versions.
 
 <Tabs syncKey="os">
-  <TabItem label="Windows" icon="seti:windows">
+<TabItem label="Windows" icon="seti:windows">
 
-Install with the `.msi` installer:
+## Installing on Windows
+
+### Installing with the .msi file
+
+<Steps>
+
+1. Double-click the Windows installation file you downloaded to run the installer. This opens the Liberica JDK Setup Wizard.
+
+2. Click **Next** on the **Welcome** screen.
+
+3. In the **Custom Setup** window, choose the features you need. Select a feature to see its description. In most cases you can use the default setup. Click **Disk Usage** to see the available and required space on your disk. Click **Next**.
+
+4. The package is ready to install — press **Install**. If you see the User Account Control warning, verify the publisher (BELLSOFT) and click **Yes**.
+
+5. After the installation completes, click **Finish** to quit the Setup Wizard.
+
+</Steps>
+
+### Silent installation with the .msi file
+
+To install Liberica JDK silently without any user interaction, open the command line and run:
 
 ```powershell
-msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi /qn /quiet /norestart /l*v "Liberica_install.log"
 ```
 
-Silent (unattended) install:
+Where:
+
+- `/i` — install the specified software;
+- `/qn` — no UI;
+- `/quiet` — quiet mode without any user interaction;
+- `/norestart` — does not restart the computer after the installation is complete;
+- `/l*v "Liberica_install.log"` — verbose logging of all messages to the specified log file.
+
+For the list of installation flags and options, run `msiexec /help` from the command line.
+
+<Aside type="caution">
+Use an administrator account to run the installation in silent mode.
+</Aside>
+
+#### .msi command line options
+
+To specify the installation directory from the command line, use the `INSTALLDIR` property:
 
 ```powershell
-msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi /qn /quiet /norestart
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi INSTALLDIR="C:\LibericaJDK\JDK21.0.6"
 ```
 
-Standalone archive:
+The Windows Installer provides several properties to directly control the features you install. The following are the most useful properties, listed in order of precedence:
+
+| Property | Description |
+| --- | --- |
+| `ADDLOCAL` | List of features to install |
+| `REMOVE` | List of features to uninstall |
+| `ADDDEFAULT` | List of features to set to their default state |
+| `REINSTALL` | List of features to repair |
+
+You can provide the list of features on the command line as follows:
 
 ```powershell
-Invoke-WebRequest "https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-windows-amd64.zip" -OutFile jdk.zip
-Expand-Archive jdk.zip -DestinationPath .
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi ADDLOCAL=FeatureA1;FeatureB REMOVE=FeatureC ADDDEFAULT=FeatureD REINSTALL=FeatureE;FeatureF
 ```
 
-  </TabItem>
-  <TabItem label="macOS" icon="apple">
+You can also use the keyword `ALL` to indicate all features. For example, the following command installs all the features in the MSI package:
 
-Download the `.dmg`, mount it, and run `Install Liberica JDK 21.0.6+10.pkg`.
+```powershell
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi ADDLOCAL=ALL
+```
 
-Standalone archive:
+Keep in mind that properties lower in the list overwrite the items higher in the list. Thus, in the following command, all the features are set to their default state:
+
+```powershell
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64.msi ADDDEFAULT=ALL ADDLOCAL=FeatureA REMOVE=FeatureB
+```
+
+The order of the properties on the command line is irrelevant. Because `ADDDEFAULT` is later in the original list, it overwrites `ADDLOCAL` and `REMOVE`. The names of features are case sensitive — for example, `FeatureA` is different from `featureA` and `Featurea`.
+
+Liberica JDK provides the following features that can be specified using the properties described above:
+
+| Feature | Description |
+| --- | --- |
+| `JavaWebStart` | Install Liberica OpenWebStart |
+| `SetupPath` | Add Liberica JDK runtime to `PATH` |
+| `SetupJavaHome` | Point `JAVA_HOME` to Liberica JDK runtime |
+| `AssociateJarFiles` | Associate `.jar` files with Liberica JDK runtime |
+| `CreateJavaSoft` | Create JavaSoft registry keys |
+
+For the full list of configurable MSI CLI properties, see the [Windows Installer Property Reference](https://learn.microsoft.com/en-us/windows/win32/msi/property-reference).
+
+#### OpenWebStart proxy configuration
+
+If your installation package includes OpenWebStart, you can configure the initial OpenWebStart proxy settings in the Installation Wizard. These settings can be changed later using the Liberica JDK OpenWebStart Control Panel, which you can launch either from the shortcut on the Windows Start Menu or by executing `javaws-settings` in the command line.
+
+You can also specify default values for the proxy configuration on the command line during installation:
+
+```powershell
+msiexec /i bellsoft-jdk21.0.6+10-windows-amd64-openwebstart.msi PROXYTYPE=0
+```
+
+<details>
+<summary>OpenWebStart proxy command line properties</summary>
+
+| Property | Description |
+| --- | --- |
+| `PROXYTYPE` | Proxy type. Allowed values: `0` — no proxy; `1` — manual proxy configuration; `2` — automatic proxy configuration; `4` — use system proxy (the default value). |
+| `SAMEPROXY` | Set to `true` to use the same proxy for all protocols; set to `false` to use specific addresses for each protocol (HTTP, HTTPS, FTP, SOCKS). Default value is `true`. |
+| `PACURL` | URL address for automatic proxy configuration. |
+| `PROXYADDRESS` | Address for the HTTP proxy; used for all protocols if `SAMEPROXY=true`. |
+| `PROXYPORT` | HTTP proxy port; used for all protocols if `SAMEPROXY=true`. |
+| `HTTPSPROXYADDRESS` | HTTPS proxy address. |
+| `HTTPSPROXYPORT` | HTTPS proxy port. |
+| `FTPPROXYADDRESS` | FTP proxy address. |
+| `FTPPROXYPORT` | FTP proxy port. |
+| `SOCKSPROXYADDRESS` | SOCKS proxy address. |
+| `SOCKSPROXYPORT` | SOCKS proxy port. |
+
+</details>
+
+### Installing a standalone package from an archive
+
+<Steps>
+
+1. Download the `.zip` package file and unpack it to a folder. You can also use Windows PowerShell to download and unpack the zip file:
+
+   ```powershell
+   Invoke-WebRequest `
+   "https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-windows-amd64.zip"`
+   Expand-Archive bellsoft-jdk21.0.6+10-windows-amd64.zip -DestinationPath .
+   ```
+
+   The commands above download the archive from the BELLSOFT public domain and unpack Liberica JDK to the current directory. If you are a support-plan customer, log in to the [support portal](https://bell-sw.com/support/), copy the link to the Liberica product under Technologies, and paste it into the `Invoke-WebRequest` command above.
+
+2. Add the `<Liberica JDK installation dir>/bin` subdirectory to `PATH` and `<Liberica JDK installation dir>` to `JAVA_HOME`:
+
+   1. On the desktop or in File Explorer, right-click the Computer icon (This PC) and choose **Properties**.
+   2. Click **Advanced system settings**.
+   3. Click **Environment Variables**.
+   4. Select `Path` in **System variables** and click **Edit**.
+   5. Click **New** and type the path to the `bin` subdirectory, for example `C:\LibericaJDK\JDK21.0.6\bin\`. Click **OK** when finished.
+   6. Select `JAVA_HOME` in **System variables** and click **Edit**.
+   7. Delete the variable's current value and type the path to the `<Liberica JDK installation dir>` subdirectory.
+   8. Click **OK** in the open dialog boxes to save the changes, and reopen the Command Prompt window for the changes to take effect.
+
+</Steps>
+
+<Aside type="note">
+If you do not have the `JAVA_HOME` variable, click **New** under **System variables** and type `JAVA_HOME` in **Variable name** and the path in **Variable value**.
+</Aside>
+
+To run your application, use:
+
+```powershell
+java -jar <your_application.jar>
+```
+
+### Verifying your installation
+
+Open a command-line interface, such as PowerShell or cmd, and run:
+
+```powershell
+java -version
+```
+
+You should see output similar to the following:
+
+```
+openjdk version "21.0.6" 2025-01-21 LTS
+OpenJDK Runtime Environment (build 21.0.6+10-LTS)
+OpenJDK 64-Bit Server VM (build 21.0.6+10-LTS, mixed mode, sharing)
+```
+
+### Uninstalling Liberica JDK
+
+**Windows installer.** If you installed Liberica JDK using a Windows installation file (`.msi`):
+
+<Steps>
+
+1. From the Windows **Control Panel**, open **Programs** > **Programs and Features** and select the Liberica package you want to remove.
+2. Click **Uninstall**.
+
+</Steps>
+
+**Standalone package.** To uninstall a standalone Liberica JDK package, remove its directory and the related environment variables in the **Environment Variables** dialog box.
+
+</TabItem>
+<TabItem label="macOS" icon="apple">
+
+## Installing on macOS
+
+### Installing with the package installer
+
+<Steps>
+
+1. Run the installer by double-clicking the `.dmg` file you downloaded.
+2. Double-click the **Install Liberica JDK 21.0.6+10.pkg** icon to run the installation wizard.
+3. Click **Continue** on the Welcome screen.
+4. Click **Install** to proceed with the default location.
+
+   Optionally, you can change the installation location by clicking **Change Install Location** (if available) on the **Installation Type** screen and selecting where to install Liberica JDK. If you change the location, select the destination drive and click **Continue**.
+
+5. Confirm the new software installation. File copying starts immediately.
+6. Observe the installation progress.
+7. Once installation is complete, click **Close** to quit the wizard.
+
+</Steps>
+
+### Installing a standalone package from an archive
+
+Download the `.zip` file and unpack it:
 
 ```bash
 wget https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-macos-amd64.zip
 unzip bellsoft-jdk21.0.6+10-macos-amd64.zip
 ```
 
-  </TabItem>
-  <TabItem label="Linux" icon="linux">
+The commands above download the archive from the BELLSOFT public domain and unpack Liberica JDK to the current directory. If you are a support-plan customer, log in to the [support portal](https://bell-sw.com/support/), copy the link to the Liberica product under Technologies, and paste it into the `wget` command above.
 
-Pick your distribution:
-
-<Tabs syncKey="distro">
-  <TabItem label="Debian / Ubuntu (APT)">
+Include the path to the `<Liberica installation dir>/bin` subdirectory when running your Java application:
 
 ```bash
-wget -qO - https://download.bell-sw.com/pki/GPG-KEY-bellsoft | sudo apt-key add -
-echo "deb [arch=amd64] https://apt.bell-sw.com/ stable main" | sudo tee /etc/apt/sources.list.d/bellsoft.list
-sudo apt-get update
-sudo apt-get install bellsoft-java21
+/Library/Java/JavaVirtualMachines/liberica-jdk-21.jdk/bin/java -jar <your_application.jar>
 ```
 
-  </TabItem>
-  <TabItem label="RHEL / CentOS / Fedora (YUM)">
+<Aside type="note">
+You can add the `<Liberica installation dir>/bin` subdirectory to `$PATH` and `<Liberica installation dir>` to `JAVA_HOME` for the current terminal session if necessary:
 
 ```bash
-sudo yum install bellsoft-java21
+export PATH=<Liberica installation dir>/bin:$PATH
+export JAVA_HOME=<Liberica installation dir>
 ```
 
-  </TabItem>
-  <TabItem label="Alpine (apk)">
+and run Liberica JDK as follows:
 
 ```bash
-apk add bellsoft-java21
+java -jar <your_application.jar>
 ```
+</Aside>
 
-  </TabItem>
-  <TabItem label="Other (archive)">
+### Verifying your installation
 
-```bash
-tar -zxvf bellsoft-jdk21.0.6+10-linux-amd64.tar.gz
-```
-
-  </TabItem>
-</Tabs>
-
-  </TabItem>
-</Tabs>
-
-## Verifying your installation
+Open the terminal and run:
 
 ```bash
 java -version
 ```
 
-Expected output:
+You should see output similar to the following:
 
 ```
 openjdk version "21.0.6" 2025-01-21 LTS
 OpenJDK Runtime Environment (build 21.0.6+10-LTS)
+OpenJDK 64-Bit Server VM (build 21.0.6+10-LTS, mixed mode, sharing)
 ```
 
-## Uninstalling Liberica JDK
+### Uninstalling Liberica JDK
+
+**Package installer.** To uninstall Liberica JDK using the package installer:
+
+<Steps>
+
+1. Run the installer by double-clicking the `.dmg` file you downloaded.
+2. Double-click the **Uninstall Liberica** icon.
+3. Click **Continue** on the Welcome screen.
+4. Select the Liberica installation you want to remove and click **Continue**.
+5. Provide authentication information if necessary and click **OK**. Once uninstallation completes, click **Exit** to quit the wizard.
+
+</Steps>
+
+**Command line.** To uninstall Liberica using the Terminal (assuming you installed Liberica using the default location on the boot volume `/`):
+
+- To uninstall Liberica JRE:
+
+  ```bash
+  sudo pkgutil --volume / --forget com.bell-sw.liberica.jre21
+  sudo rm -rf /Library/Java/JavaVirtualMachines/liberica-jre-21.jre
+  ```
+
+- To uninstall Liberica JDK:
+
+  ```bash
+  sudo pkgutil --volume / --forget com.bell-sw.liberica.jdk21
+  sudo rm -rf /Library/Java/JavaVirtualMachines/liberica-jdk-21.jdk
+  ```
+
+<Aside type="note">
+For Liberica JDK lite or full versions, add `-lite` or `-full` respectively to the name, such as `liberica-jdk-21-full.jdk`.
+</Aside>
+
+**Standalone package.** To uninstall a standalone Liberica JDK package, remove its directory. Related environment variables set with the `export` command are only valid for the current terminal session and are removed once you close the terminal.
+
+</TabItem>
+<TabItem label="Linux" icon="linux">
+
+## Installing on Linux
+
+On most Linux versions, you can install new software using a repository, which is a storage location hosted on remote servers from which the system retrieves and installs software and updates. If the repository is not available or due to other considerations, you can download and install new software manually.
+
+Pick your distribution:
+
+<Tabs syncKey="distro">
+<TabItem label="Debian / Ubuntu (APT)">
+
+### Installing from the APT repository
+
+<Steps>
+
+1. Add the BELLSOFT official GPG key and set up the repository. Adding the GPG key is required only once on a computer.
+
+   If you are running Ubuntu prior to version 20, use the following command:
+
+   ```bash
+   wget -q -O - https://download.bell-sw.com/pki/GPG-KEY-bellsoft | sudo apt-key add -
+   echo "deb https://apt.bell-sw.com/ stable main" | sudo tee /etc/apt/sources.list.d/bellsoft.list
+   ```
+
+   If you are running Ubuntu version 20 or later:
+
+   1. For versions prior to Debian 12 and Ubuntu 22.04, first create a directory:
+
+      ```bash
+      mkdir -m 0755 -p /etc/apt/keyrings/
+      ```
+
+   2. Add the key:
+
+      ```bash
+      wget -q -O - https://download.bell-sw.com/pki/GPG-KEY-bellsoft | gpg --dearmor | sudo tee /etc/apt/keyrings/GPG-KEY-bellsoft.gpg > /dev/null
+      echo "deb [arch=$(dpkg --print-architecture) \
+      signed-by=/etc/apt/keyrings/GPG-KEY-bellsoft.gpg] \
+      https://apt.bell-sw.com/ stable main" | sudo tee /etc/apt/sources.list.d/bellsoft.list
+      ```
+
+   <Aside type="caution">
+   If you are installing Liberica JDK in a container, make sure all necessary tools are added to your container image, such as GPG, Wget, and so on. For example, to install GPG, run `sudo apt-get install gpg`.
+   </Aside>
+
+   Liberica JDK repositories contain all Linux architectures supported in the release: amd64, i386, arm64, armhf, ppc64le.
+
+2. Update repositories and install packages. Type `Y` if a warning message about the installed packages appears.
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install bellsoft-java21
+   ```
+
+</Steps>
+
+The following packages are available:
+
+- `bellsoft-java21` contains the optimal build for most desktops/servers;
+- `bellsoft-java21-lite` includes Liberica JDK with compressed modules and Server VM, without any extra packages;
+- `bellsoft-java21-full` contains the full Liberica JDK, including Liberica FX and a variety of JVMs for platforms which support it;
+- `bellsoft-java21-runtime` includes Liberica JRE only;
+- `bellsoft-java21-runtime-full` contains the full Liberica JRE, including Liberica FX.
+
+### Manual installation (.deb)
+
+<Steps>
+
+1. Download the `.deb` package using `wget`:
+
+   ```bash
+   wget \
+   https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-linux-amd64.deb
+   ```
+
+   Or open the [downloads page](https://bell-sw.com/pages/downloads/) in the browser, scroll down, and download the required package.
+
+2. Run the `apt` tool:
+
+   ```bash
+   sudo apt install ./bellsoft-jdk21.0.6+10-linux-amd64.deb
+   ```
+
+</Steps>
+
+To use Liberica JDK, run `java -jar <your_application.jar>`.
+
+</TabItem>
+<TabItem label="RHEL / Fedora (YUM)">
+
+### Installing from the YUM repository
+
+<Steps>
+
+1. Set up the repository:
+
+   ```bash
+   echo | sudo tee /etc/yum.repos.d/bellsoft.repo > /dev/null << EOF
+   [BELLSOFT]
+   name=BELLSOFT Repository
+   baseurl=https://yum.bell-sw.com
+   enabled=1
+   gpgcheck=1
+   gpgkey=https://download.bell-sw.com/pki/GPG-KEY-bellsoft
+   priority=1
+   EOF
+   ```
+
+   Liberica JDK repositories contain all Linux architectures supported in the release.
+
+2. Install packages:
+
+   ```bash
+   sudo yum install bellsoft-java21
+   ```
+
+</Steps>
+
+The following packages are available:
+
+- `bellsoft-java21` contains the optimal build for most desktops/servers;
+- `bellsoft-java21-lite` includes Liberica JDK with compressed modules and Server VM, without any extra packages;
+- `bellsoft-java21-full` contains the full Liberica JDK, including Liberica FX and a variety of JVMs for platforms which support it;
+- `bellsoft-java21-runtime` includes Liberica JRE only;
+- `bellsoft-java21-runtime-full` contains the full Liberica JRE, including Liberica FX.
+
+### Manual installation (.rpm)
+
+To install Liberica JDK, download the `.rpm` package and run the `rpm` tool:
+
+```bash
+wget https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-linux-amd64.rpm
+sudo yum install ./bellsoft-jdk21.0.6+10-linux-amd64.rpm
+```
+
+To use Liberica JDK, run `java -jar <your_application.jar>`.
+
+<details>
+<summary>Manual RPM installation with GPG key</summary>
+
+<Steps>
+
+1. Obtain the BELLSOFT official GPG key and import it (required only once on a computer):
+
+   ```bash
+   wget https://download.bell-sw.com/pki/GPG-KEY-bellsoft
+   sudo rpm --import ./GPG-KEY-bellsoft
+   ```
+
+2. Download a package using `wget` and install it:
+
+   ```bash
+   wget \
+   https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-linux-amd64.rpm
+   sudo rpm --install bellsoft-jdk21.0.6+10-linux-amd64.rpm
+   ```
+
+</Steps>
+
+</details>
+
+</TabItem>
+<TabItem label="SUSE (Zypper)">
+
+### Installing from the YaST/Zypper repository
+
+<Steps>
+
+1. Set up the repository:
+
+   ```bash
+   echo | sudo tee /etc/zypp/repos.d/repo-bellsoft.repo > /dev/null << EOF
+   [BELLSOFT]
+   name=BELLSOFT Repository
+   baseurl=https://yum.bell-sw.com
+   enabled=1
+   gpgcheck=1
+   gpgkey=https://download.bell-sw.com/pki/GPG-KEY-bellsoft
+   priority=1
+   EOF
+   ```
+
+2. Update repositories and install packages:
+
+   ```bash
+   sudo zypper up
+   sudo zypper in bellsoft-java21
+   ```
+
+</Steps>
+
+The following packages are available:
+
+- `bellsoft-java21` contains the optimal build for most desktops/servers;
+- `bellsoft-java21-lite` includes Liberica JDK with compressed modules and Server VM, without any extra packages;
+- `bellsoft-java21-full` contains the full Liberica JDK, including Liberica FX and a variety of JVMs for platforms which support it;
+- `bellsoft-java21-runtime` includes Liberica JRE only;
+- `bellsoft-java21-runtime-full` contains the full Liberica JRE, including Liberica FX.
+
+</TabItem>
+<TabItem label="Alpine (apk)">
+
+### Installing from the Alpine Linux repository
+
+<Steps>
+
+1. Set up the repository:
+
+   ```bash
+   echo "https://apk.bell-sw.com/main" | sudo tee -a /etc/apk/repositories
+   sudo wget -P /etc/apk/keys/ \
+   https://apk.bell-sw.com/info@bell-sw.com-5fea454e.rsa.pub
+   ```
+
+   <Aside type="note">
+   The `sudo` command may require entering the administrator password.
+   </Aside>
+
+2. Install packages:
+
+   ```bash
+   apk add bellsoft-java21
+   ```
+
+</Steps>
+
+The following packages are available:
+
+- `bellsoft-java21` contains the optimal build for most desktops/servers;
+- `bellsoft-java21-lite` includes Liberica JDK with compressed modules and Server VM, without any extra packages;
+- `bellsoft-java21-runtime` includes Liberica JRE only.
+
+### Manual installation (.apk)
+
+<Steps>
+
+1. Download the `.apk` package:
+
+   ```bash
+   wget https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-linux-x64-musl.apk
+   ```
+
+   Or open the [downloads page](https://bell-sw.com/pages/downloads/) in the browser, scroll down, and download the required package.
+
+2. Install the BELLSOFT official key:
+
+   ```bash
+   sudo wget -P /etc/apk/keys/ \
+   https://apk.bell-sw.com/info@bell-sw.com-5fea454e.rsa.pub
+   ```
+
+3. Install the package:
+
+   ```bash
+   sudo apk add bellsoft-jdk21.0.6+10-linux-x64-musl.apk
+   ```
+
+</Steps>
+
+</TabItem>
+<TabItem label="Other (archive)">
+
+### Installing a standalone JDK package from an archive
+
+Download the `.tar.gz` package and unpack it:
+
+```bash
+wget \
+https://download.bell-sw.com/java/21.0.6+10/bellsoft-jdk21.0.6+10-linux-amd64.tar.gz
+tar -zxf bellsoft-jdk21.0.6+10-linux-amd64.tar.gz
+```
+
+The commands above unpack Liberica JDK to the current directory. To run your Java application, use:
+
+```bash
+<Liberica installation dir>/bin/java -jar <your_application.jar>
+```
+
+You can add the `<Liberica installation dir>/bin` subdirectory to `$PATH` and `<Liberica installation dir>` to `JAVA_HOME` for the current terminal session if necessary:
+
+```bash
+export PATH=<Liberica installation dir>/bin:$PATH
+export JAVA_HOME=<Liberica installation dir>
+```
+
+After that, run your Java application:
+
+```bash
+java -jar <your_application.jar>
+```
+
+</TabItem>
+</Tabs>
+
+### Verifying your installation
+
+Open a command-line interface and run:
+
+```bash
+java -version
+```
+
+You should see output similar to the following:
+
+```
+openjdk version "21.0.6" 2025-01-21 LTS
+OpenJDK Runtime Environment (build 21.0.6+10-LTS)
+OpenJDK 64-Bit Server VM (build 21.0.6+10-LTS, mixed mode, sharing)
+```
+
+### Uninstalling Liberica JDK
+
+| Distribution | Command |
+| --- | --- |
+| Alpine Linux | `sudo apk del <bellsoft-package-name>` |
+| Ubuntu / DEB-based | `sudo apt remove <bellsoft-package-name>` |
+| Red Hat / RPM-based | `sudo yum remove <bellsoft-package-name>` |
+
+To uninstall a standalone Liberica JDK package, remove its directory. Related environment variables are only valid for the current terminal session and are removed once you close the terminal.
+
+</TabItem>
+</Tabs>
+
+## Verifying downloaded files
+
+It is a good practice to verify the downloaded installation file by comparing its size on your drive to the size on the [Downloads](https://bell-sw.com/pages/downloads/) page.
+
+A more advanced approach is to obtain the checksum of the downloaded file in a command-line interface and compare it to the one next to the Liberica JDK link on the [Downloads](https://bell-sw.com/pages/downloads/) page. Check the OS-specific commands below.
 
 <Tabs syncKey="os">
-  <TabItem label="Windows" icon="seti:windows">Control Panel → Programs and Features → Liberica JDK → Uninstall.</TabItem>
-  <TabItem label="macOS" icon="apple">Mount the `.dmg` and run the Uninstall icon.</TabItem>
-  <TabItem label="Linux" icon="linux">`sudo apt-get remove bellsoft-java21` or `sudo yum remove bellsoft-java21`.</TabItem>
+<TabItem label="Windows" icon="seti:windows">
+
+To get the checksum of the downloaded file, run the following command in Windows PowerShell. To run PowerShell, open the **Start** menu or press Windows key + R, type `powershell` in the **Run** dialog box, and click **OK**.
+
+```powershell
+(Get-FileHash .\bellsoft-jdk21.0.6+10-windows-amd64.msi -Algorithm SHA1).Hash
+```
+
+</TabItem>
+<TabItem label="macOS" icon="apple">
+
+```bash
+shasum -a 1 bellsoft-jdk21.0.6+10-macos-amd64.dmg
+```
+
+</TabItem>
+<TabItem label="Linux" icon="linux">
+
+The installation file extension depends on the Linux version.
+
+```bash
+shasum -a 1 bellsoft-jdk21.0.6+10-linux-amd64.apk
+```
+
+</TabItem>
 </Tabs>
 
 ## Troubleshooting
 
-If `java -version` reports the wrong version, ensure `JAVA_HOME` points to the
-Liberica JDK 21 directory and that its `bin` is first on your `PATH`.
+This section provides instructions to resolve some of the most common installation issues.
+
+### Checking system requirements
+
+The JDK code can run on a number of platforms, using different compilers and build tools. We recommend checking your system compatibility on the [Supported System Configurations](https://bell-sw.com/pages/supported-configurations/) page before installing the Liberica product.
+
+Issues below are grouped by platform — the tab matches the OS you selected above.
+
+<Tabs syncKey="os">
+  <TabItem label="Windows" icon="seti:windows">
+
+#### Microsoft Defender SmartScreen warnings
+
+To ensure the security of the user's computer, Microsoft Defender SmartScreen sometimes prevents running downloaded files and triggers warnings while installing software. If SmartScreen prevents installing the Liberica product, follow these steps:
+
+<Steps>
+
+1. Verify the downloaded Liberica installation file as described in [Verifying downloaded files](#verifying-downloaded-files).
+2. Ensure that the installation file is signed by BELLSOFT by checking the details of the **Digital Signatures** in the Liberica installation file **Properties**.
+3. Depending on the verification results:
+   - If the size and checksum of the downloaded file match those on the [Downloads](https://bell-sw.com/pages/downloads/) page and the file is signed by BELLSOFT, click **More info** on the Microsoft Defender SmartScreen window and then click **Run anyway**.
+   - If any of the verified information is not correct, delete the file and download the Liberica installation file again.
+
+</Steps>
+
+#### Browser warnings
+
+If your browser prevents saving the downloaded Liberica installation file, click the **Downloads** icon and either click **Keep** or click **More actions** next to the downloaded file and, depending on the browser, select **Keep** or **Download** to save the file.
+
+#### Silent installation on Windows
+
+If after running a silent installation the software is not installed, check your log file for error messages. If the issue is the lack of administrator rights of the account running the installation, the log should contain a message similar to the following:
+
+```
+Error 1925. You do not have sufficient privileges to complete this installation for all users of the machine. Log on as administrator and then retry this installation.
+```
+
+Make sure you use an administrator account for running silent installation.
+
+#### Reverting to a previous Liberica product version on Windows
+
+<Aside type="caution">
+We do not recommend installing previous versions of Liberica products, because they may contain security issues resolved in the latest release.
+</Aside>
+
+If you have the latest version of a Liberica product installed and need to install a previous version of exactly the same product, first uninstall the current version and then install the version you need.
+
+  </TabItem>
+  <TabItem label="macOS" icon="apple">
+
+#### Browser warnings
+
+If your browser prevents saving the downloaded Liberica installation file, click the **Downloads** icon and either click **Keep** or click **More actions** next to the downloaded file and, depending on the browser, select **Keep** or **Download** to save the file.
+
+#### Gatekeeper and quarantine
+
+If macOS blocks the package because it was downloaded from the internet, first [verify the file](#verifying-downloaded-files) and confirm it is signed by BELLSOFT, then allow it from **System Settings → Privacy & Security**.
+
+  </TabItem>
+  <TabItem label="Linux" icon="linux">
+
+#### Browser warnings
+
+If your browser prevents saving the downloaded Liberica installation file, click the **Downloads** icon and either click **Keep** or click **More actions** next to the downloaded file and, depending on the browser, select **Keep** or **Download** to save the file.
+
+#### Unreachable Linux repositories due to an outdated certificate
+
+If you install Liberica JDK from a repository and encounter an error similar to the following:
+
+```
+Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification.
+```
+
+Make sure your Linux distribution contains the current root and intermediate ca-certificates. You can verify this by running:
+
+```bash
+openssl s_client -connect download.bell-sw.com:443 -showcerts </dev/null 2>/dev/null
+```
+
+If updating the system CA bundle (`ca-certificates`) is not possible, you can manually install the missing certificates. For example, if your system is missing the current Sectigo certificate:
+
+<Steps>
+
+1. Download the certificates:
+
+   ```bash
+   mkdir -p /tmp/sectigo-certs && cd /tmp/sectigo-certs
+   wget --no-check-certificate https://sectigo.tbs-certificats.com/SectigoPublicServerAuthenticationCAOVR36.crt
+   wget --no-check-certificate https://sectigo.tbs-certificats.com/SectigoPublicServerAuthenticationRootR46.crt
+   ```
+
+2. Verify that the downloaded certificates are correct:
+
+   ```bash
+   openssl x509 -in SectigoPublicServerAuthenticationCAOVR36.crt -noout -subject
+
+   subject=C = GB, O = Sectigo Limited, CN = Sectigo Public Server Authentication CA OV R36
+   openssl x509 -in SectigoPublicServerAuthenticationRootR46.crt -noout -subject
+
+   subject=C = GB, O = Sectigo Limited, CN = Sectigo Public Server Authentication Root R46
+   ```
+
+3. Install the new certificates into the operating system trust store:
+
+   ```bash
+   cp -v *.crt /usr/local/share/ca-certificates/
+   update-ca-certificates
+   ```
+
+   Expected output:
+
+   ```
+   <...>
+   2 added, 0 removed; done.
+   <...>
+   ```
+
+4. Verify that the Sectigo root and intermediate certificates are now available and that the web server's certificate chain validates successfully:
+
+   ```bash
+   openssl s_client -connect download.bell-sw.com:443 </dev/null 2>/dev/null | grep "Verify return code"
+
+   Verify return code: 0 (ok)
+   ```
+
+</Steps>
+
+  </TabItem>
+</Tabs>

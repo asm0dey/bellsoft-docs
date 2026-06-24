@@ -1,4 +1,4 @@
-import ContainerTagPicker from '../components/ContainerTagPicker.astro';
+import TagPicker from '../components/TagPicker.astro';
 
 Tags follow the pattern:
 
@@ -9,7 +9,7 @@ Tags follow the pattern:
 Use the picker to build a valid tag for your needs — it checks your choice
 against the tags actually published on Docker Hub:
 
-<ContainerTagPicker />
+<TagPicker />
 
 Images come in **musl** or **glibc** variants, with optional **CRaC** and
 **Class Data Sharing (CDS)** builds.
@@ -20,3 +20,5 @@ Images come in **musl** or **glibc** variants, with optional **CRaC** and
 | `jdk-17-glibc` | JDK Lite 17, glibc |
 | `jre-21-crac-slim-glibc` | Slim JRE 21 with CRaC, glibc |
 | `jre-11-slim-musl` | Slim JRE 11, musl |
+
+For near-zero-CVE nonroot and distroless builds, see [Hardened Images](../hardened/).

@@ -1,0 +1,278 @@
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+To develop Java applications in your development environment or IDE, you need a Java SDK (JDK). A JDK is a software package that contains libraries, tools for developing and testing Java applications (development tools), and tools for running applications on the Java platform (Java Runtime Environment, JRE).
+
+[Liberica JDK](https://bell-sw.com/libericajdk/) is a secure and reliable tool for application development that is compatible with the broadest range of system configurations on the market. You can use Liberica JDK in your IDE to create Java applications.
+
+In this document, you will learn how to use Liberica JDK in your IDE. For the general installation instructions, see the [Liberica JDK Installation Guide](../../install-guide/).
+
+### Which Liberica to choose
+
+It depends on your needs which Liberica JDK version to choose for your project.
+
+- If you develop from scratch, we recommend using the latest Liberica JDK LTS builds, which are guaranteed to have prompt bug fixes, security updates, and other improvements as needed. We keep supporting LTS Liberica JDK builds even after the corresponding versions of OpenJDK are no longer supported. For more information, see [Support Roadmap for Liberica JDK](https://bell-sw.com/support/).
+- If you run older software, stick to the version it was developed for. In case your app is based on a version that is no longer supported, download the safest build of this version and get ready to upgrade your app, because your data is no longer safe.
+- If you plan to use the latest language features, use the latest versions and builds of Liberica JDK. We release new builds concurrently with Oracle JDK. In addition, we put out security patches and customer fixes on a regular basis.
+
+### Liberica JDK and JFX
+
+JFX is an open-source platform containing graphics and media tools for developing and deploying rich client applications. We deliver a special flavor of Liberica JDK (Full version) containing LibericaFX — our instance of OpenJFX. [Liberica for Embedded](https://bell-sw.com/libericajdk-for-embedded/) also comes with LibericaFX, enabling the developers to create GUIs for embedded systems.
+
+If you plan to create desktop, web, mobile, or embedded systems applications with JFX, consider the following:
+
+- If you develop your JavaFX applications using a build system, such as Maven, download the Standard version of Liberica JDK. Specify the modules and the versions you want in the `pom.xml` file, and the build system will download the required modules, including the native libraries for your platform.
+- If you want to use the JFX SDK to develop your applications, download and install the Full version of Liberica JDK that contains LibericaFX.
+
+## Configuring Liberica JDK in your IDE
+
+<Tabs syncKey="ide">
+
+<TabItem label="IntelliJ IDEA">
+
+IntelliJ IDEA supports a wide range of Java versions for developing applications. See [Supported Java versions and features](https://www.jetbrains.com/help/idea/2023.2/supported-java-versions.html) for details.
+
+### Specifying Liberica JDK as the SDK for all new projects
+
+You can set up IntelliJ IDEA to use Liberica JDK for all new projects.
+
+<Steps>
+
+1. Start IntelliJ IDEA and click **File** > **New Project Setup** > **Structure**.
+
+2. Select **Project** under **Project Settings** in the left pane.
+
+   The right pane now contains project options including the selected SDK for all new projects.
+
+3. Click the **SDK** list and select the required Liberica JDK version.
+
+   - If Liberica JDK is installed on your computer, but not defined in the IDE, either select it from the detected SDKs, or click **Add SDK** > **JDK**, and specify the path to the JDK home directory, for example, `C:\Program Files\BellSoft\LibericaJDK-21`.
+   - If Liberica JDK is not installed, you can download and install it right in the **New Project** window as follows:
+     1. Click the **JDK** list and select **Add SDK** > **Download JDK**.
+     2. In the **Download JDK** dialog box, specify a version and vendor, and change the installation path if necessary.
+     3. Click **Download**.
+
+</Steps>
+
+### Specifying Liberica JDK for a new project
+
+If you have not specified Liberica JDK as an SDK for all new projects, you can select Liberica JDK in your new Java project while creating it in the IDE.
+
+<Steps>
+
+1. Start IntelliJ IDEA and click **File** > **New** > **Project**.
+
+2. On the **New Project** screen, specify the name of your project and language (Java), and select Liberica JDK in the **JDK** list. The list contains the default JDK as well as detected JDKs installed on your computer.
+
+   - If Liberica JDK is already defined in IntelliJ IDEA, select it from the SDK list.
+   - If Liberica JDK is installed on your computer, but not defined in the IDE, either select it from the detected SDKs, or click **Add SDK** > **JDK**, and specify the path to the JDK home directory, for example, `C:\Program Files\BellSoft\LibericaJDK-21`.
+   - If Liberica JDK is not installed, you can download and install it using the **Add SDK** > **Download JDK** option.
+
+</Steps>
+
+### Specifying Liberica JDK for an existing project
+
+Follow the next steps to use Liberica JDK in your existing Java project.
+
+<Steps>
+
+1. Start IntelliJ IDEA and open your Java project.
+
+2. Select the project and click **File** > **Project Structure**.
+
+3. Select **Project** under **Project Settings** in the left pane.
+
+   The right pane now contains your project options including the selected SDK.
+
+4. Click the SDK list and select the required Liberica JDK version.
+
+   If Liberica JDK is not installed, you can download and install it using the **Add SDK** > **Download JDK** option.
+
+</Steps>
+
+</TabItem>
+
+<TabItem label="VS Code" icon="seti:vscode">
+
+### Prerequisites
+
+We assume that you have set up Visual Studio Code (VSCode) to edit, run, and debug Java programs. For more information, see [Java in Visual Studio Code](https://code.visualstudio.com/docs/languages/java).
+
+To run Java within Visual Studio Code, you need to install a JDK. For the installation instructions, see the [Liberica JDK Installation Guide](../../install-guide/).
+
+<Aside type="note">
+If you are working on Windows or macOS and you have installed the Coding Pack for Java, it already includes the Java Development Kit (JDK) and essential Java extensions.
+</Aside>
+
+### Specifying Liberica JDK as the SDK for a project
+
+VSCode uses the default JDK installed on your computer as an SDK for Java projects. Therefore, all you need to do to use Liberica JDK as an SDK in VSCode is install it and check the default JDK in the command-line prompt as follows:
+
+```
+java -version
+openjdk version "21.0.1" 2023-10-17 LTS
+OpenJDK Runtime Environment (build 21.0.1+12-LTS)
+OpenJDK 64-Bit Server VM (build 21.0.1+12-LTS, mixed mode, sharing)
+```
+
+To see which JDKs are used for your projects, you can trigger the command `Java: Configure Java Runtime` in the Command Palette (Ctrl+Shift+P). This command opens a view displaying the runtime information for your projects.
+
+Click the Java Version list to see which JDKs are installed on your system and can be used for your project.
+
+If you have several JDKs installed on your computer and want to use Liberica JDK as an SDK in VSCode, perform the following:
+
+<Steps>
+
+1. Download and install the required version of Liberica JDK. See the [Liberica JDK Installation Guide](../../install-guide/) for details.
+
+2. Open the `settings.json` file in VSCode.
+
+3. Add the `java.configuration.runtimes` setting specifying the required Liberica JDK version and correct paths.
+
+   ```json
+   {
+       "java.project.sourcePaths": ["src"],
+       "java.project.outputPath": "bin",
+       "java.project.referencedLibraries": [
+           "lib/**/*.jar"
+       ],
+       "java.configuration.runtimes": [
+           {
+               "name": "JavaSE-21",
+               "path": "C:\\Program Files\\BellSoft\\LibericaJDK-21",
+               "sources" : "C:\\Program Files\\BellSoft\\LibericaJDK-21\\libsrc.zip",
+               "javadoc" : "https://docs.oracle.com/en/java/javase/21/docs/api/",
+               "default":  true
+              }
+       ]
+   }
+   ```
+
+</Steps>
+
+<Aside type="note">
+You can set Liberica JDK to default by adding `"default": true` to the entry. The default JDK will be used for your unmanaged folders.
+</Aside>
+
+For more information, see [Managing Java Projects in VS Code](https://code.visualstudio.com/docs/java/java-project#_configure-runtime-for-projects).
+
+</TabItem>
+
+<TabItem label="Apache NetBeans">
+
+Apache NetBeans is a development environment that provides editors, wizards, and templates to help you create applications in Java, PHP, and many other languages.
+
+### Specifying Liberica JDK as default JDK
+
+When you install NetBeans, you are required to specify a JDK for the IDE during the installation process. This version of JDK is the default JDK used for all new Java projects.
+
+If you are installing NetBeans for the first time and want to use Liberica JDK for all of your Java projects, first [install Liberica JDK on your computer](../../install-guide/) and then choose Liberica JDK as the JDK for NetBeans IDE during the installation.
+
+### Specifying Liberica JDK for a project
+
+If you want to use Liberica JDK in your project in NetBeans IDE that was installed with another default JDK, perform the following:
+
+<Steps>
+
+1. Download and install the required version of Liberica JDK. See the [Liberica JDK Installation Guide](../../install-guide/) for details.
+
+2. Start NetBeans.
+
+3. Right-click your project in NetBeans and select **Properties** on the shortcut menu.
+
+4. Select **Libraries** in the **Categories** pane.
+
+5. Click **Manage Platforms**. The **Java Platform Manager** appears.
+
+6. Click **Add Platform**.
+
+7. Select **Java Standard Edition** on the **Select platform type** step and click **Next**.
+
+8. On the **Choose Platform Folder** step, select a folder to look in and then select the Liberica JDK installation folder. Click **Next**.
+
+9. The wizard detects the platform name, path to sources, and adds a link to the platform's Javadoc. If the required information is not detected, enter it manually. Click **Finish** to exit the wizard.
+
+   The added Liberica JDK version should be listed under **Platforms** in the Java Platform Manager. Close the manager.
+
+10. Now you can select the JDK for the project in the **Java Platform** list on the **Project Properties** window.
+
+</Steps>
+
+</TabItem>
+
+<TabItem label="Eclipse">
+
+The Eclipse IDE is famous for its Java Integrated Development Environment (IDE), but also includes a number of other tools including C/C++ IDE, JavaScript/TypeScript IDE, PHP IDE, and more.
+
+### Specifying Liberica JDK during Eclipse installation
+
+When you install Eclipse, you are asked to specify a JVM to use with the IDE. The latest Eclipse versions require Java version 17 or later.
+
+If you are installing Eclipse for the first time and want to use Liberica JDK as a default JRE for all of your Java projects, first [install Liberica JDK on your computer](../../install-guide/) and then choose Liberica JDK as the JDK for Eclipse IDE during the installation.
+
+### Specifying Liberica JDK as default JRE for new projects
+
+You can set up Eclipse IDE to use Liberica JDK for all new projects by selecting it in the preferences.
+
+<Steps>
+
+1. Start Eclipse IDE.
+
+2. Go to **Window** > **Preferences**.
+
+3. Select **Java** > **Installed JREs** in the navigation pane on the left.
+
+4. Select a Liberica JDK version under **Installed JREs** to make it a default JRE for new projects. Click **Apply and Close** for the changes to take effect.
+
+</Steps>
+
+If the installed Liberica JDK is not listed, click **Add** and follow the steps of the Wizard to create a new JRE definition in the IDE. Once it is added to the **Installed JREs** list, select it to make it a default JRE for new projects.
+
+For more information, see _Installed JREs Preferences_ in Eclipse Help.
+
+### Selecting Liberica JDK when creating a project
+
+<Steps>
+
+1. Download and install the required version of Liberica JDK. See the [Liberica JDK Installation Guide](../../install-guide/) for details.
+
+2. Start Eclipse IDE.
+
+3. Select **File** > **New** > **Java Project**. You are prompted to specify a JRE to use with the project.
+
+   - If Liberica JDK is selected as an execution environment JRE in Eclipse IDE, select **Use an execution environment JRE**.
+   - If you specified another JDK as the execution environment JRE for Eclipse, select **Use a project-specific JRE** and select the Liberica JDK version you want to use. The new project will use a compiler compliance which matches the version of the selected JRE.
+   - If Liberica JDK is selected as the default JRE in Eclipse IDE, select **Use default JRE**. The **New Java Project** Wizard creates a new Java project which uses the workspace default JRE. Click **Configure JREs** to add, remove, or edit JRE definitions.
+
+</Steps>
+
+For more information, see _New Java Project Wizard_ in Eclipse Help.
+
+### Specifying Liberica JDK for an existing project
+
+If you want to use Liberica JDK in your existing project in Eclipse IDE, perform the following:
+
+<Steps>
+
+1. Download and install the required version of Liberica JDK. See the [Liberica JDK Installation Guide](../../install-guide/) for details.
+
+2. Start Eclipse IDE.
+
+3. Right-click your project in Eclipse and select **Properties** on the shortcut menu. The Properties window for your project appears.
+
+4. Select **Java Build Path** in the left pane and select the **Libraries** tab in the right pane.
+
+5. Select the current JRE under **Modulepath** in the tree and click **Edit**.
+
+6. In the **Edit Library** window, select the Liberica JDK version you want to use and click **Finish**.
+
+7. Click **Apply and Close** in the properties window for your project.
+
+</Steps>
+
+For more information, see _Working with JREs_ in Eclipse Help.
+
+</TabItem>
+
+</Tabs>

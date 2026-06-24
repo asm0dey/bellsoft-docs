@@ -1,0 +1,39 @@
+import TagPicker from '../components/TagPicker.astro';
+
+`bellsoft/hardened-liberica-native-image-kit-container` provides near-zero-CVE
+**nonroot** and **distroless** variants (see [BellSoft Hardened Images](/bellsoft-docs/alpaquita/hardened/overview/#hardened-image-types)).
+Tag pattern:
+
+```text
+jdk-<java_version>-nik-<nik_version>[-nonroot|-distroless]-<libc>
+```
+
+<TagPicker mode="hardened" repos="hardened-liberica-native-image-kit-container" />
+
+Tag examples:
+
+- `jdk-17-nik-23-musl` — standard hardened image, NIK 23 on JDK 17, musl
+- `jdk-25-nik-25-distroless-glibc` — distroless hardened image, NIK 25, glibc
+
+Multi-stage build — compile a native binary with NIK, run it in a distroless base:
+
+```dockerfile
+FROM bellsoft/hardened-liberica-native-image-kit-container:jdk-25-nik-25-nonroot-musl AS builder
+
+COPY <<'EOF' HelloBellsoft.java
+public class HelloBellsoft {
+    public static void main(String[] args) {
+        System.out.println("Hello BellSoft!");
+    }
+}
+EOF
+
+RUN javac HelloBellsoft.java
+RUN native-image --no-fallback -o hello-bellsoft HelloBellsoft
+
+FROM bellsoft/hardened-base:distroless-musl
+
+COPY --from=builder /home/appuser/hello-bellsoft .
+
+ENTRYPOINT [ "/home/appuser/hello-bellsoft" ]
+```

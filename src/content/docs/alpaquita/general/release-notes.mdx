@@ -1,0 +1,81 @@
+---
+title: "Alpaquita Linux: Release Notes"
+slug: alpaquita/general/release-notes
+description: Late-breaking information about the BellSoft Alpaquita Linux stream release, including kernel version, supported architectures, new features, and package updates.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+The release notes give you late-breaking information about BellSoft Alpaquita Linux stream release. Please read this document carefully, as it contains information that is not included in other BellSoft Alpaquita documents.
+
+### Kernel version
+
+Alpaquita Linux ships 6.1.112 kernel version that is the LTS version with the longest period of support. This kernel version will continue to be updated to include all required security and major functional fixes. Note that our release supports smooth kernel updates when the previous kernel version is not deleted right away and can be used for boot or in the rollback.
+
+### Architecture
+
+This release supports the following processors for all deliverables - iso, minirootfs, package repositories, and docker images.
+
+| Processor       | Baseline    |
+| --------------- | ----------- |
+| Intel           | x86-64-v2   |
+| AMD 64-bit      | x86-64-v2   |
+| AArch64 (ARM64) | —           |
+
+Modern CPUs can provide optimal extensions for better performance in the core system libraries. x86-64-v2 provides proper support for new CPU features (CMPXCHG16B, LAHF-SAHF, POPCNT, SSE3, SSE4_1, SSE4_2, SSSE3), vector instructions up to Streaming SIMD Extensions 4.2 (SSE4.2), Supplemental Streaming SIMD Extensions 3 (SSSE3), the POPCNT instruction (useful for data analysis and bit-fiddling in some data structures), and CMPXCHG16B (a two-word compare-and-swap instruction useful for concurrent algorithms).
+
+## New Features and Changes
+
+This section lists the features that are introduced in Alpaquita Linux stream release.
+
+New kernel build with configuration optimized for smaller size, better security and performance.
+
+- Better latencies and responsiveness
+- Compressed modules to save disc space
+- Dropped some old modules that have improper support or have known CVE defects
+
+New package updates include the following features.
+
+- `alpaquita-installer` - Cross-libc installer for Alpaquita Linux that supports non-interactive installation process. See the [Alpaquita Linux Installation Guide](/bellsoft-docs/alpaquita/general/install-guide/) for details.
+- `musl-perf` - BellSoft version with performance improvements.
+  - `glibc-string` - this new package can be used to enable optimized string operations for a particular application or used in a build to link to it; synced with glibc 2.37 upstream.
+- `apk-tools` - Improved version of the well-known APK tools with the support for
+  - gradual downgrade in `apk add` command
+  - support for alternative packages and cleaner db handling
+  - sorted `apk search` output
+- `malloc` - BellSoft versions with different malloc implementations: jemalloc, mimalloc, and rpmalloc.
+- liberica product family - JRE and JDK packages for the latest 8, 11, 17, and 21 versions; NIK version 23 and 24.
+- `openrc` - Set up quiet mode and agetty.tty1 service to speed up booting.
+
+### Noticeable package updates
+
+| Package           | Version  |
+| ----------------- | -------- |
+| GCC               | [14.2.0](https://gcc.gnu.org/) |
+| Go                | [1.23.2](https://go.dev/) |
+| LLVM              | [18](https://releases.llvm.org/) |
+| MariaDB           | [11.4.3](https://mariadb.org/download/) |
+| Node.js (current) | [20.15.1](https://nodejs.org/en) |
+| Perl              | [5.40.0](https://www.perl.org/get.html) |
+| Redis             | [7.2.5](https://redis.io/resources/clients/) |
+| Ruby              | [3.3.3](https://www.ruby-lang.org/) |
+| Rust              | [1.81.0](https://github.com/rust-lang/rust/blob/stable/RELEASES.md) |
+| Python            | [3.12.7](https://www.python.org/downloads/) |
+| PHP               | [8.3.12](https://www.php.net/releases/) |
+| PostgreSQL        | [16.3](https://www.postgresql.org/download/) |
+
+## Known Issues
+
+No known issues are reported for this first release.
+
+Report issues to [support@bell-sw.com](mailto:support@bell-sw.com).
+
+## Security Bug Fixes
+
+This release includes a number of bug and security fixes.
+
+## Installation Process
+
+Alpaquita installation procedures are described in the [Alpaquita Linux Installation Guide](/bellsoft-docs/alpaquita/general/install-guide/). Typical process for installing from the ISO image requires access to a command line interpreter and contains several steps.

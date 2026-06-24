@@ -1,0 +1,284 @@
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+JDK Flight Recorder, also Java Flight Recorder (JFR), is a powerful feature of Hotspot JVM. JFR takes its origin from [JRockit JVM](https://en.wikipedia.org/wiki/JRockit); later, it was ported to Hotspot JVM and introduced in Oracle Java 7. At the time of Java 9, JFR was fully open source, and now it is an integral part of OpenJDK. This document will highlight key features of Java Flight Recorder and how it can be useful for Java developers.
+
+## What is Java Flight Recorder?
+
+Java Flight Recorder is a performance/diagnostic tool that can be a huge time saver for Java engineers while troubleshooting applications at runtime. As the name suggests, Java Flight Recorder collects various kinds of events from JVM runtime and records them in the form of binary log files (further referred to as recordings). In Liberica JDK 11, JFR is capable of tracing a few hundred types of events, creating a comprehensive JVM runtime picture. Recordings produced by JFR are self-contained files that can be further analyzed in Mission Control.
+
+JDK Flight Recorder is integrated into Liberica JDK 8 and later. The Liberica JDK binaries are available in the [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/#jdk-17-lts).
+
+## What is Mission Control?
+
+Mission Control is essentially a graphical front end working with JFR recordings (binary log files) produced by Java Flight Recorder. Mission Control is also open-source. You can get Mission Control binaries in the [Mission Control Download Center](https://bell-sw.com/liberica-mission-control/#downloads).
+
+JFR recordings are straightforward, each one is a plain collection of events. For them to make sense, this data needs to be post-processed. Mission Control offers several built-in reports outlining various aspects of JVM runtime (e.g., code execution, object allocation, garbage collection, and more). Besides general reports, Mission Control has a number of rule-based heuristics for detecting typical problems of Java applications. Finally, you can use a generic event browser and customizable filters to configure reports tailored for your task.
+
+## How JFR + MC differ from other profiling tools
+
+To a certain extent, features of JFR + Mission Control compete with those of profilers, but comparing them to traditional profilers is not very fair.
+
+JFR is a tool of its own kind. It is a feature of JDK, so other Java profilers besides Mission Control can benefit from JFR capabilities, too.
+
+For certain profiling tasks (e.g., identifying code hot spots or object allocation profiling), JFR + Mission Control is similar to a typical Java profiler (Visual VM, JProfiler, YourKit profiler). These are good open-source Java profilers that you can use to avoid paying for commercial tools.
+
+Some features essential for profilers are not covered by JFR. For instance, if you want to trace SQL statements sent to the database, JFR is not your tool.
+
+You can send application-specific events to JFR. This is a compelling way to collect telemetry peculiar to your application, though it requires upfront work to place event generation in application logic.
+
+Finally, some kinds of JVM telemetry are available only via JFR.
+
+## How to start using Java Flight Recorder
+
+JFR is an integral part of OpenJDK now. You do not need to download anything besides JDK or configure JVM in any special way to start using it.
+
+JFR workflow is as follows:
+
+- Start a flight recording session with a particular configuration.
+
+- Once the session is active for some time, dump recording to a file.
+
+- Stop the session after the dump (this step is optional, you can leave it active if you plan to record more information later).
+
+There are three ways to start a flight recording session:
+
+- Using the jcmd CLI tool included in JDK, start/stop/dump JFR sessions. You need access to the command-line on the server running your Java application to use jcmd.
+
+- Using Mission Control application, you can do the same for both locally running and remote processes (you need a configured JMX to connect to JVM remotely).
+
+- It is also possible to activate a JFR session on the application startup via JVM command-line options (this is very useful if you want to profile applications during startup).
+
+Starting a flight recording session also requires a configuration (called a profile). The profile defines what kind of events will be collected during the session. It also determines per probe configuration (frequency for method sampling, duration threshold for I/O events, etc.).
+
+There are two built-in profiles, "default" and "profiling." You can also configure and use custom profiles via Mission Control UI.
+
+Once you have a JFR recording file, you need Mission Control to open it.
+
+## A brief overview of Mission Control reports
+
+Mission Control has numerous features and a fairly steep learning curve. Below is a brief description of key reports available in Mission Control.
+
+### Method profiling
+
+JFR can periodically capture stack traces for running threads in JVM. This technique is known as sampling profiling and available in all Java profilers. Statistical analysis of a large corpus of stack traces gives an excellent picture of where the application spends most of the time down to method name or even line number. This report provides useful visualization for this subset of data collected by JFR.
+
+![Method profiling report](https://assets.bell-sw.com/docs.bell-sw.com/static/edb4315885a0834233e2e35b005633cdee95874a5441b4459ffd20e3f2904dd0/c15e7/method-profiling.png)
+
+This method is typically used in cases where the application is CPU bound. Sampling helps to identify code that is inefficient or can be optimized for better performance.
+
+### Memory
+
+This report outlines the memory usage statistics of your Java application. It combines multiple data points, with the most important of them being object allocation samples.
+
+If enabled, JFR records samples of new object allocation events, including allocated classes, size of object, and stack trace to the point of allocation. Statistical analysis of these samples can reveal a lot about your code.
+
+![Memory report](https://assets.bell-sw.com/docs.bell-sw.com/static/60136e423dfe77406935fbeb0d69c4512cb3c1cb43d8cc9e27efb1dc4a59660e/c15e7/memory-report.png)
+
+The "Memory" report shows top classes of objects being allocated. Information on actual allocated size, including stack trace to the point of allocation, is also available.
+
+This report is most helpful if you want to reduce garbage collector pressure or optimize memory usage. Memory profiling is extremely valuable when it quickly identifies the "littering" code in your application and provides ideas for optimization.
+
+### Lock Instances
+
+Contentions and deadlocks is another class of Java problems hard to approach without a good tool. JFR collects events of thread blocking on synchronized sections and other concurrency primitives that can be useful during the investigation of Java concurrency problems.
+
+![Lock Instances report](https://assets.bell-sw.com/docs.bell-sw.com/static/0e66bd400a636a93ec73ef9b8126e23e1bd74adbcc55a408ffac56d4eef33092/c15e7/lock-instances-report.png)
+
+"Lock Instances" report shows you aggregated statistics for these events. "Threads" is another report helpful in tracking down concurrency issues.
+
+A built-in "Profiling" configuration has a threshold on the duration for such events. Keep in mind that you may need to lower it to get a more detailed picture.
+
+The cost of inter-thread contention becomes a harsh reality for high parallel code running on dozens of cores. Java ships with a few concurrency primitives, including lock-free ones. The contention report helps understand the cost of multithreading in your application and possibly highlights bottlenecks where switching to more elaborate locking is most beneficial.
+
+### File I/O and Socket I/O
+
+![File I/O report](https://assets.bell-sw.com/docs.bell-sw.com/static/fc6ec631d7ef677231ad966df6a8c0b5a208473a15279072bd5760c2c3420392/c15e7/file-io-report.png)
+
+![Socket I/O report](https://assets.bell-sw.com/docs.bell-sw.com/static/29bf548fe8ea26b88fedd7bca7939ae5c7778c4cef163d2fc632c3b087014896/c15e7/socket-io-report.png)
+
+Blocking file and socket I/O operations are also traced by JFR. These reports show aggregated statistics built from file and socket I/O events, respectively.
+
+You can see which files your application has been reading and for how long or at which remote endpoints it has exchanged data.
+
+There is a caveat, though. When using JFR for the first time, you are likely to find both of these reports to be empty or almost empty. The reason is the 10 ms threshold used by default for these kinds of events. If you want to see a full I/O picture, set this threshold to 0 when starting a flight recording session.
+
+This report is very good at catching "unexpected" I/O events buried deep inside the layers of libraries and frameworks.
+
+### Threads
+
+In this report, you can see various events (contention related, I/O associated, Java thread state changes) put into a unified timeline. Here, you can see the interaction of threads in an intuitive visual way. The ability to zoom into the millisecond level of precision is helpful, too.
+
+![Threads report](https://assets.bell-sw.com/docs.bell-sw.com/static/ed30b98f5784bce31cc97a0eb202521b9b23f8cbb07b67f28bda09e9305bf117/c15e7/threads-report.png)
+
+### Exceptions
+
+Every Java application produces a handful of exceptions at runtime. Some of them end up in log files, but many are suppressed for one reason or another. Silently swallowed exceptions sometimes lead to many hours wasted during the incident investigation afterward.
+
+![Exceptions report](https://assets.bell-sw.com/docs.bell-sw.com/static/41ca9b2037b1f8803dcb6ab2207a048da24b0f02364f8606f36b653c24bd3456/c15e7/exceptions-report.png)
+
+JFR sees all exceptions (whether they were suppressed or not). There are two kinds of related events. JFR records the total count of exceptions produced by runtime. This metric helps to identify exception misuse. JFR can also record every single exception created, including the stack trace, although you need to tweak the flight recording session’s configuration to get this level of detail.
+
+### Garbage Collections
+
+GC troubleshooting typically involves digging through GC logs. JFR collects detailed information concerning GC events, and this report visualizes this data. Almost any metric of GC present in JVM is available here.
+
+If you need to tune GC or troubleshoot abnormal GC pauses, this is a report to start with.
+
+![Garbage Collections report](https://assets.bell-sw.com/docs.bell-sw.com/static/eccee8e22e005250cb0425cfdecc2ed3d83bd1cfce14c0782f68b8e03c4d1301/c15e7/garbage-collections-report.png)
+
+### VM Operations
+
+HotSpot has a concept of VM operations ranging in types. But the critical point is that all of them require the Stop-the-World pause. With some JVM options, you can enable logging of VM operation or use JFR and this handy report.
+
+VM operations are often mistaken for GC pauses (which is just one type of VM operations). Developers tend to blame Stop-the-World on garbage collectors. This report is your first stop if the application is experiencing Stop-the-World pauses.
+
+### Configuration and environment
+
+![JVM Intervals report](https://assets.bell-sw.com/docs.bell-sw.com/static/a75247cca50eb57be2bffb92d0ba9cd3ae207e600b91bff5b8d968d8f8f89e4f/c15e7/jvm-intervals.png)
+
+![Environment report](https://assets.bell-sw.com/docs.bell-sw.com/static/06823b0aba104c7814186a9282f36c6ff1359593aeebcab1c7b97e96294064fc/c15e7/environment-report.png)
+
+![Processes report](https://assets.bell-sw.com/docs.bell-sw.com/static/56d1a56b9886595b3b9001d5e0b92766b416aab7da1b662515a52ecdb2588122/c15e7/processes-report.png)
+
+You can send JFR files for analysis to an expert in the JVM domain. Files include JVM configuration, hardware configuration, and even a list of other processes running on a server and competing for resources without application.
+
+## Continuous flight recording
+
+JFR + Mission Control can be used as a free and capable Java profiler, but using them in continuous mode can bring even more value.
+
+To get the full benefit from continuous flight recording, you need to
+
+- configure your JVM to be accessible via JMX;
+
+- add JVM command-line arguments to activate Flight Recorder on startup.
+
+A minimal command to start flight recording session on startup is the following:
+
+```bash
+-XX:StartFlightRecording=name=background,maxsize=100m
+```
+
+An important option is `maxsize` that limits how many events are retained in memory.
+
+Now, you have JFR silently collecting events in the background. As long as the application runs fine, you can forget about JFR being active. The default JFR profile adds very little overhead.
+
+At the same time, you can quickly connect to JVM via Mission Control and dump accumulated events from a problematic server, which is especially useful for tracking down problems reproducible only on live production.
+
+One can argue that instead of pulling data dumps from individual VMs, it is better to have a centralized monitoring system where you can access diagnostics from any server. In theory, that will be perfect, but arranging quality centralized monitoring is extremely challenging. Central monitoring solutions have to compromise on the level of details.
+
+Continuous flight recording and the ability to pull event dumps on demand are complementary to central logging and general monitoring solutions, as you can get very detailed telemetry from JVM.
+
+## Connecting Mission Control to a remote JMX agent
+
+### How to enable JMX Agent
+
+This table lists application properties used in the following example.
+
+| Property | Description | Example value |
+|----|----|----|
+| `com.sun.management.jmxremote` | Enables the JMX agent |  |
+| `java.rmi.server.hostname` | Sets the hostname the RMI connector is bound | 192.168.88.82 |
+| `com.sun.management.jmxremote.host` | The local host name or IP address on which the JMX RMI agent will bind | 192.168.88.82 |
+| `com.sun.management.jmxremote.port` | Sets the JMX RMI agent port | 9010 |
+| `com.sun.management.jmxremote.rmi.port` | Sets a port to be used to export RMI object | 9010 |
+| `com.sun.management.jmxremote.local.only` | Allows remote connection to the JMX RMI agent | false |
+| `com.sun.management.jmxremote.ssl` | Enables (disables) the RMI monitoring with SSL | true |
+| `com.sun.management.jmxremote.registry.ssl` | Enables (disables) the RMI registry with SSL | true |
+| `javax.net.ssl.keyStore` | Sets the path to the storage facility for cryptographic keys and certificates | jmxkeystore.jks |
+| `javax.net.ssl.keyStorePassword` | Keystore password | 123456 |
+| `javax.net.ssl.keyStoreType` | Keystore type | JKS |
+
+#### Running JMX agent without SSL
+
+<Aside type="caution">
+Running the JMX agent without SSL is insecure and should not be used in production. For a secure setup, see [Running JMX agent with SSL](#running-jmx-agent-with-ssl).
+
+Specify an available and reachable port for the JMX (`com.sun.management.jmxremote.port`). In this example we use port 9010. You can also specify a port for the RMI registry to simplify the firewall rules (`com.sun.management.jmxremote.rmi.port`). If the port is not specified, the program allocates a random port.
+</Aside>
+
+```bash
+java -Dcom.sun.management.jmxremote
+    -Djava.rmi.server.hostname=192.168.88.82
+    -Dcom.sun.management.jmxremote.host=192.168.88.82
+    -Dcom.sun.management.jmxremote.port=9010
+    -Dcom.sun.management.jmxremote.rmi.port=9010
+    -Dcom.sun.management.jmxremote.local.only=false
+    -Dcom.sun.management.jmxremote.ssl=false
+    -Dcom.sun.management.jmxremote.registry.ssl=false
+    -Dcom.sun.management.jmxremote.authenticate=false JmxAgentApp
+```
+
+#### Running JMX agent with SSL
+
+<Steps>
+
+1. Use the `keytool` utility to generate a key pair (the keystore password in this example is `123456`). Skip this step if you already have a public/private key pair.
+
+   ```bash
+   keytool -genkeypair -alias jmxapp -keyalg RSA -keypass 123456 -dname "cn=Jmx App, ou=QA, o=JMXTestAppSoft, c=US" -keystore jmxkeystore.jks -storetype JKS
+   ```
+
+2. Start the application with JMX RMI agent with SSL. Note that this configuration authenticates the server only. If SSL client authentication is set up, you will need to provide a similar keystore for JConsole’s keys, and an appropriate truststore for the application. For more information, see [Remote Monitoring with JConsole with SSL Enabled](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html#gdevo).
+
+   ```bash
+   java -Dcom.sun.management.jmxremote
+       -Djava.rmi.server.hostname=192.168.88.82
+       -Dcom.sun.management.jmxremote.host=192.168.88.82
+       -Dcom.sun.management.jmxremote.port=9010
+       -Dcom.sun.management.jmxremote.rmi.port=9010
+       -Dcom.sun.management.jmxremote.local.only=false
+       -Dcom.sun.management.jmxremote.ssl=true
+       -Dcom.sun.management.jmxremote.registry.ssl=true
+       -Djavax.net.ssl.keyStore=jmxkeystore.jks
+       -Djavax.net.ssl.keyStoreType=JKS
+       -Djavax.net.ssl.keyStorePassword=123456
+       -Dcom.sun.management.jmxremote.authenticate=false JmxAgentApp
+   ```
+
+</Steps>
+
+#### JMC setup
+
+<Steps>
+
+1. Export the certificate of the server using the `keytool` utility on the JMX agent side. Perform this step if you generated your key pair during the JMX agent setup.
+
+   ```bash
+   keytool -export -alias jmxapp -keystore jmxkeystore.jks -rfc -file jmxapp.cer
+   ```
+
+2. Import the certificate on a machine with JMC to the trust store. Previously generated certificates are used in this example. A new trust store is created with a password `123456`.
+
+   ```bash
+   keytool -import -alias jmxapp -file jmxapp.cer -rfc -storetype JKS -keystore jmxapp.truststore
+   ```
+
+3. Run `jmc.exe`.
+
+4. Set truststore if the JMX agent uses SSL.
+
+   1. Navigate to Window → Preferences → JMXRMI.
+
+      ![preferences jmxrmi](https://assets.bell-sw.com/docs.bell-sw.com/static/0db65601a8475a90bd08f8054f8329c938f6641ce55fac1df7f69e47208d788e/c15e7/preferences-jmxrmi.png)
+
+   2. Choose your trust store (`jmxapp.truststore` from step 2).
+
+   3. Enter trust store password ( «123456» from the step 2 ).
+
+   4. Restart JMC.
+
+5. Create a new connection to the JMX agent.
+
+   1. Navigate to File → Connect.
+
+      ![jvm connection](https://assets.bell-sw.com/docs.bell-sw.com/static/318f3064a60e14e8fc81a6b74e11a52bf30f2654902a209dafd919e12bcbf5df/c15e7/jvm-connection.png)
+
+   2. Input your host and port. In this example `192.168.88.82:9010`.
+
+   3. Start Flight Recording by right-clicking the server and selecting **Start Flight Recording**.
+
+      ![start recording](https://assets.bell-sw.com/docs.bell-sw.com/static/44e2d05f36cdd577f563a2559ac6771a3e50763c78e5d8cdca3ed8e24b8f6599/c15e7/start-recording.png)
+
+</Steps>

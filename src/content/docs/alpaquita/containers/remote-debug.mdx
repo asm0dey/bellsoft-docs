@@ -1,0 +1,907 @@
+---
+title: "Debugging apps running in Docker with JetBrains and VSCode: Java, C, and Python"
+slug: alpaquita/containers/remote-debug
+description: Remotely debug Java, C, and Python applications running inside a Docker container using IntelliJ IDEA, CLion, and VSCode.
+---
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+If you have a setup to deploy your application using containers, debugging your application by connecting to debugging server that is running in your development docker container has the following advantages:
+
+- Environment consistency: minimize environment-related bugs.
+- Isolation of dependencies: less clutter in your local machine, avoid version conflicts.
+- Easy cleanup and reset: restart, delete or stop your container as necessary.
+
+The goal of this guide is to display how to remotely debug an application written in Java, Python, or C running inside a docker container. We will use CLion, IntelliJ IDEA, and VSCode to demonstrate this. We do not cover PyCharm in the guide, because at the time of writing, the remote debugging feature is limited to the paid version of their software.
+
+Each section includes a sample application for those without an existing project who still want to follow along.
+
+Although this document covers remote debugging with three popular languages using three IDEs, the key patterns in remote debugging are the same for any environment:
+
+<Steps>
+
+1. Find out whether your IDE can connect to a debugging server.
+
+2. Learn which debugging tool your IDE uses. For example, PyCharm uses `pydevd-pycharm` and VSCode uses `debugpy` for Python by default.
+
+3. Adjust or create a Docker image that exposes the debugging server over a network.
+
+4. Configure your IDE to use the debugging server exposed by a Docker container for debugging.
+
+</Steps>
+
+After studying the examples in this guide, you should be able to adapt them to your own needs. For example, you can use `delve` debugger to debug Go applications using GoLand. And as an alternative to IntelliJ IDEA, use Eclipse for Java debugging and so forth.
+
+The next parts demonstrate how to use popular IDEs to debug applications written in Java, Python, or C.
+
+## Java
+
+We will use a sample Spring application, [Spring PetClinic](https://github.com/spring-projects/spring-petclinic), to explain how to remotely debug Java docker applications. Spring PetClinic was dockerized using [Liberica](https://bell-sw.com/libericajdk/) as a base image.
+
+We will also use [IntelliJ IDEA](https://www.jetbrains.com/idea/), as it is popular among Java developers.
+
+### Prerequisites
+
+- Docker installed and running
+- Installed IntelliJ IDEA
+
+### Dockerizing the PetClinic application
+
+<Aside type="note">
+If you already have a containerized Java application, you can skip this step and replace the `petclinic-liberica` with your application image name.
+</Aside>
+
+#### Application overview
+
+Spring PetClinic is a CRUD application that uses technologies such as Spring Boot, Thymeleaf, Bootstrap, in-memory database H2.
+
+Overall, it is a well-known and suitable application for use as an example.
+
+#### Clone the PetClinic application from GitHub
+
+Use the following command to clone the sample application.
+
+```bash
+$ git clone https://github.com/spring-projects/spring-petclinic.git
+```
+
+#### Dockerfile
+
+Place the contents of the Dockerfile below into a file `Dockerfile` inside the `spring-petclinic` directory we have just cloned.
+
+```dockerfile
+# Create a stage for resolving and downloading dependencies.
+FROM bellsoft/liberica-openjdk-alpine:21 AS deps
+
+# Download dependencies as a separate step to take advantage of Docker's
+# caching.
+WORKDIR /build
+
+COPY --chmod=0755 mvnw mvnw
+COPY .mvn/ .mvn/
+
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=cache,target=/root/.m2 \
+    ./mvnw dependency:go-offline -DskipTests
+
+
+# Create a stage for building the application based on the stage with
+# downloaded dependencies.
+FROM deps AS package
+
+WORKDIR /build
+COPY ./src src/
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=cache,target=/root/.m2 \
+    ./mvnw package -DskipTests && \
+    mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId \
+        -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version \
+        -q -DforceStdout).jar \
+        target/app.jar
+
+
+# Create a stage for extracting the application into separate layers.
+FROM package AS extract
+
+WORKDIR /build
+
+RUN java -Djarmode=layertools -jar target/app.jar \
+        extract --destination target/extracted
+
+# Create a new stage for running the application that contains the minimal
+# runtime dependencies. We use liberica-openjre-alpine:21
+# because there is no need to use a full blown JDK just to run the app.
+FROM bellsoft/liberica-openjre-alpine:21 AS final
+
+# Create a non-privileged user that the app will run under.
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+USER appuser
+
+# Copy the executable from the "package" stage.
+COPY --from=extract build/target/extracted/dependencies/ ./
+COPY --from=extract build/target/extracted/spring-boot-loader/ ./
+COPY --from=extract build/target/extracted/snapshot-dependencies/ ./
+COPY --from=extract build/target/extracted/application/ ./
+
+# Expose 8080, as we will use this as the application port.
+EXPOSE 8080
+
+# Specifying the command that will executed when the container starts.
+ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
+```
+
+#### Building the `petclinic-liberica` image
+
+Use the following commands to build the `petclinic-liberica` image.
+
+```bash
+$ cd spring-petclinic
+$ docker build --tag petclinic-liberica .
+```
+
+In this section we have created the example production image that we want to debug.
+
+### Creating a debugging image
+
+#### Overview
+
+To debug the PetClinic application, we use [Java Debug Wire Protocol (JDWP)](https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/introclientissues005.html), which is the protocol used for communication between a debugger (the IDE) and the Java virtual machine (the PetClinic app). It helps to perform debugging tasks such as setting breakpoints, stepping through code, and inspecting variables in IntelliJ IDEA.
+
+Liberica and many other docker java images come with JDWP; therefore, you do not need to install other tools. We will instruct JVM to use JDWP using the command line arguments.
+
+[`JAVA_TOOL_OPTIONS`](https://docs.oracle.com/en/java/javase/21/docs/specs/jvmti.html#tooloptions) environment variable can be used to specify command line options for java launcher. The content of the `JAVA_TOOL_OPTIONS` environment variable is a list of arguments separated by space.
+
+We can append a command line option required to start java debugging server to `JAVA_TOOL_OPTIONS`.
+
+The option needed by java launcher is the following:
+
+```text
+-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+```
+
+<Aside type="tip">
+If you want to use a port other than 5005 for debugging server, change `address=5005` to `address=<your_port>`.
+</Aside>
+
+<Aside type="tip">
+Change `suspend=n` to `suspend=y` if you want the app to be suspended immediately before the main class is loaded. The app will wait until you connect to the java debugging server.
+</Aside>
+
+#### Edit Dockerfile.debug
+
+Copy the contents of the Dockerfile above into a file `Dockerfile.debug` in the `spring-petclinic` directory.
+
+<Aside type="caution" title="Important">
+This section assumes you are using java launcher for starting your app. If you use another method to run your application inside a container, the approach described here may not work. In that case, look for an alternative way to add `jdwp` capabilities to your launcher.
+</Aside>
+
+```dockerfile
+# Change this to your production image
+FROM petclinic-liberica
+
+# Add command line option for enabling JDWP debugging server
+ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} \
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+```
+
+#### Build and run debugging image
+
+Use the following commands to build the debugging image. Remember to expose the port that was specified, in this case `5005`, defined in the `JAVA_TOOL_OPTIONS` environment variable.
+
+```bash
+$ docker build --tag petclinic-liberica-debug -f Dockerfile.debug .
+$ docker run -p8080:8080 -p5005:5005 petclinic-liberica-debug
+Picked up JAVA_TOOL_OPTIONS:  -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
+Listening for transport dt_socket at address: 5005
+...
+```
+
+As stated in the output, the application is listening for a debugging session on port 5005.
+
+### Remote debugging using IntelliJ IDEA
+
+Before proceeding, ensure the debugging container is running and the Java debugging server is set up, waiting at port 5005.
+
+#### Configure remote debugging
+
+<Steps>
+
+1. Open the previously cloned `spring-petclinic` directory using IntelliJ IDEA by clicking **File** > **Open** and then selecting the path to `spring-petclinic` directory. Click **OK**.
+
+   ![intellij open project](https://assets.bell-sw.com/docs.bell-sw.com/static/e370dd66f9cdbd1076167ff1b2d51d76032785b552b12c94cb416db654939d65/c15e7/intellij-open-project.png)
+
+2. Click **Open as Maven project** and click **Trust Project**. You should be now in the `spring-petclinic` project.
+
+3. From the main menu, select **Run** > **Edit Configurations**.
+
+   ![intellij edit config](https://assets.bell-sw.com/docs.bell-sw.com/static/c00fc8f09bd289e3947f4584330feb4785e54786febe0b8e9dfc93319f949f6e/c15e7/intellij-edit-config.png)
+
+4. Click "+" (plus) on the top left to add a new configuration and select **Remote JVM Debug**.
+
+   ![intellij add config remote jvm](https://assets.bell-sw.com/docs.bell-sw.com/static/18afe920a58d034b80bbba6ae2a9de8e9dfc3d144e69e45c1c48f95e9c6e106a/c15e7/intellij-add-config-remote-jvm.png)
+
+   You can give this configuration a meaningful name, such as "Docker Pet Clinic Debugging".
+
+   ![intellij remote jvm debug settings](https://assets.bell-sw.com/docs.bell-sw.com/static/5a38afb6bdb9ce0837ed073b6c6d9a48c6f1c071379d5c0b7bd9035bd493a5d4/c15e7/intellij-remote-jvm-debug-settings.png)
+
+   Note that the default values for **Host** and **Port** are `localhost` and `5005` respectively. Update these to match the host address and port configured in the previous steps if you changed the values.
+
+5. Click **OK** to save the configuration.
+
+</Steps>
+
+To ensure debugging is working as expected, let's insert a breakpoint at the `processCreationForm` method of the `OwnerController` class.
+
+![intellij add breakpoint to processCreationForm](https://assets.bell-sw.com/docs.bell-sw.com/static/06466b96024017d117bdbc1927cdbdb9904fe73e5c9773c5ca7bce894ceac0b9/c15e7/intellij-add-breakpoint-to-processCreationForm.png)
+
+Let's try to debug the application using the configuration we have created.
+
+From the main menu, click **Run** > **Debug 'Docker Pet Clinic Debugging'** (or select the name assigned to the debug configuration earlier).
+
+![intellij run debugging](https://assets.bell-sw.com/docs.bell-sw.com/static/e707d89ccd00f19c4aee87844fdba918f2558be414384ed135ad1f01b9f93089/c15e7/intellij-run-debugging.png)
+
+You should see a message in the debugging console that you are connected to `localhost:5005` or your specified port over the network.
+
+![intellij debugging connected](https://assets.bell-sw.com/docs.bell-sw.com/static/e0c361b62c14bdc654ee0df89b69c368e1e2039c5b810949371fa111aef6806b/c15e7/intellij-debugging-connected.png)
+
+`processCreationForm` method is responsible for handling POST requests to the endpoint /owners/new. It manages the creation of a new Owner entity, validates the form input, and redirects users based on the result of the validation.
+
+Let's try to debug that method.
+
+<Steps>
+
+1. In your browser, go to [http://localhost:8080](http://localhost:8080) and click **Add Owner** on the **Find Owners** section.
+
+   ![petclinic add owner](https://assets.bell-sw.com/docs.bell-sw.com/static/b2e255d833e44af79e2c384aad717ac65d5956c4f2f0955395eddf608c341761/c15e7/petclinic-add-owner.png)
+
+2. Fill the form and click **Add Owner**.
+
+   ![petclinic add owner form](https://assets.bell-sw.com/docs.bell-sw.com/static/1fdc4b98ba4ef2f7dac708f8ff9e73f42f7857aa44170c6dd10ff7cefec80576/c15e7/petclinic-add-owner-form.png)
+
+   Now the web page waits, because we have instructed the debugger to stop at the `processCreationForm` method in the `OwnerController` class.
+
+   We can see that the method first instantiates an owner object with the data we provided and then saves it to the `owners` which is a [Spring Repository](https://docs.spring.io/spring-data/data-commons/docs/1.6.1.RELEASE/reference/html/repositories.html).
+
+   We can step through the code, set other breakpoints, evaluate expressions, and more.
+
+   <Aside type="note">
+   See the debugging section of [Intellij IDEA Documentation](https://www.jetbrains.com/help/idea/debugging-code.html) to get more information about debugging in IntelliJ IDEA.
+   </Aside>
+
+3. Click **Continue** to let the application continue normally.
+
+   ![intellij debugging continue](https://assets.bell-sw.com/docs.bell-sw.com/static/abc7d3b72498fb2defd9c399856c1a8ff07d0bb3c631d0d0a24a8d3a6a9ca7c0/03654/intellij-debugging-continue.png)
+
+   Now we see that the application continues and finishes the POST request normally. Every time the application runs the code we marked with a breakpoint, it stops and waits for an input in IntelliJ IDEA, so we can debug it further.
+
+   ![petclinic owner created](https://assets.bell-sw.com/docs.bell-sw.com/static/93cf9a7f2e73878dcb934c4bcae3834ddf5ba7c8863ccd39aa7333be80bf69e5/c15e7/petclinic-owner-created.png)
+
+</Steps>
+
+## Python
+
+### Prerequisites
+
+- Docker installed and running
+- Working VSCode with a Python extension installed
+
+We will debug the [FastAPI](https://fastapi.tiangolo.com/) application running on [uvicorn](https://www.uvicorn.org/) web server. It should be easy to adjust the setup to other web frameworks like Flask or Django.
+
+We use `debugpy` module since it is provided by [Python Debugger extension](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy) and bundled with the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) from VSCode marketplace.
+
+### Dockerizing a FastAPI application
+
+<Aside type="note">
+Skip this section if you already have a python image of your application and replace the base image in `Dockerfile.debug` with your application image name.
+</Aside>
+
+The final structure of the sample project should look like the following:
+
+```text
+$ tree
+.
+├── Dockerfile
+├── Dockerfile.debug
+├── requirements.txt
+└── src
+    └── main.py
+
+2 directories, 4 files
+```
+
+#### Application: quadratic equation solver
+
+We have a simple application that returns the roots of the following quadratic equation $ax^2 + bx + c = 0$.
+
+```bash
+$ curl -s \
+    --request GET \
+    --url 'http://localhost:8000/solve_quadratic?a=1&b=-8&c=15' \
+    | jq
+
+{
+  "x1": 5.0,
+  "x2": 3.0
+}
+```
+
+#### main.py
+
+Create a directory `src` and copy the contents of the following python code into `main.py` in the `src` directory.
+
+<Aside type="note">
+We have introduced a not-so-subtle bug in the logic where we calculate x1 and x2. We should be dividing by `(2 * a)` instead of `(2 * c)`.
+</Aside>
+
+```python
+from fastapi import FastAPI, HTTPException
+from math import sqrt
+from typing import Dict
+
+app = FastAPI()
+
+@app.get("/solve_quadratic")
+def solve_quadratic(a: float, b: float = 0, c: float = 0) -> Dict[str, float]:
+    if a == 0:
+        raise HTTPException(status_code=400,
+            detail="Coefficient 'a' cannot be zero.")
+
+    discriminant = b**2 - 4*a*c
+
+    if discriminant < 0:
+        raise HTTPException(status_code=400,
+            detail="No real solutions, discriminant is negative.")
+
+    # Bug introduced here: it should be (2 * a)
+    x1 = (-b + sqrt(discriminant)) / (2 * c)
+    x2 = (-b - sqrt(discriminant)) / (2 * c)
+
+    if x1 == x2:
+        return {"x": x1}
+
+    return {"x1": x1, "x2": x2}
+```
+
+#### Dockerfile
+
+Create a file `Dockerfile` with following contents.
+
+```dockerfile
+FROM bellsoft/alpaquita-linux-python:3.12-musl
+
+# Print log messages immediately instead of them being buffered
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /src
+
+# Activate virtual environment
+ENV VIRTUAL_ENV=/src/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+RUN python3 -m venv $VIRTUAL_ENV
+
+# Install dependencies:
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+# Copy source code
+COPY src/ .
+
+# Start the uvicorn web server. 8000 is the default port
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0"]
+```
+
+#### requirements.txt
+
+Put the following content into a file `requirements.txt`
+
+```text
+fastapi
+uvicorn
+```
+
+Build your image with the following command.
+
+```bash
+$ docker build --tag fastapi-app .
+```
+
+### Building a debugging image
+
+It is important that both local dev environment, where we debug the python code, and the container, where the application is running, have the `debugpy` module available.
+
+We will install it in the debugging image and also instruct docker to run `debugpy` as a default command when the container starts.
+
+#### Dockerfile.debug
+
+<Steps>
+
+1. Copy the contents of the following Dockerfile into a file `Dockerfile.debug`.
+
+   <Aside type="note">
+   We used the default port `5678` for `debugpy` debugging server port. You can use any available port.
+   </Aside>
+
+   ```dockerfile
+   # Base image
+   FROM fastapi-app
+
+   WORKDIR /src
+
+   # Install debugpy for vscode remote debugging
+   RUN pip3 install debugpy
+
+   # Append debugpy to the uvicorn command so it will be executed in a debugging
+   # mode
+   CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
+       "-m", "uvicorn", "main:app", "--host", "0.0.0.0"]
+   ```
+
+2. Build the debugging image with the following command.
+
+   ```bash
+   $ docker build --tag fastapi-app-debug -f Dockerfile.debug .
+   ```
+
+3. Finally, run the debugging image.
+
+   ```bash
+   $ docker run --rm -p8000:8000 -p5678:5678 fastapi-app-debug
+   ```
+
+</Steps>
+
+### Configuring VSCode for remote debugging
+
+VSCode uses `debugpy` python module for debugging remotely. We will install Python Debugger for accessing the `debugpy` module.
+
+Also, `launch.json` configuration file inside the `.vscode` directory dictates the behavior of the debugger in VSCode. We will be using this file to connect to debugging session in the container.
+
+Before continuing, make sure your debugging docker application is running.
+
+<Steps>
+
+1. Let's open the source code directory of the FastAPI project.
+
+   ![vscode open folder](https://assets.bell-sw.com/docs.bell-sw.com/static/da72ea87639c7a321a9e0fe14c76fff3bc12bf915ddde9b7e5461714eb8784fc/5d70e/vscode-open-folder.png)
+
+2. Select the path for the parent directory of `main.py` from the previous steps. Click **Yes, I trust the authors**.
+
+</Steps>
+
+#### Install extensions
+
+From activity bar, select extensions, and search for `ms-python.debugpy`. Click **Install**.
+
+![vscode install debugger ext](https://assets.bell-sw.com/docs.bell-sw.com/static/e833eda8dc2727656b710511815a9537826f582026f9c47bea24df21d9c6c639/1bda3/vscode-install-debugger-ext.png)
+
+#### Create launch.json
+
+<Steps>
+
+1. `launch.json` is necessary for configuring the debugger of VSCode. From activity bar, select **Run and Debug**. Click **create a launch.json file**.
+
+   ![vscode create launch json](https://assets.bell-sw.com/docs.bell-sw.com/static/5b4bf3c020616af6001d51953d18b77d6d79d278e3945ee3d3e55e61628fd7e6/6cd33/vscode-create-launch-json.png)
+
+2. Select **Python Debugger** and select **Remote Attach**.
+
+   ![vscode create remote attach](https://assets.bell-sw.com/docs.bell-sw.com/static/ec6050eabdcd60f1253972b2e3514edb06d6da78777b93d3104da405461605d1/c15e7/vscode-create-remote-attach.png)
+
+3. VSCode asks for an IP address of the debugging server. Keep the default option `localhost`.
+
+   ![vscode remote debugging ip](https://assets.bell-sw.com/docs.bell-sw.com/static/608f40f046d099c536e591b8e76e78c215e24dfb0715d513629d5492c6df5ea5/c15e7/vscode-remote-debugging-ip.png)
+
+4. Either keep the default port number `5678` or change to your port in case you have used a different port.
+
+   ![vscode remote debugging port](https://assets.bell-sw.com/docs.bell-sw.com/static/9ee894a956c60ba89e599f2d50a72001d1e2f92b3bef4693a7e299c15de97182/c15e7/vscode-remote-debugging-port.png)
+
+5. Verify that VSCode created a `launch.json` file and looks similar to this:
+
+   ```json
+   {
+       "version": "0.2.0",
+       "configurations": [
+           {
+               "name": "Python Debugger: Remote Attach",
+               "type": "debugpy",
+               "request": "attach",
+               "connect": {
+                   "host": "localhost",
+                   "port": 5678
+               },
+               "pathMappings": [
+                   {
+                       "localRoot": "${workspaceFolder}",
+                       "remoteRoot": "."
+                   }
+               ]
+           }
+       ]
+   }
+   ```
+
+</Steps>
+
+#### Start debugging
+
+<Steps>
+
+1. Create some breakpoints in the application.
+
+   ![vscode breakpoints](https://assets.bell-sw.com/docs.bell-sw.com/static/2e767b1e42cbc09497a180d3da02e53d468d1b70ede53e322d167b1ce31a155d/c15e7/vscode-breakpoints.png)
+
+2. Click **Run** > **Start Debugging**.
+
+   You should now see a Debug toolbar at the top center.
+
+3. From the terminal, send a get request to the FastAPI application as follows.
+
+   ```bash
+   $ curl -s \
+       --request GET \
+       --url 'http://localhost:8000/solve_quadratic?a=1&b=-8&c=15' \
+       | jq
+   ```
+
+   You should see that the command "hangs". This is because we have set breakpoints in the `main.py` file and application freezes the execution for us at the breakpoints.
+
+4. Go to **Run and Debug** from the activity bar. Observe that we have received the parameters of the request: `a`, `b` and `c` in the variables section.
+
+   ![vscode debugging variables](https://assets.bell-sw.com/docs.bell-sw.com/static/640e59de2737cfc2be5828dc8011323d55f662f72809d402430f9b64a7940d99/ef2b5/vscode-debugging-variables.png)
+
+5. Click **Continue** from the Debug toolbar to jump to the next breakpoint. Click **Step over** to execute one line of code. We now see the value of `discriminant` from the variables section.
+
+6. Step over until you reach the `x2 = …`. We see that `x1` and `x2` are calculated incorrectly.
+
+</Steps>
+
+You may debug further or stop the debugging session by pressing the red square on the debug toolbar.
+
+This concludes the guide for remote debugging in Python.
+
+For more information about debugging in VSCode, visit the [documentation section on the Visual Studio Code website](https://code.visualstudio.com/docs/editor/debugging).
+
+## C/C++
+
+As an example in this part of the guide, we will use an application that returns a reversed version of the string received from the standard input. The application will be running inside an Alpaquita docker container. Then we will introduce a bug in the application and attempt to debug it remotely in [CLion](https://www.jetbrains.com/clion/).
+
+We will use `gdbserver`, which is a lightweight debugging server for [`gdb`](https://sourceware.org/gdb/).
+
+### Prerequisites
+
+- Docker installed and running
+- Installed CLion
+
+### Dockerizing a C application
+
+Upon completion of this section, you should have the following directory structure:
+
+```text
+$ tree
+.
+├── Dockerfile
+├── Makefile
+└── src
+    └── main.c
+```
+
+#### Application: String reverser
+
+We have a simple application that takes a string of characters from standard input, reverses it, and finally, prints the reversed string to the standard output.
+
+Let's provide the input "noel sees leon" to the program.
+
+```text
+$ docker run -it reverser:latest
+noel sees leon
+Reversed string:
+noel sees leon
+```
+
+#### main.c
+
+```c
+#include <string.h>
+#include <stdio.h>
+
+
+/* reverse:  reverse string s in place */
+void reverse(char s[]) {
+    int n = strlen(s);
+
+    for (int i = 0,j = n - 1; i < j; i++, j--) {
+        char tmp = s[i];
+        s[i] = s[j];
+        s[j] = tmp;
+    }
+}
+
+/* main: get string from stdin, reverse and print it */
+int main() {
+    char str[256];
+    fgets(str, sizeof(str), stdin);
+
+    reverse(str);
+    printf("Reversed string: %s\n", str);
+}
+```
+
+#### Makefile
+
+```makefile
+CC = gcc
+SRC_DIR = src
+BUILD_DIR := build
+CFLAGS = -Wall -Wextra -O2
+
+BIN = reverser
+
+main: $(BUILD_DIR)/$(BIN)
+
+$(BUILD_DIR)/$(BIN): $(SRC_DIR)/main.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o $@ $<
+
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: main clean
+```
+
+#### Dockerfile
+
+The following Dockerfile has two stages. The First stage is for compiling the code. The second stage is only for executing the binary, hence it is lightweight.
+
+```dockerfile
+FROM bellsoft/alpaquita-linux-gcc:14.2-musl AS build
+WORKDIR /build
+# Copy src and Makefile
+COPY src src
+COPY Makefile .
+# Compile the app
+RUN make
+
+# Use a lightweight base for final image
+FROM bellsoft/alpaquita-linux-base:stream-musl
+WORKDIR /app
+# Follow best practices and use a non-root user
+RUN adduser -D user
+USER user
+# Copy the binary
+COPY --from=build /build/build/reverser .
+# Execute the binary
+ENTRYPOINT ["./reverser"]
+```
+
+#### Modified main.c
+
+The `main.c` above works fine. Let's say we want to take the input from arguments, not from the standard input. While doing so, we will introduce a bug in the new `main.c`.
+
+```c
+#include <string.h>
+#include <stdio.h>
+
+/* reverse:  reverse string s in place */
+void reverse(char s[]) {
+    int n = strlen(s);
+
+    for (int i = 0,j = n - 1; i < j; i++, j--) {
+        char tmp = s[i];
+        s[i] = s[j];
+        s[j] = tmp;
+    }
+}
+
+/* reverse: print reversed string from args */
+int main(const int argc, char *argv[]) {
+    /* We accept only one argument.If we receive more or less than one
+    argument, exit with error */
+    if (argc != 1) {
+        fprintf(stderr, "Usage: ./reverser <string>\n");
+        return 1;
+    }
+
+    // If we receive a too long string, exit
+    if (strlen(argv[1]) > 256) {
+        fprintf(stderr, "%s", "String too long\n");
+        return 1;
+    }
+    // Copy the argument into a string
+    char str[256];
+    strncpy(str, argv[1], sizeof(str) - 1);
+
+    reverse(str);
+    printf("Reversed string: %s\n", str);
+}
+```
+
+The modified code prints out the "wrong usage" error:
+
+```text
+$ docker build --tag reverser-arg .
+[+] Building 0.8s (15/15) FINISHED
+...
+$ docker run --rm -it reverser-arg:latest "noel sees leon"
+Usage: ./reverser <string>
+```
+
+Next, we will create a Dockerfile for debugging this image.
+
+### Creating a debugging image
+
+#### Updated Makefile
+
+For debugging the binary, compile the code with the `-g` and `-O0` flags. Flag `-g` adds debugging information to the binary. Flag `-O0` disables the optimization, which can rearrange, inline, or remove code, in turn, might make debugging difficult.
+
+Make the following adjustments to accept variable `DEBUG` in `Makefile`, which is 0 by default. If you invoke `make` with `DEBUG=1`, it will adjust the `CFLAGS` by adding debugging flag `-g` and disabling optimization with `-O0`. Also, it changes the build directory and binary names.
+
+```makefile
+CC = gcc
+CFLAGS = -Wall -Wextra
+SRC_DIR = src
+BUILD_DIR = build
+BIN = reverser
+
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+    CFLAGS := $(CFLAGS) -g -O0
+    BUILD_DIR := $(BUILD_DIR)-debug
+    BIN := $(BIN).debug
+else
+    CFLAGS := $(CFLAGS) -O3
+endif
+
+main: $(BUILD_DIR)/$(BIN)
+
+$(BUILD_DIR)/$(BIN): $(SRC_DIR)/main.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o $@ $<
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: main clean
+```
+
+#### Dockerfile.debug
+
+Change the `make` command to `make DEBUG=1`, install `gdb` and start `gdbserver`.
+
+<Aside type="note">
+We used port 2159 for `gdbserver`, which is the registered TCP port number for ["GDB Remote Debug Port"](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=2159). You can use any available port.
+</Aside>
+
+Create a file `Dockerfile.debug` with the following content:
+
+```dockerfile
+FROM bellsoft/alpaquita-linux-gcc:14.2-musl AS build
+
+WORKDIR /build
+COPY Makefile .
+COPY src src
+# compile the code with debugging symbols
+RUN make DEBUG=1
+
+
+FROM bellsoft/alpaquita-linux-base:stream-musl
+WORKDIR /app
+# Install gdb package
+RUN apk update && apk add --no-cache gdb
+COPY --from=build /build/build-debug/reverser.debug .
+COPY --from=build /build/src src
+# Start gdbserver on port 2159 to debug the application
+ENTRYPOINT ["gdbserver", ":2159","./reverser.debug"]
+```
+
+<Aside type="tip">
+To minimize disk usage, you can remove the binaries and files provided by the `gdb` package and leave only the `gdbserver` binary. Note that `gdbserver` requires the `libstdc++` library.
+</Aside>
+
+#### Building the image and running the container
+
+Build the debugging image tagged as `reverser-arg-debug`.
+
+To use gdb for tracing, the process group of the tracee must allow ptrace operations. By default, Docker removes the `SYS_PTRACE` capability, which restricts ptrace use inside the container. This capability needs to be re-enabled.
+
+Additionally, Docker's default seccomp profile blocks several system calls essential for gdb, including `ptrace`, `perf_event_open`, and `process_vm_writev`. Using `--security-opt seccomp=unconfined` will bypass seccomp filtering for all processes in the container.
+
+Then, run the `gdbserver` with the options explained above passing the string, "noel sees leon" as the first argument to the program.
+
+```bash
+$ docker build --tag reverser-arg-debug -f Dockerfile.debug .
+
+$ docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+    -p2159:2159 reverser-arg-debug:latest "noel sees leon"
+
+Process ./reverser.debug created; pid = 9
+Listening on port 2159
+```
+
+The `gdb` server is now waiting on port 2159. The next section explains how to connect to the `gdb` server using `CLion`.
+
+### Configuring CLion for remote debugging
+
+<Aside type="caution" title="Important">
+Before continuing, make sure that `gdbserver` is running inside a docker container.
+</Aside>
+
+<Steps>
+
+1. First, open the project directory.
+
+   ![clion open project](https://assets.bell-sw.com/docs.bell-sw.com/static/1d7b50cd9b87da31f473a43f1184d2abd46cbea32519b746027aa0f6339e2456/554fc/clion-open-project.png)
+
+2. Click **Trust Project**.
+
+   <Aside type="note">
+   Ignore the "No compilation commands found" error in the **Build** sidebar, since we will be building our project inside a docker image anyway.
+   </Aside>
+
+3. On the main menu, select **Run** > **Edit Configurations**.
+
+   ![clion run edit config](https://assets.bell-sw.com/docs.bell-sw.com/static/c1e4f4af6a504c02cc23575698481b4ae1e90c689382f29ebbb9420713f71ebc/c15e7/clion-run-edit-config.png)
+
+4. Click the **+** icon and then select **Remote Debug**.
+
+   ![clion add config remote debug](https://assets.bell-sw.com/docs.bell-sw.com/static/f21c3a5595a4d738d8770cb5304136fe6b8b2f8ddf09f0ea97d1aa6cb37b2989/c15e7/clion-add-config-remote-debug.png)
+
+5. Fill the **'target remote' args** with IP address and the port of the `gdbserver`, in this case localhost and 2159. You may want to give this configuration a meaningful name like "Docker Remote Debugging". Click **OK**.
+
+   ![clion add gdbserver config](https://assets.bell-sw.com/docs.bell-sw.com/static/3801029841ed5f6b5b31bf7d9371e338ef12a7acab053dad18a2275308a19be7/c15e7/clion-add-gdbserver-config.png)
+
+6. On the side menu, open `main.c`. Set breakpoints in the `main` and `reverse` functions as in the following image:
+
+   ![clion set breakpoints](https://assets.bell-sw.com/docs.bell-sw.com/static/2e511b48eea66888c43f0ce7300a2cee1a4b913d5c06e62c178ed23e0677f8a9/c15e7/clion-set-breakpoints.png)
+
+7. On the toolbar (top right), click the green bug icon to connect to `gdbserver` on port 2159, as we configured earlier.
+
+   ![clion green bug icon](https://assets.bell-sw.com/docs.bell-sw.com/static/de025715eba27ca1d8d2f55b557cc5e48fdee29006cce851c624d658ef021819/fab5c/clion-green-bug-icon.png)
+
+   The program stops at line 20 in the `main` function, and you can see an argument count (`argc`) of 2. The value of `argv[0]` is "./reverser.debug".
+
+   ![clion gdb run argc value](https://assets.bell-sw.com/docs.bell-sw.com/static/ac1abef9293dfd713aed4b722970bdfb797f1fb831de6a178e8ac73da896ffce/c15e7/clion-gdb-run-argc-value.png)
+
+   We undoubtedly passed the string "noel sees leon" to the program as an argument in the previous steps. Let's look at the value of `argv[1]`.
+
+8. On the debugging toolbar (bottom part of the interface), select **Threads & Variables**. At the top of the window, enter the value you want to evaluate, in this case, `argv[1]`. Press Enter.
+
+   ![clion argv eval](https://assets.bell-sw.com/docs.bell-sw.com/static/937dfc03be74bb7e8883d42d54c080f9c050e1d91e962ddc140e9e444e438abd/c15e7/clion-argv-eval.png)
+
+   The "noel sees leon" string is displayed in the window.
+
+   The first argument of the program is always the program itself, "./reverser.debug". That's why the conditional `if (argc != 1)` fails, since we provide an argument to the program, `argc` should be 2, not 1.
+
+9. Stop the debugging session by pressing red square on the toolbar.
+
+</Steps>
+
+Now fix the bug, re-build the image and run the container again. Then click the debug icon on the toolbar.
+
+![clion step over fixed code](https://assets.bell-sw.com/docs.bell-sw.com/static/aaac7b1014e3bae4c9d194e38dfe6c20657b833533153ec0297048c13aea7a44/c15e7/clion-step-over-fixed-code.png)
+
+The program now continues without exiting with a usage message. Click **Step over** a couple of times, inspect variables or explore the interface. Click **resume program** a few times until the program completes.
+
+Upon finishing the program, it should display the reversed string and `gdbserver` exits.
+
+```text
+$ docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+    -p2159:2159 reverser-arg-debug:latest "noel sees leon"
+
+Process ./reverser.debug created; pid = 9
+Listening on port 2159
+Remote debugging from host ::ffff:172.17.0.1, port 39550
+Reversed string: noel sees leon
+```
+
+<Aside type="note">
+See [CLion's documentation](https://www.jetbrains.com/help/clion/debugging-code.html) for more information about debugging in CLion.
+</Aside>

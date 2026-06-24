@@ -1,0 +1,72 @@
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+## Introduction
+
+Liberica JDK includes the timezone data file `tzdb.dat` that contains information about local time options/properties, including UTC offsets and daylight saving time (DST) changes in different countries. This information is sometimes changed, and thus such data in Liberica JDK may become obsolete before a new build of Liberica JDK is released.
+
+The Time Zone Database (often called tz or zoneinfo) contains code and data that represent the history of local time for many representative locations around the globe. The Time Zone Database is now hosted by the [Internet Assigned Numbers Authority](http://www.iana.org/time-zones) (IANA).
+
+### IANA Updater
+
+[IANAUpdater](https://bell-sw.com/iana-updater/) is the tool that updates the Time Zones information in Liberica JDK and potentially other OpenJDK-based distributions.
+
+IANAUpdater reads timezone data from the [IANA Time Zone Database](https://data.iana.org/time-zones/releases/) and converts it into the binary format of the file `tzdb.dat` used in Liberica JDK.
+
+<Aside type="caution">
+Ensure that you have sufficient privileges to modify the `JDK_HOME/jre/lib` or `JRE_HOME/lib` directory to successfully update timezone data.
+</Aside>
+
+## Using IANA Updater
+
+<Steps>
+
+1. [Download IANAUpdater](https://bell-sw.com/iana-updater/).
+
+2. Run the IANAUpdater tool with the following command:
+
+   ```
+   java -jar IANAUpdater.jar [-options]
+   ```
+
+   If no option is provided, the list of available options is displayed.
+
+</Steps>
+
+### Available options
+
+| Option | Description | Mandatory |
+|---|---|---|
+| `-t, --target` | Path to Liberica runtime base installation directory which contains file `tzdb.dat` in one of its subdirectories, or the absolute path to the `tzdb.dat` file. | Yes |
+| `-z, --tzbundle` | Absolute path to the new timezone data bundle file or URL link to the new IANA timezone data bundle. | Yes |
+| `-q, --quiet` | Switch to silent mode (do not display any messages). | No |
+| `-v, --version` | Print the version number of IANAUpdater and exit. | No |
+
+### Examples
+
+<Aside type="note">
+In the following examples we use IANA Updater version 20230215, which was the latest version at the time of creating this document.
+</Aside>
+
+- Update Liberica JDK which can be found in `${JAVA_HOME}` with time zone data provided in a file:
+
+  ```bash
+  java -jar IANAUpdater-20230215.jar -t ${JAVA_HOME} -z tzdata2021a.tar.gz
+  ```
+
+- Update Liberica JDK `tzdb.dat` with time zone data provided in a file:
+
+  ```bash
+  java -jar IANAUpdater-20230215.jar -t ${JAVA_HOME}/jre/lib/tzdb.dat -z tzdata2021a.tar.gz
+  ```
+
+- Update Liberica JDK `tzdb.dat` with time zone data from a web URL:
+
+  ```bash
+  java -jar IANAUpdater-20230215.jar -t ${JAVA_HOME} -z https://data.iana.org/time-zones/releases/tzdata2021a.tar.gz
+  ```
+
+- Quietly update Liberica JDK `tzdb.dat` with time zone data provided in a file:
+
+  ```bash
+  java -jar IANAUpdater-20230215.jar -t ${JAVA_HOME} -z tzdata2021a.tar.gz -q
+  ```
