@@ -1,5 +1,9 @@
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
+// The product switcher (icons) from starlight-sidebar-topics. We override
+// Starlight's `Sidebar`, which is also what that plugin overrides — so we must
+// render its switcher ourselves, or the product list disappears.
+import TopicsSwitcher from 'starlight-sidebar-topics/components/Sidebar.astro';
 import {
   PRODUCT_VERSIONS,
   productOf,
@@ -18,6 +22,8 @@ if (active && product) {
   route.sidebar = filterSidebarForVersion(route.sidebar, product, active);
 }
 ---
+
+<TopicsSwitcher />
 
 {
   active && (
