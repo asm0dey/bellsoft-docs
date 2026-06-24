@@ -105,6 +105,14 @@ $NIK_HOME/bin/gu -L install python-installable-openjdk21.0.6+10-23.1.6+1-macos-a
 If Liberica Native Image Kit was installed in `/Library/Java/LibericaNativeImageKit` or another location requiring root privileges, you might have to use `sudo` to perform administrative tasks, such as installing additional components or rebuilding the images.
 </Aside>
 
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix), on macOS and Linux. Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
+
+```bash
+sdk install java <identifier-from-the-list>
+```
+
 ### Liberica NIK dependencies on macOS
 
 <Aside type="caution">
@@ -197,6 +205,14 @@ $NIK_HOME/bin/gu -L install python-installable-openjdk21.0.6+10-23.1.6+1-linux-a
 <Aside type="caution">
 If Liberica Native Image Kit was installed via a package manager or in a location requiring root privileges, you might have to use `sudo` to perform administrative tasks, such as installing additional components or rebuilding the images.
 </Aside>
+
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix). Run `sdk list java | grep nik` to find the current Liberica NIK identifier for JDK 21, then install it:
+
+```bash
+sdk install java <identifier-from-the-list>
+```
 
 ### Liberica NIK dependencies on Linux
 
@@ -380,6 +396,16 @@ wasm           23.1.6   GraalWasm           Experimental download.bell-sw.com
 ```
 
 Execute `"%NIK_HOME%\bin\gu.cmd" install [language]` to install a specific language. For example, `"%NIK_HOME%\bin\gu.cmd" install nodejs`.
+
+### Installing with winget
+
+[winget](https://learn.microsoft.com/windows/package-manager/) carries Liberica NIK for JDK 21 (the NIK 23 line):
+
+```powershell
+winget install -e --id BellSoft.LibericaNIK.23.JDK21
+```
+
+Append `--version <build>` to pin a specific build; run `winget show BellSoft.LibericaNIK.23.JDK21` for available versions.
 
 ### Liberica NIK dependencies on Windows
 

@@ -4,15 +4,5 @@ description: Ready-to-run Liberica JDK/JRE container images built on Alpaquita L
 slug: liberica-jdk/21.0.6b10/containers
 ---
 import Body from '@partials/containers-index.mdx';
-import TagPicker from '@components/TagPicker.astro';
-import { withBase } from '@lib/swapVersion.mjs';
-
-export const base = import.meta.env.BASE_URL;
 
 <Body />
-
-See <a href={withBase('/liberica-jdk/21.0.6b10/containers/tags/', base)}>Tags</a> for the
-full naming scheme and <a href={withBase('/liberica-jdk/21.0.6b10/containers/usage/', base)}>Usage</a>
-for `docker` commands. Or build a tag for your needs right here:
-
-<TagPicker />

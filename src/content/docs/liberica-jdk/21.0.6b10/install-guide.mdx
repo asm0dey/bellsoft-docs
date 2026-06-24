@@ -36,6 +36,11 @@ Pick your platform below — your choice is remembered as you scroll and when yo
 
 ## Installing on Windows
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.msi)">
+
 ### Installing with the .msi file
 
 <Steps>
@@ -152,6 +157,9 @@ msiexec /i bellsoft-jdk21.0.6+10-windows-amd64-openwebstart.msi PROXYTYPE=0
 
 </details>
 
+</TabItem>
+<TabItem label="Archive">
+
 ### Installing a standalone package from an archive
 
 <Steps>
@@ -189,6 +197,49 @@ To run your application, use:
 java -jar <your_application.jar>
 ```
 
+</TabItem>
+<TabItem label="Package manager">
+
+### Installing with a package manager
+
+Liberica JDK 21 is also published to common Windows package managers.
+
+<Tabs syncKey="win-pkg">
+<TabItem label="winget">
+
+```powershell
+winget install -e --id BellSoft.LibericaJDK.21.Full --version 21.0.6.10
+```
+
+Omit `--version` to get the latest JDK 21 build. winget uses dotted notation (`21.0.6.10`, not `21.0.6+10`); use the `.Lite` id for the Lite variant.
+
+</TabItem>
+<TabItem label="Scoop">
+
+```powershell
+scoop bucket add java
+scoop install liberica21-jdk
+```
+
+Scoop installs the latest patch of the JDK 21 line (no per-patch pinning).
+
+</TabItem>
+<TabItem label="Chocolatey">
+
+```powershell
+choco install libericajdk
+```
+
+<Aside type="caution">
+Chocolatey packages are community-maintained and lag the official releases — they may not carry the newest JDK 21 patch. Prefer winget or Scoop.
+</Aside>
+
+</TabItem>
+</Tabs>
+
+</TabItem>
+</Tabs>
+
 ### Verifying your installation
 
 Open a command-line interface, such as PowerShell or cmd, and run:
@@ -223,6 +274,11 @@ OpenJDK 64-Bit Server VM (build 21.0.6+10-LTS, mixed mode, sharing)
 
 ## Installing on macOS
 
+Choose an installation method:
+
+<Tabs>
+<TabItem label="Installer (.pkg)">
+
 ### Installing with the package installer
 
 <Steps>
@@ -239,6 +295,9 @@ OpenJDK 64-Bit Server VM (build 21.0.6+10-LTS, mixed mode, sharing)
 7. Once installation is complete, click **Close** to quit the wizard.
 
 </Steps>
+
+</TabItem>
+<TabItem label="Archive">
 
 ### Installing a standalone package from an archive
 
@@ -271,6 +330,38 @@ and run Liberica JDK as follows:
 java -jar <your_application.jar>
 ```
 </Aside>
+
+</TabItem>
+<TabItem label="Package manager">
+
+### Installing with a package manager
+
+Liberica JDK 21 is also available through macOS package managers. Both track the latest patch of a major line, which may be newer than the 21.0.6+10 build documented here.
+
+<Tabs syncKey="mac-pkg">
+<TabItem label="Homebrew">
+
+```bash
+brew tap bell-sw/liberica
+brew install --cask liberica-jdk21
+```
+
+Use `liberica-jdk21-full` or `liberica-jdk21-lite` for those variants.
+
+</TabItem>
+<TabItem label="SDKMAN!">
+
+```bash
+sdk install java 21.0.6-librca
+```
+
+SDKMAN exposes the newest patch of each major line as a single identifier, so the current 21 id may be newer than `21.0.6-librca`; run `sdk list java | grep librca` to confirm. JavaFX and CRaC bundles use the `.fx` / `.crac` suffixes.
+
+</TabItem>
+</Tabs>
+
+</TabItem>
+</Tabs>
 
 ### Verifying your installation
 
@@ -615,6 +706,19 @@ After that, run your Java application:
 ```bash
 java -jar <your_application.jar>
 ```
+
+</TabItem>
+<TabItem label="SDKMAN!">
+
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs and switches between JDKs on Linux, macOS, and WSL:
+
+```bash
+sdk install java 21.0.6-librca
+```
+
+SDKMAN exposes the newest patch of each major line as a single identifier, so the current 21 id may be newer than `21.0.6-librca`; run `sdk list java | grep librca` to confirm. JavaFX and CRaC bundles use the `.fx` / `.crac` suffixes.
 
 </TabItem>
 </Tabs>

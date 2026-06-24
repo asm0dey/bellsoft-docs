@@ -64,6 +64,16 @@ Liberica NIK 25.0.3 is installed to the `/Library/Java/LibericaNativeImageKit/li
 
 To uninstall Liberica NIK, simply remove its directory and unset the related environment variables.
 
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix), on macOS and Linux:
+
+```bash
+sdk install java 25.0.3.r25-nik
+```
+
+SDKMAN exposes only the current NIK build; run `sdk list java | grep nik` for the available identifier. The `.fx` suffix (`25.0.3.fx-nik`) adds JavaFX support.
+
 ### Liberica NIK dependencies on macOS
 
 <Aside type="caution">
@@ -117,6 +127,16 @@ For scripting purposes, we recommend adding the `${NIK_HOME}` environment variab
 </Steps>
 
 To uninstall Liberica NIK, simply remove this directory and unset the related environment variables.
+
+### Installing with SDKMAN!
+
+[SDKMAN!](https://sdkman.io/) installs Liberica NIK as a Java candidate (the `-nik` suffix):
+
+```bash
+sdk install java 25.0.3.r25-nik
+```
+
+SDKMAN exposes only the current NIK build; run `sdk list java | grep nik` for the available identifier.
 
 ### Liberica NIK dependencies on Linux
 

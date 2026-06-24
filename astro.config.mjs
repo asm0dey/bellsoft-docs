@@ -55,13 +55,20 @@ export default defineConfig({
                     'liberica-jdk/25.0.3b11/how-to/performance-edition-overview',
                     'liberica-jdk/25.0.3b11/how-to/perf-getting-started',
                   ]},
+                  { label: 'Container Images', items: [
+                    'liberica-jdk/25.0.3b11/containers',
+                    'liberica-jdk/25.0.3b11/containers/usage',
+                    'liberica-jdk/25.0.3b11/containers/tags',
+                    'liberica-jdk/25.0.3b11/containers/distributions',
+                    'liberica-jdk/25.0.3b11/containers/hardened',
+                  ]},
                   { label: 'How To', items: [
                     'liberica-jdk/25.0.3b11/how-to/use-ide',
                     'liberica-jdk/25.0.3b11/how-to/jvm-memory-configuration',
                     'liberica-jdk/25.0.3b11/how-to/using-crac',
                     'liberica-jdk/25.0.3b11/how-to/updating-time-zone-data',
                   ]},
-                  { label: 'Debugging and Optimization', items: [
+                  { label: 'Debugging and Optimization', collapsed: true, items: [
                     { label: 'JDK Flight Recorder', items: [
                       'liberica-jdk/25.0.3b11/debugging/flight-recorder-mission-control-basics',
                       'liberica-jdk/25.0.3b11/debugging/flight-recorder-code-hotspots',
@@ -71,13 +78,6 @@ export default defineConfig({
                     ]},
                     'liberica-jdk/25.0.3b11/debugging/perf-monitor-java-performance',
                     'liberica-jdk/25.0.3b11/debugging/use-jcmd',
-                  ]},
-                  { label: 'Container Images', items: [
-                    'liberica-jdk/25.0.3b11/containers',
-                    'liberica-jdk/25.0.3b11/containers/tags',
-                    'liberica-jdk/25.0.3b11/containers/usage',
-                    'liberica-jdk/25.0.3b11/containers/distributions',
-                    'liberica-jdk/25.0.3b11/containers/hardened',
                   ]},
                 ],
               },
@@ -91,13 +91,20 @@ export default defineConfig({
                     'liberica-jdk/21.0.6b10/how-to/performance-edition-overview',
                     'liberica-jdk/21.0.6b10/how-to/perf-getting-started',
                   ]},
+                  { label: 'Container Images', items: [
+                    'liberica-jdk/21.0.6b10/containers',
+                    'liberica-jdk/21.0.6b10/containers/usage',
+                    'liberica-jdk/21.0.6b10/containers/tags',
+                    'liberica-jdk/21.0.6b10/containers/distributions',
+                    'liberica-jdk/21.0.6b10/containers/hardened',
+                  ]},
                   { label: 'How To', items: [
                     'liberica-jdk/21.0.6b10/how-to/use-ide',
                     'liberica-jdk/21.0.6b10/how-to/jvm-memory-configuration',
                     'liberica-jdk/21.0.6b10/how-to/using-crac',
                     'liberica-jdk/21.0.6b10/how-to/updating-time-zone-data',
                   ]},
-                  { label: 'Debugging and Optimization', items: [
+                  { label: 'Debugging and Optimization', collapsed: true, items: [
                     { label: 'JDK Flight Recorder', items: [
                       'liberica-jdk/21.0.6b10/debugging/flight-recorder-mission-control-basics',
                       'liberica-jdk/21.0.6b10/debugging/flight-recorder-code-hotspots',
@@ -107,13 +114,6 @@ export default defineConfig({
                     ]},
                     'liberica-jdk/21.0.6b10/debugging/perf-monitor-java-performance',
                     'liberica-jdk/21.0.6b10/debugging/use-jcmd',
-                  ]},
-                  { label: 'Container Images', items: [
-                    'liberica-jdk/21.0.6b10/containers',
-                    'liberica-jdk/21.0.6b10/containers/tags',
-                    'liberica-jdk/21.0.6b10/containers/usage',
-                    'liberica-jdk/21.0.6b10/containers/distributions',
-                    'liberica-jdk/21.0.6b10/containers/hardened',
                   ]},
                 ],
               },
