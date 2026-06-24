@@ -14,7 +14,8 @@ export default defineConfig({
     starlight({
       title: 'BellSoft Docs',
       logo: {
-        src: './src/assets/bellsoft-logo.svg',
+        light: './src/assets/bellsoft-logo.svg',
+        dark: './src/assets/bellsoft-logo-white.svg',
         replacesTitle: false,
         alt: 'BellSoft',
       },
