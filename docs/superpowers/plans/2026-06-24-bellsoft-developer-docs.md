@@ -15,8 +15,14 @@
 - Docs content lives under `src/content/docs/`. Route = file path. Trailing-slash URLs.
 - Product slugs (URL roots, fixed — the version dropdown and topics config depend on them):
   `liberica-jdk`, `liberica-nik`, `containers`, `alpaquita`.
-- Java versions in scope: **25** and **21** only. Version segment is the bare major: `/liberica-jdk/25/...` and `/liberica-jdk/21/...`.
-- Only **Installation Guide** and **Release Notes** are per-version. How-To pages are shared and live at `/liberica-jdk/how-to/...` (no version segment).
+- Versions are **full build versions**, slugified for URLs by replacing `+` with `b` (matching bell-sw.com): display `25.0.3+11` → slug `25.0.3b11`; display `21.0.6+10` → slug `21.0.6b10`. Dots are kept.
+- Two path-versioned products, each with its own version list, in this scope:
+  - **Liberica JDK**: `25.0.3b11`, `21.0.6b10` → `/liberica-jdk/25.0.3b11/...`, `/liberica-jdk/21.0.6b10/...`
+  - **Liberica NIK**: `25.0.3b11`, `21.0.6b10` → `/liberica-nik/25.0.3b11/...`, `/liberica-nik/21.0.6b10/...` (ponytail: NIK's real scheme is GraalVM-based; we reuse the bundled-Java full versions so the dropdown is uniform).
+  - Containers (Docker tags) and Alpaquita (streams) are NOT path-versioned.
+- The single source of truth for versions is the `PRODUCT_VERSIONS` registry in `src/lib/swapVersion.mjs` (Task 3): `{ 'liberica-jdk': [{slug,label}…], 'liberica-nik': [{slug,label}…] }`. The sidebar config, the dropdown, and the content dir names all use these exact slugs.
+- Only **Installation Guide** and **Release Notes** are per-version. How-To / Debugging pages are shared and live at `/liberica-jdk/how-to/...`, `/liberica-jdk/debugging/...` (no version segment).
+- **Search:** Starlight's built-in Pagefind search is enabled by default and must stay on — do not disable it.
 - Real product/package facts (use verbatim, do not invent):
   - JDK Linux package name pattern: `bellsoft-java<major>` (e.g. `bellsoft-java25`, `bellsoft-java21`).
   - JDK download host: `https://download.bell-sw.com/java/<version>/...`; APT repo `https://apt.bell-sw.com/`; GPG key `https://download.bell-sw.com/pki/GPG-KEY-bellsoft`.
@@ -48,11 +54,15 @@ bellsoft-docs/
 │       └── docs/
 │           ├── index.mdx                                  # landing / splash
 │           ├── liberica-jdk/
-│           │   ├── 25/{install-guide.mdx,release-notes.md}   # .mdx: uses <Tabs>
-│           │   ├── 21/{install-guide.mdx,release-notes.md}
+│           │   ├── 25.0.3b11/{install-guide.mdx,release-notes.md}  # .mdx: uses <Tabs>
+│           │   ├── 21.0.6b10/{install-guide.mdx,release-notes.md}
 │           │   ├── how-to/{ide,jvm-memory,crac}.md
 │           │   └── debugging/{jfr-mission-control,jcmd}.md   # external links: Security Advisory, Legal (no local files)
-│           ├── liberica-nik/{index,install-guide,release-notes,how-to-spring-boot}.md
+│           ├── liberica-nik/
+│           │   ├── index.md                                  # shared landing
+│           │   ├── 25.0.3b11/{install-guide,release-notes}.md
+│           │   ├── 21.0.6b10/{install-guide,release-notes}.md
+│           │   └── how-to-spring-boot.md                     # shared
 │           ├── containers/{index,tags,usage}.md
 │           └── alpaquita/{index,get-started}.md
 └── public/                        # (favicon/logo placeholder if added)
@@ -122,7 +132,7 @@ hero:
   tagline: Liberica JDK, Native Image Kit, container images, and Alpaquita Linux — in one place.
   actions:
     - text: Liberica JDK 25 install
-      link: /liberica-jdk/25/install-guide/
+      link: /liberica-jdk/25.0.3b11/install-guide/
       icon: right-arrow
 ---
 
@@ -148,14 +158,14 @@ git commit -m "chore: scaffold Astro + Starlight docs site"
 **Files:**
 - Modify: `astro.config.mjs`
 - Create: stub content so every topic link resolves —
-  `src/content/docs/liberica-jdk/25/install-guide.mdx`,
+  `src/content/docs/liberica-jdk/25.0.3b11/install-guide.mdx`,
   `src/content/docs/liberica-nik/index.md`,
   `src/content/docs/containers/index.md`,
   `src/content/docs/alpaquita/index.md`
 
 **Interfaces:**
 - Consumes: working Starlight site from Task 1.
-- Produces: four-topic sidebar (icons: JDK, NIK, Containers, Alpaquita), each topic linking to a real page. JDK topic sidebar exposes version groups `25` and `21` plus a shared `How To` group. The exact slugs `liberica-jdk/25/install-guide`, `liberica-jdk/21/install-guide`, `liberica-jdk/25/release-notes`, `liberica-jdk/21/release-notes`, `liberica-jdk/how-to/ide`, `liberica-jdk/how-to/jvm-memory` are fixed here and consumed by Tasks 3–5.
+- Produces: four-topic sidebar (icons: JDK, NIK, Containers, Alpaquita), each topic linking to a real page. JDK topic sidebar exposes version groups `25` and `21` plus a shared `How To` group. The exact slugs `liberica-jdk/25.0.3b11/install-guide`, `liberica-jdk/21.0.6b10/install-guide`, `liberica-jdk/25.0.3b11/release-notes`, `liberica-jdk/21.0.6b10/release-notes`, `liberica-jdk/how-to/ide`, `liberica-jdk/how-to/jvm-memory` are fixed here and consumed by Tasks 3–5.
 
 - [ ] **Step 1: Install the topics plugin**
 
@@ -165,7 +175,7 @@ bun add starlight-sidebar-topics
 
 - [ ] **Step 2: Create stub pages so all topic links resolve (build fails otherwise)**
 
-`src/content/docs/liberica-jdk/25/install-guide.mdx` (note `.mdx` — Task 4 adds `<Tabs>`):
+`src/content/docs/liberica-jdk/25.0.3b11/install-guide.mdx` (note `.mdx` — Task 4 adds `<Tabs>`):
 
 ```mdx
 ---
@@ -224,21 +234,21 @@ export default defineConfig({
         starlightSidebarTopics([
           {
             label: 'Liberica JDK',
-            link: '/liberica-jdk/25/install-guide/',
+            link: '/liberica-jdk/25.0.3b11/install-guide/',
             icon: 'seti:java',
             items: [
               {
-                label: 'Version 25 (LTS)',
+                label: '25.0.3+11 (LTS)',
                 items: [
-                  'liberica-jdk/25/release-notes',
-                  'liberica-jdk/25/install-guide',
+                  'liberica-jdk/25.0.3b11/release-notes',
+                  'liberica-jdk/25.0.3b11/install-guide',
                 ],
               },
               {
-                label: 'Version 21 (LTS)',
+                label: '21.0.6+10 (LTS)',
                 items: [
-                  'liberica-jdk/21/release-notes',
-                  'liberica-jdk/21/install-guide',
+                  'liberica-jdk/21.0.6b10/release-notes',
+                  'liberica-jdk/21.0.6b10/install-guide',
                 ],
               },
               {
@@ -328,16 +338,16 @@ Note: icon names must be valid Starlight built-ins. `seti:java`, `seti:docker`, 
 - [ ] **Step 5: Build — only the stub pages exist, so expect "missing page" errors for not-yet-created slugs**
 
 Run: `bun run build`
-Expected: FAIL. The plugin references slugs (`liberica-jdk/21/...`, `liberica-nik/install-guide`, etc.) that have no file yet, so Starlight errors with `The slug "..." does not exist`. This confirms the config is being read.
+Expected: FAIL. The plugin references slugs (`liberica-jdk/21.0.6b10/...`, `liberica-nik/install-guide`, etc.) that have no file yet, so Starlight errors with `The slug "..." does not exist`. This confirms the config is being read.
 
 - [ ] **Step 6: Create minimal stubs for every remaining referenced slug so the build passes**
 
 Create each of these with a one-line frontmatter `title:` and a "Content in Task N." body:
-`liberica-jdk/25/release-notes.md`, `liberica-jdk/21/install-guide.mdx`, `liberica-jdk/21/release-notes.md`, `liberica-jdk/how-to/ide.md`, `liberica-jdk/how-to/jvm-memory.md`, `liberica-jdk/how-to/crac.md`, `liberica-jdk/debugging/jfr-mission-control.md`, `liberica-jdk/debugging/jcmd.md`, `liberica-nik/install-guide.md`, `liberica-nik/release-notes.md`, `liberica-nik/how-to-spring-boot.md`, `containers/tags.md`, `containers/usage.md`, `alpaquita/get-started.md`.
+`liberica-jdk/25.0.3b11/release-notes.md`, `liberica-jdk/21.0.6b10/install-guide.mdx`, `liberica-jdk/21.0.6b10/release-notes.md`, `liberica-jdk/how-to/ide.md`, `liberica-jdk/how-to/jvm-memory.md`, `liberica-jdk/how-to/crac.md`, `liberica-jdk/debugging/jfr-mission-control.md`, `liberica-jdk/debugging/jcmd.md`, `liberica-nik/install-guide.md`, `liberica-nik/release-notes.md`, `liberica-nik/how-to-spring-boot.md`, `containers/tags.md`, `containers/usage.md`, `alpaquita/get-started.md`.
 
 (The Security Advisory and Legal sidebar entries are external links — no local files needed.)
 
-Example (`src/content/docs/liberica-jdk/21/install-guide.mdx`):
+Example (`src/content/docs/liberica-jdk/21.0.6b10/install-guide.mdx`):
 
 ```mdx
 ---
@@ -354,7 +364,7 @@ Expected: PASS. Output includes all the routes above.
 
 - [ ] **Step 8: Eyeball the switcher**
 
-Run: `bun run dev`, open `http://localhost:4321/liberica-jdk/25/install-guide/`.
+Run: `bun run dev`, open `http://localhost:4321/liberica-jdk/25.0.3b11/install-guide/`.
 Expected: top-of-sidebar shows four product entries with icons; JDK sidebar shows the Version 25 / Version 21 / How To groups. Stop the dev server.
 
 - [ ] **Step 9: Commit**
@@ -385,38 +395,68 @@ git commit -m "feat: product switcher with icons and topic sidebars"
 ```js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { swapVersion, KNOWN_VERSIONS, versionOf } from '../src/lib/swapVersion.mjs';
+import {
+  swapVersion,
+  versionOf,
+  productOf,
+  PRODUCT_VERSIONS,
+} from '../src/lib/swapVersion.mjs';
 
-test('swaps the version segment, keeping the rest of the path', () => {
+test('swaps the full-version segment on JDK paths, keeping the rest', () => {
   assert.equal(
-    swapVersion('/liberica-jdk/25/install-guide/', '21'),
-    '/liberica-jdk/21/install-guide/'
+    swapVersion('/liberica-jdk/25.0.3b11/install-guide/', '21.0.6b10'),
+    '/liberica-jdk/21.0.6b10/install-guide/'
   );
   assert.equal(
-    swapVersion('/liberica-jdk/21/release-notes/', '25'),
-    '/liberica-jdk/25/release-notes/'
+    swapVersion('/liberica-jdk/21.0.6b10/release-notes/', '25.0.3b11'),
+    '/liberica-jdk/25.0.3b11/release-notes/'
   );
 });
 
-test('returns the path unchanged for non-version JDK paths', () => {
+test('swaps the full-version segment on NIK paths, keeping the product', () => {
   assert.equal(
-    swapVersion('/liberica-jdk/how-to/ide/', '21'),
+    swapVersion('/liberica-nik/25.0.3b11/install-guide/', '21.0.6b10'),
+    '/liberica-nik/21.0.6b10/install-guide/'
+  );
+});
+
+test('returns the path unchanged for shared (non-version) pages', () => {
+  assert.equal(
+    swapVersion('/liberica-jdk/how-to/ide/', '21.0.6b10'),
     '/liberica-jdk/how-to/ide/'
   );
+  assert.equal(
+    swapVersion('/liberica-nik/how-to-spring-boot/', '21.0.6b10'),
+    '/liberica-nik/how-to-spring-boot/'
+  );
 });
 
-test('returns the path unchanged for other products', () => {
-  assert.equal(swapVersion('/containers/tags/', '21'), '/containers/tags/');
+test('returns the path unchanged for unversioned products', () => {
+  assert.equal(swapVersion('/containers/tags/', '21.0.6b10'), '/containers/tags/');
+  assert.equal(swapVersion('/alpaquita/', '25.0.3b11'), '/alpaquita/');
 });
 
-test('versionOf extracts the active version, or null', () => {
-  assert.equal(versionOf('/liberica-jdk/25/install-guide/'), '25');
+test('versionOf returns the active slug only for a known version of that product', () => {
+  assert.equal(versionOf('/liberica-jdk/25.0.3b11/install-guide/'), '25.0.3b11');
+  assert.equal(versionOf('/liberica-nik/21.0.6b10/install-guide/'), '21.0.6b10');
   assert.equal(versionOf('/liberica-jdk/how-to/ide/'), null);
-  assert.equal(versionOf('/containers/'), null);
+  assert.equal(versionOf('/liberica-jdk/9.9.9b9/install-guide/'), null);
+  assert.equal(versionOf('/containers/tags/'), null);
 });
 
-test('KNOWN_VERSIONS is the showcase set', () => {
-  assert.deepEqual(KNOWN_VERSIONS, ['25', '21']);
+test('productOf identifies the path-versioned product, or null', () => {
+  assert.equal(productOf('/liberica-jdk/25.0.3b11/install-guide/'), 'liberica-jdk');
+  assert.equal(productOf('/liberica-nik/21.0.6b10/release-notes/'), 'liberica-nik');
+  assert.equal(productOf('/containers/tags/'), null);
+});
+
+test('PRODUCT_VERSIONS holds the showcase registry', () => {
+  assert.deepEqual(Object.keys(PRODUCT_VERSIONS), ['liberica-jdk', 'liberica-nik']);
+  assert.deepEqual(
+    PRODUCT_VERSIONS['liberica-jdk'].map((v) => v.slug),
+    ['25.0.3b11', '21.0.6b10']
+  );
+  assert.equal(PRODUCT_VERSIONS['liberica-jdk'][0].label, '25.0.3+11');
 });
 ```
 
@@ -430,28 +470,52 @@ Expected: FAIL with `Cannot find module '../src/lib/swapVersion.mjs'`.
 `src/lib/swapVersion.mjs`:
 
 ```js
-// Showcase version set. Order = display order in the dropdown.
-export const KNOWN_VERSIONS = ['25', '21'];
+// Single source of truth for path-versioned products. Order = dropdown order.
+// slug = URL segment (bell-sw.com style: `+` -> `b`); label = display string.
+// Containers (Docker tags) and Alpaquita (streams) are intentionally absent —
+// they are not path-versioned, so the dropdown never appears on them.
+export const PRODUCT_VERSIONS = {
+  'liberica-jdk': [
+    { slug: '25.0.3b11', label: '25.0.3+11' },
+    { slug: '21.0.6b10', label: '21.0.6+10' },
+  ],
+  'liberica-nik': [
+    { slug: '25.0.3b11', label: '25.0.3+11' },
+    { slug: '21.0.6b10', label: '21.0.6+10' },
+  ],
+};
 
-const VERSION_PATH = /^\/liberica-jdk\/(\d+)(\/|$)/;
+// Matches the leading `/<product>/<segment>/` of a path.
+// Group 1 = product, 2 = segment, 3 = trailing slash or end.
+const PREFIX = /^\/([^/]+)\/([^/]+)(\/|$)/;
 
-// Returns the active JDK version in a path, or null if not version-scoped.
-export function versionOf(pathname) {
-  const m = pathname.match(VERSION_PATH);
-  return m && KNOWN_VERSIONS.includes(m[1]) ? m[1] : null;
+// The path-versioned product in a path, or null.
+export function productOf(pathname) {
+  const m = pathname.match(PREFIX);
+  return m && PRODUCT_VERSIONS[m[1]] ? m[1] : null;
 }
 
-// Rewrites the version segment; leaves non-version paths untouched.
-export function swapVersion(pathname, version) {
+// The active version slug in a path, or null when the segment is not a known
+// version of that product (e.g. a shared page like `/liberica-jdk/how-to/...`).
+export function versionOf(pathname) {
+  const m = pathname.match(PREFIX);
+  if (!m) return null;
+  const versions = PRODUCT_VERSIONS[m[1]];
+  return versions && versions.some((v) => v.slug === m[2]) ? m[2] : null;
+}
+
+// Rewrites the version segment to `slug`, keeping the product and rest of the
+// path. Non-version paths are returned untouched.
+export function swapVersion(pathname, slug) {
   if (!versionOf(pathname)) return pathname;
-  return pathname.replace(VERSION_PATH, `/liberica-jdk/${version}$2`);
+  return pathname.replace(PREFIX, `/$1/${slug}$3`);
 }
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `bun run test:unit`
-Expected: PASS (5 tests, 0 failures).
+Expected: PASS (7 tests, 0 failures).
 
 - [ ] **Step 5: Build the dropdown component**
 
@@ -460,20 +524,22 @@ Expected: PASS (5 tests, 0 failures).
 ```astro
 ---
 import Default from '@astrojs/starlight/components/Sidebar.astro';
-import { KNOWN_VERSIONS, versionOf } from '../lib/swapVersion.mjs';
+import { PRODUCT_VERSIONS, productOf, versionOf } from '../lib/swapVersion.mjs';
 
 const pathname = Astro.url.pathname;
 const active = versionOf(pathname);
+const product = productOf(pathname);
+const versions = active ? PRODUCT_VERSIONS[product] : [];
 ---
 
 {
   active && (
     <div class="version-switcher">
-      <label for="jdk-version">Java version</label>
-      <select id="jdk-version" data-path={pathname}>
-        {KNOWN_VERSIONS.map((v) => (
-          <option value={v} selected={v === active}>
-            JDK {v}
+      <label for="version-select">Version</label>
+      <select id="version-select" data-path={pathname}>
+        {versions.map((v) => (
+          <option value={v.slug} selected={v.slug === active}>
+            {v.label}
           </option>
         ))}
       </select>
@@ -485,7 +551,7 @@ const active = versionOf(pathname);
 
 <script>
   import { swapVersion } from '../lib/swapVersion.mjs';
-  const select = document.getElementById('jdk-version');
+  const select = document.getElementById('version-select');
   if (select instanceof HTMLSelectElement) {
     select.addEventListener('change', () => {
       const from = select.dataset.path ?? location.pathname;
@@ -538,7 +604,8 @@ Run: `bun run build`
 Expected: PASS.
 
 Run: `bun run dev`, then check:
-- `http://localhost:4321/liberica-jdk/25/install-guide/` → dropdown shows "JDK 25" selected.
+- `http://localhost:4321/liberica-jdk/25.0.3b11/install-guide/` → dropdown shows "25.0.3+11" selected.
+- `http://localhost:4321/liberica-nik/25.0.3b11/install-guide/` → dropdown shows on NIK too (once Task 6 lands; the stub Task 2 created is flat, so the dropdown only appears after Task 6 versions NIK).
 - `http://localhost:4321/liberica-jdk/how-to/ide/` → no dropdown.
 - `http://localhost:4321/containers/` → no dropdown.
 Stop the dev server.
@@ -571,22 +638,22 @@ export default defineConfig({
 import { test, expect } from '@playwright/test';
 
 test('switching JDK version lands on the same page', async ({ page }) => {
-  await page.goto('/liberica-jdk/25/install-guide/');
-  await page.selectOption('#jdk-version', '21');
-  await expect(page).toHaveURL(/\/liberica-jdk\/21\/install-guide\/?$/);
-  await expect(page.locator('h1')).toContainText('21');
+  await page.goto('/liberica-jdk/25.0.3b11/install-guide/');
+  await page.selectOption('#version-select', '21.0.6b10');
+  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/install-guide\/?$/);
+  await expect(page.locator('h1')).toContainText('21'); // URL above proves the exact slug
 });
 
 test('no version dropdown on shared how-to pages', async ({ page }) => {
   await page.goto('/liberica-jdk/how-to/ide/');
-  await expect(page.locator('#jdk-version')).toHaveCount(0);
+  await expect(page.locator('#version-select')).toHaveCount(0);
 });
 ```
 
 - [ ] **Step 9: Run the e2e smoke test**
 
 Run: `bun run test:e2e`
-Expected: PASS (2 tests). The first relies on `21/install-guide` having an `<h1>` containing "21" — the stub from Task 2 satisfies this; Task 5 keeps it true.
+Expected: PASS (2 tests). The first relies on the `21.0.6b10/install-guide` page existing with an `<h1>` containing "21" — the stub from Task 2 (after migration to full-version slugs) satisfies this; Task 5 keeps it true. The URL assertion proves the exact full-version slug.
 
 - [ ] **Step 10: Commit**
 
@@ -600,8 +667,8 @@ git commit -m "feat: version-switcher dropdown with same-page mapping"
 ### Task 4: Liberica JDK 25 — real Installation Guide + Release Notes
 
 **Files:**
-- Modify: `src/content/docs/liberica-jdk/25/install-guide.mdx`
-- Modify: `src/content/docs/liberica-jdk/25/release-notes.md`
+- Modify: `src/content/docs/liberica-jdk/25.0.3b11/install-guide.mdx`
+- Modify: `src/content/docs/liberica-jdk/25.0.3b11/release-notes.md`
 
 **Interfaces:**
 - Consumes: slugs fixed in Task 2; dropdown from Task 3.
@@ -609,7 +676,7 @@ git commit -m "feat: version-switcher dropdown with same-page mapping"
 
 - [ ] **Step 1: Write the Installation Guide with synced tabs**
 
-Overwrite `src/content/docs/liberica-jdk/25/install-guide.mdx` (`.mdx` is required for the `<Tabs>` import):
+Overwrite `src/content/docs/liberica-jdk/25.0.3b11/install-guide.mdx` (`.mdx` is required for the `<Tabs>` import):
 
 ````mdx
 ---
@@ -730,7 +797,7 @@ Liberica JDK 25 directory and that its `bin` is first on your `PATH`.
 
 - [ ] **Step 2: Write the Release Notes**
 
-Overwrite `src/content/docs/liberica-jdk/25/release-notes.md`:
+Overwrite `src/content/docs/liberica-jdk/25.0.3b11/release-notes.md`:
 
 ```md
 ---
@@ -788,8 +855,8 @@ git commit -m "docs: Liberica JDK 25 install guide and release notes"
 ### Task 5: Liberica JDK 21 — parallel Installation Guide + Release Notes
 
 **Files:**
-- Modify: `src/content/docs/liberica-jdk/21/install-guide.mdx`
-- Modify: `src/content/docs/liberica-jdk/21/release-notes.md`
+- Modify: `src/content/docs/liberica-jdk/21.0.6b10/install-guide.mdx`
+- Modify: `src/content/docs/liberica-jdk/21.0.6b10/release-notes.md`
 
 **Interfaces:**
 - Consumes: same slug/heading structure and the **same `syncKey` values** (`os`, `distro`) as Task 4 — so a reader's OS/distro choice carries over when the version dropdown switches 25 ⇄ 21. The dropdown depends on identical page slugs across versions; the e2e test depends on the `<h1>` containing "21".
@@ -797,7 +864,7 @@ git commit -m "docs: Liberica JDK 25 install guide and release notes"
 
 - [ ] **Step 1: Write the Installation Guide (same tab structure, version 21 values)**
 
-Overwrite `src/content/docs/liberica-jdk/21/install-guide.mdx`:
+Overwrite `src/content/docs/liberica-jdk/21.0.6b10/install-guide.mdx`:
 
 ````mdx
 ---
@@ -918,7 +985,7 @@ Liberica JDK 21 directory and that its `bin` is first on your `PATH`.
 
 - [ ] **Step 2: Write the Release Notes**
 
-Overwrite `src/content/docs/liberica-jdk/21/release-notes.md`:
+Overwrite `src/content/docs/liberica-jdk/21.0.6b10/release-notes.md`:
 
 ```md
 ---
@@ -967,7 +1034,7 @@ Expected: PASS.
 - [ ] **Step 4: Re-run the e2e smoke test now that both versions are real**
 
 Run: `bun run test:e2e`
-Expected: PASS (2 tests). Switching 25 → 21 lands on `/liberica-jdk/21/install-guide/` with an `<h1>` containing "21".
+Expected: PASS (2 tests). Switching 25 → 21 lands on `/liberica-jdk/21.0.6b10/install-guide/` with an `<h1>` containing "21".
 
 - [ ] **Step 5: Commit**
 
@@ -1083,7 +1150,43 @@ with `Core.getGlobalContext().register(...)` to close/reopen files and sockets
 around the checkpoint.
 ````
 
-- [ ] **Step 2: Write the NIK landing page**
+**NIK is path-versioned (25 + 21), like JDK**, so it gets the version dropdown too. Per-version pages are Install Guide + Release Notes; the landing and the Spring Boot how-to are shared (no version segment). ponytail: real NIK versioning follows a GraalVM-based scheme — for the showcase we label NIK builds by their bundled-Java LTS (25, 21) so the dropdown is uniform across products; upgrade path is to use NIK's real version strings if you later mirror them.
+
+- [ ] **Step 2: Restructure the NIK topic to be versioned (astro.config.mjs)**
+
+The NIK topic was a flat list in Task 2. Replace its `items` so it mirrors the JDK topic — version groups + a shared How To group. In `astro.config.mjs`, change the Native Image Kit topic's `items` to:
+
+```js
+            items: [
+              'liberica-nik',
+              {
+                label: '25.0.3+11 (LTS)',
+                items: [
+                  'liberica-nik/25.0.3b11/release-notes',
+                  'liberica-nik/25.0.3b11/install-guide',
+                ],
+              },
+              {
+                label: '21.0.6+10 (LTS)',
+                items: [
+                  'liberica-nik/21.0.6b10/release-notes',
+                  'liberica-nik/21.0.6b10/install-guide',
+                ],
+              },
+              {
+                label: 'How To',
+                items: ['liberica-nik/how-to-spring-boot'],
+              },
+            ],
+```
+
+Then delete the two now-obsolete flat stubs from Task 2:
+
+```bash
+git rm src/content/docs/liberica-nik/install-guide.md src/content/docs/liberica-nik/release-notes.md
+```
+
+- [ ] **Step 3: Write the NIK landing page (shared)**
 
 Overwrite `src/content/docs/liberica-nik/index.md`:
 
@@ -1097,29 +1200,29 @@ Liberica Native Image Kit (NIK) is a GraalVM-based tool that transforms Java
 applications into fast, lightweight native executables. Ahead-of-time
 compilation cuts startup time and memory use — ideal for cloud and containers.
 
-- [Installation Guide](/liberica-nik/install-guide/)
-- [Release Notes](/liberica-nik/release-notes/)
+- [Installation Guide (NIK 25)](/liberica-nik/25.0.3b11/install-guide/)
+- [Release Notes (NIK 25)](/liberica-nik/25.0.3b11/release-notes/)
 - [How To: native image from Spring Boot](/liberica-nik/how-to-spring-boot/)
 ```
 
-- [ ] **Step 3: Write the NIK install guide**
+- [ ] **Step 4: Write the per-version NIK install guides**
 
-Overwrite `src/content/docs/liberica-nik/install-guide.md`:
+`src/content/docs/liberica-nik/25.0.3b11/install-guide.md`:
 
 ````md
 ---
-title: "Liberica NIK: Installation Guide"
-description: Install Liberica Native Image Kit and build your first native image.
+title: "Liberica NIK 25: Installation Guide"
+description: Install Liberica Native Image Kit (bundles Java 25) and build your first native image.
 ---
 
 ## Install
 
-Download the NIK archive for your platform from the BellSoft downloads page and
-unpack it, then put its `bin` on your `PATH`:
+Download the NIK 25 archive for your platform from the BellSoft downloads page,
+unpack it, and put its `bin` on your `PATH`:
 
 ```bash
-tar -zxvf bellsoft-nik-24-25-linux-amd64.tar.gz
-export PATH="$PWD/bellsoft-nik-24-25/bin:$PATH"
+tar -zxvf bellsoft-nik-25-linux-amd64.tar.gz
+export PATH="$PWD/bellsoft-nik-25/bin:$PATH"
 ```
 
 ## Build a native HelloWorld
@@ -1139,26 +1242,82 @@ native-image HelloWorld
 ```
 ````
 
-- [ ] **Step 4: Write the NIK release notes and Spring Boot how-to**
+`src/content/docs/liberica-nik/21.0.6b10/install-guide.md` (same structure, NIK 21):
 
-Overwrite `src/content/docs/liberica-nik/release-notes.md`:
+````md
+---
+title: "Liberica NIK 21: Installation Guide"
+description: Install Liberica Native Image Kit (bundles Java 21) and build your first native image.
+---
+
+## Install
+
+Download the NIK 21 archive for your platform from the BellSoft downloads page,
+unpack it, and put its `bin` on your `PATH`:
+
+```bash
+tar -zxvf bellsoft-nik-21-linux-amd64.tar.gz
+export PATH="$PWD/bellsoft-nik-21/bin:$PATH"
+```
+
+## Build a native HelloWorld
+
+```bash
+cat > HelloWorld.java <<'EOF'
+public class HelloWorld {
+  public static void main(String[] args) {
+    System.out.println("Hello, native world!");
+  }
+}
+EOF
+
+javac HelloWorld.java
+native-image HelloWorld
+./helloworld
+```
+````
+
+- [ ] **Step 5a: Write the per-version NIK release notes**
+
+`src/content/docs/liberica-nik/25.0.3b11/release-notes.md`:
 
 ```md
 ---
-title: "Liberica NIK: Release Notes"
-description: Release notes for Liberica Native Image Kit.
+title: "Liberica NIK 25: Release Notes"
+description: Release notes for Liberica Native Image Kit bundling Java 25.
 ---
 
 ## Version information
 
 - **Base:** GraalVM Community
-- **Bundled Java:** matches the corresponding Liberica JDK LTS line.
+- **Bundled Java:** Liberica JDK 25 (LTS).
 
 ## What's New
 
-- Native image generation for current LTS Java versions.
+- Native image generation on the Java 25 LTS line.
 - CRaC and container-friendly defaults.
 ```
+
+`src/content/docs/liberica-nik/21.0.6b10/release-notes.md`:
+
+```md
+---
+title: "Liberica NIK 21: Release Notes"
+description: Release notes for Liberica Native Image Kit bundling Java 21.
+---
+
+## Version information
+
+- **Base:** GraalVM Community
+- **Bundled Java:** Liberica JDK 21 (LTS).
+
+## What's New
+
+- Native image generation on the Java 21 LTS line.
+- CRaC and container-friendly defaults.
+```
+
+- [ ] **Step 5b: Write the shared Spring Boot how-to**
 
 Overwrite `src/content/docs/liberica-nik/how-to-spring-boot.md`:
 
@@ -1456,13 +1615,46 @@ git commit -m "docs: Alpaquita Linux product pages"
 ### Task 10: Branding, landing polish, and full verification
 
 **Files:**
+- Create: `src/assets/bellsoft-logo.svg` (downloaded from the official site)
+- Modify: `astro.config.mjs` (real title, `logo` config, fix scaffold social link)
 - Modify: `src/styles/custom.css`
-- Modify: `astro.config.mjs` (site title / social link, optional)
 - Modify: `src/content/docs/index.mdx` (richer hero with all four products)
 
 **Interfaces:**
 - Consumes: everything above.
-- Produces: branded, developer-friendly landing and the final green build + tests.
+- Produces: branded, developer-friendly landing (real BellSoft logo in the header) and the final green build + tests.
+
+- [ ] **Step 0: Reuse the real BellSoft logo in the header**
+
+Download the official logo asset and wire it via Starlight's native `logo` option (no component override needed). ponytail: BellSoft's logo is their trademark — fine for this showcase, not for publishing as if official.
+
+```bash
+mkdir -p src/assets
+# Grab the site's header logo (SVG preferred). Inspect https://bell-sw.com/ for the
+# current asset URL; as of writing it is served from their assets path:
+curl -fsSL -o src/assets/bellsoft-logo.svg "https://bell-sw.com/assets/images/logo.svg" \
+  || curl -fsSL -o src/assets/bellsoft-logo.svg "https://www.bell-sw.com/assets/images/bellsoft-logo.svg"
+# Verify it is real SVG, not an HTML error page:
+head -c 64 src/assets/bellsoft-logo.svg
+```
+
+If neither URL resolves to an SVG, open https://bell-sw.com/ in a browser, copy the header logo's asset URL from devtools, and curl that. If only a PNG is available, save it as `src/assets/bellsoft-logo.png` and reference that path instead.
+
+In `astro.config.mjs`, set the real title and logo inside the `starlight({ ... })` options, and replace the scaffold GitHub social link with the BellSoft site:
+
+```js
+      title: 'BellSoft Docs',
+      logo: {
+        src: './src/assets/bellsoft-logo.svg',
+        replacesTitle: false,
+        alt: 'BellSoft',
+      },
+      social: [
+        { icon: 'external', label: 'bell-sw.com', href: 'https://bell-sw.com/' },
+      ],
+```
+
+Build to confirm the asset resolves (`bun run build` — Astro errors if the `logo.src` path is missing).
 
 - [ ] **Step 1: Add brand color tokens**
 
@@ -1497,7 +1689,7 @@ hero:
   tagline: Everything you need to download, install, and run BellSoft's Java runtimes.
   actions:
     - text: Install Liberica JDK 25
-      link: /liberica-jdk/25/install-guide/
+      link: /liberica-jdk/25.0.3b11/install-guide/
       icon: right-arrow
       variant: primary
     - text: Native Image Kit
@@ -1539,7 +1731,7 @@ Expected: unit 5 PASS; e2e 2 PASS.
 
 Run: `bun run dev` and verify:
 - Sidebar shows four product icons; clicking each swaps the sidebar.
-- On `/liberica-jdk/25/install-guide/`, the version dropdown switches to 21 and stays on the install guide.
+- On `/liberica-jdk/25.0.3b11/install-guide/`, the version dropdown switches to 21 and stays on the install guide.
 - On the install guide, picking the **Linux → Alpine (apk)** tab, then switching to JDK 21 via the dropdown, keeps Linux/Alpine selected (synced tabs).
 - The JDK sidebar shows a visible **Security Advisory** link (opens docs.bell-sw.com) and a **Legal** group (EULA + third-party licenses).
 - Search (top of page) finds "native-image" and "bellsoft-java21".
@@ -1572,12 +1764,13 @@ bun run test:e2e
 ## Structure
 
 - Products are sidebar "topics" (`starlight-sidebar-topics`) with icons.
-- Liberica JDK has per-version pages for 25 and 21; the sidebar version
-  dropdown (`src/components/VersionSwitcher.astro`) keeps you on the same page
-  across versions via `src/lib/swapVersion.mjs`.
-- Add a JDK version: create `src/content/docs/liberica-jdk/<major>/{install-guide,release-notes}.md`,
-  add `<major>` to `KNOWN_VERSIONS` in `src/lib/swapVersion.mjs`, and add a
-  group to the JDK topic in `astro.config.mjs`.
+- Liberica JDK and NIK have per-version pages (full versions, e.g. `25.0.3b11`);
+  the sidebar version dropdown (`src/components/VersionSwitcher.astro`) keeps you
+  on the same page across versions via `src/lib/swapVersion.mjs`.
+- Add a version: create `src/content/docs/<product>/<version-slug>/{install-guide,release-notes}.md`
+  (slug = full version with `+`→`b`, e.g. `25.0.4b7`), add `{slug,label}` to that
+  product's array in `PRODUCT_VERSIONS` in `src/lib/swapVersion.mjs`, and add a
+  group to the product's topic in `astro.config.mjs`.
 ````
 
 - [ ] **Step 7: Final commit**
@@ -1661,7 +1854,7 @@ git commit -m "build: validate internal links via starlight-links-validator"
 
 **2. Placeholder scan:** No "TBD"/"add error handling"/"similar to Task N". Every code/content step shows full content. The Task 2 stubs are an intentional, explicitly-labeled bootstrap (the plugin needs all referenced slugs to exist before the build passes) and every stub is replaced with real content in Tasks 4–9.
 
-**3. Type consistency:** `swapVersion(pathname, version)`, `versionOf(pathname)`, `KNOWN_VERSIONS` are defined in Task 3 and used identically in the component, tests, and README. Slugs (`liberica-jdk/25/install-guide`, etc.) are fixed in Task 2 and reused verbatim everywhere. Icon names (`seti:java`, `rocket`, `seti:docker`, `linux`) are consistent between the topics config (Task 2) and the landing cards (Task 9).
+**3. Type consistency:** `swapVersion(pathname, slug)`, `versionOf(pathname)`, `productOf(pathname)`, and the `PRODUCT_VERSIONS` registry are defined in Task 3 and used identically in the component, tests, and README. Full-version slugs (`liberica-jdk/25.0.3b11/install-guide`, `liberica-nik/21.0.6b10/release-notes`, etc.) come from `PRODUCT_VERSIONS` and are reused verbatim in the topics config and content dir names. Icon names (`seti:java`, `rocket`, `seti:docker`, `linux`) are consistent between the topics config (Task 2) and the landing cards (Task 9).
 
 ---
 
