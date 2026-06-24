@@ -30,6 +30,15 @@ export default defineConfig({
                 items: [
                   'liberica-jdk/25.0.3b11/release-notes',
                   'liberica-jdk/25.0.3b11/install-guide',
+                  { label: 'How To', items: [
+                    'liberica-jdk/25.0.3b11/how-to/ide',
+                    'liberica-jdk/25.0.3b11/how-to/jvm-memory',
+                    'liberica-jdk/25.0.3b11/how-to/crac',
+                  ]},
+                  { label: 'Debugging and Optimization', items: [
+                    'liberica-jdk/25.0.3b11/debugging/jfr-mission-control',
+                    'liberica-jdk/25.0.3b11/debugging/jcmd',
+                  ]},
                 ],
               },
               {
@@ -37,21 +46,15 @@ export default defineConfig({
                 items: [
                   'liberica-jdk/21.0.6b10/release-notes',
                   'liberica-jdk/21.0.6b10/install-guide',
-                ],
-              },
-              {
-                label: 'How To',
-                items: [
-                  'liberica-jdk/how-to/ide',
-                  'liberica-jdk/how-to/jvm-memory',
-                  'liberica-jdk/how-to/crac',
-                ],
-              },
-              {
-                label: 'Debugging and Optimization',
-                items: [
-                  'liberica-jdk/debugging/jfr-mission-control',
-                  'liberica-jdk/debugging/jcmd',
+                  { label: 'How To', items: [
+                    'liberica-jdk/21.0.6b10/how-to/ide',
+                    'liberica-jdk/21.0.6b10/how-to/jvm-memory',
+                    'liberica-jdk/21.0.6b10/how-to/crac',
+                  ]},
+                  { label: 'Debugging and Optimization', items: [
+                    'liberica-jdk/21.0.6b10/debugging/jfr-mission-control',
+                    'liberica-jdk/21.0.6b10/debugging/jcmd',
+                  ]},
                 ],
               },
               // Visible external links — hosted on the official site.
@@ -94,6 +97,7 @@ export default defineConfig({
                 items: [
                   'liberica-nik/25.0.3b11/release-notes',
                   'liberica-nik/25.0.3b11/install-guide',
+                  { label: 'How To', items: ['liberica-nik/25.0.3b11/how-to/spring-boot'] },
                 ],
               },
               {
@@ -101,11 +105,8 @@ export default defineConfig({
                 items: [
                   'liberica-nik/21.0.6b10/release-notes',
                   'liberica-nik/21.0.6b10/install-guide',
+                  { label: 'How To', items: ['liberica-nik/21.0.6b10/how-to/spring-boot'] },
                 ],
-              },
-              {
-                label: 'How To',
-                items: ['liberica-nik/how-to-spring-boot'],
               },
             ],
           },
