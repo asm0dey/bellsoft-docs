@@ -85,7 +85,7 @@ export default defineConfig({
           },
           {
             label: 'Native Image Kit',
-            link: '/liberica-nik/',
+            link: '/liberica-nik/25.0.3b11/install-guide/',
             icon: 'rocket',
             items: [
               'liberica-nik',
