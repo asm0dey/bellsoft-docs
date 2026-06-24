@@ -59,9 +59,14 @@ export function filterSidebarForVersion(sidebar, product, activeSlug) {
   const labels = versions.map((v) => v.label);
   const activeLabel = versions.find((v) => v.slug === activeSlug)?.label;
   if (!activeLabel) return sidebar;
+  // A version group's config label is `<version label> (LTS)`, so match the
+  // label at a word boundary (exact, or version-label followed by a space) —
+  // a plain `includes` would let `25.0.3+1` also match `25.0.3+11 (LTS)`.
+  const isLabel = (groupLabel, verLabel) =>
+    groupLabel === verLabel || groupLabel.startsWith(verLabel + ' ');
   return sidebar.filter((entry) => {
     if (entry.type !== 'group') return true;
-    const isVersionGroup = labels.some((l) => entry.label.includes(l));
-    return !isVersionGroup || entry.label.includes(activeLabel);
+    const isVersionGroup = labels.some((l) => isLabel(entry.label, l));
+    return !isVersionGroup || isLabel(entry.label, activeLabel);
   });
 }

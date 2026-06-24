@@ -38,6 +38,25 @@ test('filterSidebarForVersion is a no-op for unknown product or slug', () => {
   assert.equal(filterSidebarForVersion(SIDEBAR, 'liberica-jdk', null), SIDEBAR);
 });
 
+test('filterSidebarForVersion matches labels at a boundary, not by substring', () => {
+  // One label is a prefix of the other (25.0.3+1 vs 25.0.3+11); a naive
+  // `includes` check would keep both groups. Boundary matching must not.
+  PRODUCT_VERSIONS.__test = [
+    { slug: 'a', label: '25.0.3+1' },
+    { slug: 'b', label: '25.0.3+11' },
+  ];
+  try {
+    const sidebar = [
+      { type: 'group', label: '25.0.3+1 (LTS)', entries: [] },
+      { type: 'group', label: '25.0.3+11 (LTS)', entries: [] },
+    ];
+    const out = filterSidebarForVersion(sidebar, '__test', 'a'); // active 25.0.3+1
+    assert.deepEqual(out.map((e) => e.label), ['25.0.3+1 (LTS)']);
+  } finally {
+    delete PRODUCT_VERSIONS.__test;
+  }
+});
+
 test('swaps the full-version segment on JDK paths, keeping the rest', () => {
   assert.equal(
     swapVersion('/liberica-jdk/25.0.3b11/install-guide/', '21.0.6b10'),

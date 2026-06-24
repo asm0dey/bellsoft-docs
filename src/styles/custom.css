@@ -8,10 +8,6 @@
   --sl-color-accent: #b81c2a;
   --sl-color-accent-high: #5a0d14;
 }
-.version-switcher select:hover {
-  border-color: var(--sl-color-accent);
-}
-
 /* Landing-page product tiles — clickable cards with real product logos. */
 .product-tiles {
   display: grid;

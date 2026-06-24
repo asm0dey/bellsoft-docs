@@ -153,6 +153,9 @@ const FLAG_LABELS = {
     root.addEventListener('change', update);
 
     // Searchable version combobox (148+ versions across major lines).
+    // Intentionally a separate implementation from the sidebar version
+    // combobox in VersionSwitcher.astro — different markup (grouped options)
+    // and action (set a value vs navigate). If you change behavior, check both.
     const vroot = root.querySelector('.tag-version');
     const vbtn = vroot.querySelector('.tpv-current');
     const vlabel = vroot.querySelector('.tpv-current-label');
