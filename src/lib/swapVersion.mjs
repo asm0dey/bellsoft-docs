@@ -17,10 +17,19 @@ export const PRODUCT_VERSIONS = {
 // Group 1 = product, 2 = segment, 3 = trailing slash or end.
 const PREFIX = /^\/([^/]+)\/([^/]+)(\/|$)/;
 
-// The path-versioned product in a path, or null.
+// Matches just the leading `/<product>` segment (covers the landing path too).
+const PRODUCT = /^\/([^/]+)/;
+
+// The path-versioned product in a path, or null. Matches both versioned and
+// shared pages of the product, including the bare landing (e.g. `/liberica-nik/`).
 export function productOf(pathname) {
-  const m = pathname.match(PREFIX);
+  const m = pathname.match(PRODUCT);
   return m && PRODUCT_VERSIONS[m[1]] ? m[1] : null;
+}
+
+// The default (latest) version slug for a product — first in the registry.
+export function defaultVersionOf(product) {
+  return PRODUCT_VERSIONS[product]?.[0]?.slug ?? null;
 }
 
 // The active version slug in a path, or null when the segment is not a known

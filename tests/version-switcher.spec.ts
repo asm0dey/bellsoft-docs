@@ -7,8 +7,18 @@ test('switching JDK version lands on the same page', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('21'); // URL above proves the exact slug
 });
 
-test('no version dropdown on shared how-to pages', async ({ page }) => {
+test('shared pages show the selector and entering a version goes to its install guide', async ({
+  page,
+}) => {
   await page.goto('/liberica-jdk/how-to/ide/');
+  // Selector is present, defaulting to the latest version.
+  await expect(page.locator('#version-select')).toHaveValue('25.0.3b11');
+  await page.selectOption('#version-select', '21.0.6b10');
+  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/install-guide\/?$/);
+});
+
+test('the selector is absent on non-versioned products', async ({ page }) => {
+  await page.goto('/containers/');
   await expect(page.locator('#version-select')).toHaveCount(0);
 });
 

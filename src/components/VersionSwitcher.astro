@@ -9,18 +9,23 @@ import {
   PRODUCT_VERSIONS,
   productOf,
   versionOf,
+  defaultVersionOf,
   filterSidebarForVersion,
 } from '../lib/swapVersion.mjs';
 
 const pathname = Astro.url.pathname;
 const active = versionOf(pathname);
 const product = productOf(pathname);
-const versions = active && product ? PRODUCT_VERSIONS[product] : [];
 
-// Show only the active version's pages in the sidebar; the dropdown switches.
+// On a version page the dropdown reflects the active version; on a shared/
+// landing page it reflects the version whose group the sidebar shows (latest).
+const displaySlug = product ? active ?? defaultVersionOf(product) : null;
+const versions = product ? PRODUCT_VERSIONS[product] : [];
+
+// Show only that one version's group in the sidebar.
 const route = Astro.locals.starlightRoute;
-if (active && product) {
-  route.sidebar = filterSidebarForVersion(route.sidebar, product, active);
+if (product && displaySlug) {
+  route.sidebar = filterSidebarForVersion(route.sidebar, product, displaySlug);
 }
 ---
 
@@ -31,12 +36,12 @@ if (active && product) {
 <TopicsSwitcher />
 
 {
-  active && (
+  product && (
     <div class="version-switcher">
       <label for="version-select">Version</label>
-      <select id="version-select" data-path={pathname}>
+      <select id="version-select" data-path={pathname} data-product={product}>
         {versions.map((v) => (
-          <option value={v.slug} selected={v.slug === active}>
+          <option value={v.slug} selected={v.slug === displaySlug}>
             {v.label}
           </option>
         ))}
@@ -53,7 +58,13 @@ if (active && product) {
   if (select instanceof HTMLSelectElement) {
     select.addEventListener('change', () => {
       const from = select.dataset.path ?? location.pathname;
-      location.pathname = swapVersion(from, select.value);
+      const product = select.dataset.product ?? '';
+      const swapped = swapVersion(from, select.value);
+      // On a version page swapVersion changes the path (same page, new version).
+      // On a shared/landing page it returns unchanged, so enter that version
+      // at its install guide.
+      location.pathname =
+        swapped !== from ? swapped : `/${product}/${select.value}/install-guide/`;
     });
   }
 </script>

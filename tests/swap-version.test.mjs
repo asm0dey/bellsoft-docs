@@ -4,6 +4,7 @@ import {
   swapVersion,
   versionOf,
   productOf,
+  defaultVersionOf,
   PRODUCT_VERSIONS,
   filterSidebarForVersion,
 } from '../src/lib/swapVersion.mjs';
@@ -83,6 +84,27 @@ test('productOf identifies the path-versioned product, or null', () => {
   assert.equal(productOf('/liberica-jdk/25.0.3b11/install-guide/'), 'liberica-jdk');
   assert.equal(productOf('/liberica-nik/21.0.6b10/release-notes/'), 'liberica-nik');
   assert.equal(productOf('/containers/tags/'), null);
+});
+
+test('productOf also matches shared and landing pages of a versioned product', () => {
+  assert.equal(productOf('/liberica-nik/'), 'liberica-nik'); // landing
+  assert.equal(productOf('/liberica-jdk/how-to/ide/'), 'liberica-jdk'); // shared
+  assert.equal(productOf('/liberica-jdk/debugging/jcmd/'), 'liberica-jdk');
+  assert.equal(productOf('/alpaquita/'), null); // not path-versioned
+});
+
+test('defaultVersionOf returns the latest (first) version slug', () => {
+  assert.equal(defaultVersionOf('liberica-jdk'), '25.0.3b11');
+  assert.equal(defaultVersionOf('liberica-nik'), '25.0.3b11');
+  assert.equal(defaultVersionOf('containers'), null);
+});
+
+test('filterSidebarForVersion with a default slug keeps the latest version on shared pages', () => {
+  const out = filterSidebarForVersion(SIDEBAR, 'liberica-jdk', defaultVersionOf('liberica-jdk'));
+  assert.deepEqual(
+    out.map((e) => e.label),
+    ['25.0.3+11 (LTS)', 'How To', 'Security Advisory']
+  );
 });
 
 test('PRODUCT_VERSIONS holds the showcase registry', () => {
