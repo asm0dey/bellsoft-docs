@@ -69,7 +69,7 @@ if (product && displaySlug) {
 </nav>
 
 {
-  active && (
+  displaySlug && (
     <div class="version-picker" data-path={pathname} data-product={product}>
       <span class="version-picker-label">Version</span>
       <button type="button" class="version-current" aria-haspopup="listbox" aria-expanded="false">
@@ -107,7 +107,7 @@ if (product && displaySlug) {
 <Default><slot /></Default>
 
 <script>
-  import { swapVersion, stripBase, withBase } from '../lib/swapVersion.mjs';
+  import { swapVersion, stripBase, withBase, entryPathOf } from '../lib/swapVersion.mjs';
   const BASE = import.meta.env.BASE_URL;
   const picker = document.querySelector('.version-picker');
   if (picker instanceof HTMLElement) {
@@ -145,7 +145,7 @@ if (product && displaySlug) {
       // Version page: same page, new version. Shared/landing page: enter the
       // chosen version at its install guide. Re-add the base before navigating.
       const target =
-        swapped !== fromPath ? swapped : `/${product}/${slug}/install-guide/`;
+        swapped !== fromPath ? swapped : entryPathOf(product, slug);
       location.pathname = withBase(target, BASE);
     };
 

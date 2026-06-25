@@ -9,7 +9,14 @@ import {
   filterSidebarForVersion,
   stripBase,
   withBase,
+  entryPathOf,
 } from '../src/lib/swapVersion.mjs';
+
+test('entryPathOf returns the version entry page (alpaquita lives under /general/)', () => {
+  assert.equal(entryPathOf('liberica-jdk', '25.0.3b11'), '/liberica-jdk/25.0.3b11/install-guide/');
+  assert.equal(entryPathOf('liberica-nik', '21.0.6b10'), '/liberica-nik/21.0.6b10/install-guide/');
+  assert.equal(entryPathOf('alpaquita', '25-lts'), '/alpaquita/25-lts/general/install-guide/');
+});
 
 test('stripBase / withBase round-trip and handle base with or without trailing slash', () => {
   for (const base of ['/bellsoft-docs', '/bellsoft-docs/']) {

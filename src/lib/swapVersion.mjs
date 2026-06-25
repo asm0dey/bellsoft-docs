@@ -70,6 +70,15 @@ export function swapVersion(pathname, slug) {
   return pathname.replace(PREFIX, `/$1/${slug}$3`);
 }
 
+// The first content page of a product version — where the version dropdown
+// navigates when switched from a shared/landing page (which has no version
+// segment to swap). Alpaquita's install guide lives under `/general/`; JDK and
+// NIK have it at the version root.
+export function entryPathOf(product, slug) {
+  if (product === 'alpaquita') return `/alpaquita/${slug}/general/install-guide/`;
+  return `/${product}/${slug}/install-guide/`;
+}
+
 // Given a Starlight sidebar entry array, keep only the ACTIVE version's group
 // (plus all shared groups and links), dropping the other versions' groups — so
 // the sidebar shows one version at a time and the dropdown switches between
