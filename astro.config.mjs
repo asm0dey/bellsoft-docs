@@ -162,12 +162,11 @@ export default defineConfig({
             link: '/liberica-nik/25.0.3b11/install-guide/',
             icon: 'rocket',
             items: [
-              'liberica-nik',
               {
                 label: '25.0.3+11 (LTS)',
                 items: [
-                  'liberica-nik/25.0.3b11/release-notes',
                   'liberica-nik/25.0.3b11/install-guide',
+                  'liberica-nik/25.0.3b11/release-notes',
                   { label: 'Container Images', items: [
                     'liberica-nik/25.0.3b11/containers',
                     'liberica-nik/25.0.3b11/containers/hardened',
@@ -184,8 +183,8 @@ export default defineConfig({
               {
                 label: '21.0.6+10 (LTS)',
                 items: [
-                  'liberica-nik/21.0.6b10/release-notes',
                   'liberica-nik/21.0.6b10/install-guide',
+                  'liberica-nik/21.0.6b10/release-notes',
                   { label: 'Container Images', items: [
                     'liberica-nik/21.0.6b10/containers',
                     'liberica-nik/21.0.6b10/containers/hardened',
@@ -212,7 +211,6 @@ export default defineConfig({
             link: '/alpaquita/stream/general/install-guide/',
             icon: 'linux',
             items: [
-              'alpaquita',
               {
                 label: 'Stream',
                 items: [
