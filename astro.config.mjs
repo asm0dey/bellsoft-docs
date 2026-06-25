@@ -59,9 +59,9 @@ export default defineConfig({
                   { label: 'Container Images', items: [
                     'liberica-jdk/25.0.3b11/containers',
                     'liberica-jdk/25.0.3b11/containers/usage',
+                    'liberica-jdk/25.0.3b11/containers/hardened',
                     'liberica-jdk/25.0.3b11/containers/tags',
                     'liberica-jdk/25.0.3b11/containers/distributions',
-                    'liberica-jdk/25.0.3b11/containers/hardened',
                   ]},
                   { label: 'How To', items: [
                     'liberica-jdk/25.0.3b11/how-to/use-ide',
@@ -97,9 +97,9 @@ export default defineConfig({
                   { label: 'Container Images', items: [
                     'liberica-jdk/21.0.6b10/containers',
                     'liberica-jdk/21.0.6b10/containers/usage',
+                    'liberica-jdk/21.0.6b10/containers/hardened',
                     'liberica-jdk/21.0.6b10/containers/tags',
                     'liberica-jdk/21.0.6b10/containers/distributions',
-                    'liberica-jdk/21.0.6b10/containers/hardened',
                   ]},
                   { label: 'How To', items: [
                     'liberica-jdk/21.0.6b10/how-to/use-ide',
