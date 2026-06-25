@@ -35,6 +35,9 @@ After studying the examples in this guide, you should be able to adapt them to y
 
 The next parts demonstrate how to use popular IDEs to debug applications written in Java, Python, or C.
 
+<Tabs syncKey="lang">
+<TabItem label="Java" icon="seti:java">
+
 ## Java
 
 We will use a sample Spring application, [Spring PetClinic](https://github.com/spring-projects/spring-petclinic), to explain how to remotely debug Java docker applications. Spring PetClinic was dockerized using [Liberica](https://bell-sw.com/libericajdk/) as a base image.
@@ -286,6 +289,9 @@ Let's try to debug that method.
    ![petclinic owner created](https://assets.bell-sw.com/docs.bell-sw.com/static/93cf9a7f2e73878dcb934c4bcae3834ddf5ba7c8863ccd39aa7333be80bf69e5/c15e7/petclinic-owner-created.png)
 
 </Steps>
+
+</TabItem>
+<TabItem label="Python" icon="seti:python">
 
 ## Python
 
@@ -568,6 +574,9 @@ You may debug further or stop the debugging session by pressing the red square o
 This concludes the guide for remote debugging in Python.
 
 For more information about debugging in VSCode, visit the [documentation section on the Visual Studio Code website](https://code.visualstudio.com/docs/editor/debugging).
+
+</TabItem>
+<TabItem label="C/C++" icon="seti:c">
 
 ## C/C++
 
@@ -905,3 +914,6 @@ Reversed string: noel sees leon
 <Aside type="note">
 See [CLion's documentation](https://www.jetbrains.com/help/clion/debugging-code.html) for more information about debugging in CLion.
 </Aside>
+
+</TabItem>
+</Tabs>
