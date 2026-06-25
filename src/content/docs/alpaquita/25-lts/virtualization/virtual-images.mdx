@@ -1,0 +1,124 @@
+---
+title: "Alpaquita Linux: Installing in virtualized environments"
+slug: alpaquita/25-lts/virtualization/virtual-images
+description: Run preinstalled Alpaquita Linux images (OVA and QCOW2) in QEMU, VirtualBox, and VMware.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+To install Alpaquita Linux in a virtualized environment you can just download the latest ISO and use it to [install](/bellsoft-docs/alpaquita/25-lts/general/install-guide/) a new VM in your favorite virtualization product. The advantage of this approach is that you can customize the new VM to your needs. The disadvantage is that you have to actually click through the installation, and while we tried to make the installation experience as smooth as possible, it is still a bit of a chore.
+
+If you just need to do a quick test, you can instead use a preinstalled Alpaquita Linux image that you can start in your virtualization software right away. BellSoft provides both OVA files and QCOW2 disk images.
+
+| Format    | Description                       | Used by                |
+| --------- | --------------------------------- | ---------------------- |
+| QCOW2     | Disk image (used directly as VM disk) | QEMU               |
+| OVA       | VM appliance template             | VirtualBox, VMware     |
+
+## Virtualization products
+
+### QEMU
+
+[QEMU](https://www.qemu.org/download/#linux) takes *tons* of different [command line options](https://www.qemu.org/docs/master/system/invocation.html) that you can read about in the manual and choose what you need. But the bare minimum that can get you started is to specify the disk image to use, request the KVM acceleration, and to specify the amount of RAM you want.
+
+Download either the [GLIBC Alpaquita QCOW2 file](https://packages.bell-sw.com/alpaquita/glibc/stream/releases/x86_64/alpaquita-stream-latest-glibc-x86_64.qcow2.xz) or the [MUSL Alpaquita QCOW2 file](https://packages.bell-sw.com/alpaquita/musl/stream/releases/x86_64/alpaquita-stream-latest-musl-x86_64.qcow2.xz) and use the following command example to start Alpaquita Linux in QEMU.
+
+```bash
+qemu-system-x86_64 -machine accel=kvm -hda alpaquita-stream-latest-musl-x86_64.qcow2 -m 1024
+```
+
+<Aside type="note">
+Unlike OVA files, the downloaded image is used as the disk image for your VM, not as a template. Therefore, you might want to keep a copy of the originally downloaded `.xz` compressed image in some other location.
+</Aside>
+
+### VirtualBox
+
+To create an Alpaquita Linux VM in [VirtualBox](https://www.virtualbox.org/), download either the [GLIBC Alpaquita OVA file](https://packages.bell-sw.com/alpaquita/glibc/stream/releases/x86_64/alpaquita-stream-latest-glibc-x86_64.ova) or the [MUSL Alpaquita OVA file](https://packages.bell-sw.com/alpaquita/musl/stream/releases/x86_64/alpaquita-stream-latest-musl-x86_64.ova).
+
+<Steps>
+
+1. Start the VirtualBox and click the **Import** button, or go to the **File** menu and select **Import Appliance**.
+
+   ![Screenshot of VirtualBox Welcome screen](https://assets.bell-sw.com/docs.bell-sw.com/static/a1b52caaa1d0b8ba60920b15fc0a82ae2a80c01097bd451df6d84c50d8339671/c15e7/vbox-010-welcome.png)
+
+2. In the **Import Virtual Appliance** wizard, click the folder icon and select the Alpaquita OVA file you have downloaded. Then click **Next**.
+
+   ![Screenshot of VirtualBox import dialog](https://assets.bell-sw.com/docs.bell-sw.com/static/58f71aaca7ccf0b6ddcff850527e5d228dbf4044c9401e11cee594220aef5ca0/c15e7/vbox-020-import-select.png)
+
+3. On the **Appliance settings** page of the import wizard you can change the name of your new virtual machine.
+
+   ![Screenshot of VirtualBox appliance settings](https://assets.bell-sw.com/docs.bell-sw.com/static/40ecce62036f31880498e621334086c3782138f34e07c3b39a15a9f303df5511/c15e7/vbox-030-import-name.png)
+
+   Scroll down the list of settings and assign more CPUs and RAM to your virtual machine if necessary. Keep the defaut values of other settings.
+
+   ![Screenshot of VirtualBox appliance settings (ctd.)](https://assets.bell-sw.com/docs.bell-sw.com/static/449ce4d5210b964c525530aa067672db3bb5bb16579ed92b8338b0b2bbf057da/c15e7/vbox-040-import-settings.png)
+
+4. Click **Finish**.
+
+5. Open the **Settings** dialog box for your new VM and go to the **System** tab (as a shortcut you can just click **System** in the VM pane).
+
+   ![Screenshot of VirtualBox VM Manager window](https://assets.bell-sw.com/docs.bell-sw.com/static/146092688de3455b3493e7a75124a930b04b6471a6f4271720ee825c0b913bc4/c15e7/vbox-050-manager-settings.png)
+
+6. On the **System** tab select the **Enable Hardware Clock in UTC Time** option.
+
+   ![Screenshot of VirtualBox system settings](https://assets.bell-sw.com/docs.bell-sw.com/static/6ebd95a63d94348e461e099c0c0ff1eb12c00155fdfbec29372da0aeab786ea9/c15e7/vbox-060-settings-clock.png)
+
+7. Change the graphics controller type to VMSVGA to get rid of a warning icon at the bottom of the **Settings** dialog box.
+
+   ![Screenshot of VirtualBox display settings](https://assets.bell-sw.com/docs.bell-sw.com/static/41aff723c6f96ca2a113977aaaee299534c5beb8b9ec41bbf76ae235e6e0ec25/c15e7/vbox-080-settings-video.png)
+
+   <Aside type="note">
+   This change is required only if you want to run KDE in this VM.
+   </Aside>
+
+   You can make any additional changes to the VM configuration that you need, such as add more network adapters, set up port forwarding, or configure a serial port.
+
+8. Click **OK** to save the changes and close the **Settings** dialog box.
+
+9. Start your new VM by clicking the **Start** button.
+
+</Steps>
+
+<Aside type="note">
+Use the small down arrow at the edge of the **Start** button to access additional start options. For example, if you choose the **Detachable Start** option, you can later close the VM window but leave the VM running in the background.
+</Aside>
+
+After a few seconds after clicking **Start**, you can log in to your new VM with the username `alpaquita` and password `alpaquita`, and do the necessary setup and configuration inside your new VM.
+
+![Screenshot of VirtualBox VM window](https://assets.bell-sw.com/docs.bell-sw.com/static/d56f11ddce2e6dddd76888a4aec1e5b630947277b392e5e58c45182ac826c08d/c15e7/vbox-090-vm-login.png)
+
+### VMWare
+
+Another virtualization solution you can use is one of the VMWare products. The walkthrough below uses [VMware Workstation Player](https://www.vmware.com/products/workstation-player.html) that is free for non-commercial use.
+
+To create an Alpaquita Linux VM in the VMWare Workstation Player, download either the [GLIBC Alpaquita OVA file](https://packages.bell-sw.com/alpaquita/glibc/stream/releases/x86_64/alpaquita-stream-latest-glibc-x86_64.ova) or the [MUSL Alpaquita OVA file](https://packages.bell-sw.com/alpaquita/musl/stream/releases/x86_64/alpaquita-stream-latest-musl-x86_64.ova).
+
+<Steps>
+
+1. Start the VMware Workstation Player and click **Open a Virtual Machine** to import the OVA template.
+
+   <Aside type="note">
+   The VMWare actually *imports* a new VM based on the OVA template, not *opens* the OVA in place.
+   </Aside>
+
+   ![Screenshot of VMWare Welcome screen](https://assets.bell-sw.com/docs.bell-sw.com/static/8444b039bfb2f8a0153143d767c5b64ed93999471fdfc660b952f25d6a140c6b/c15e7/vmware-010-welcome.png)
+
+2. Select the OVA file, change the VM name if you want and click **Import**.
+
+   ![Screenshot of VMWare import dialog](https://assets.bell-sw.com/docs.bell-sw.com/static/758e646b11660f0c8abd625536887b0d894b140c08700369a52c643c20b3bc28/c15e7/vmware-020-import-select.png)
+
+   You might see the following warning if the imported OVA only asks for one CPU. Click **Retry** to proceed with the import.
+
+   ![Screenshot of VMWare import warning](https://assets.bell-sw.com/docs.bell-sw.com/static/befc236c86904d247ddc606da3fa4db3f479cd2f53e4ed3e851ff0df9641a647/e9a79/vmware-030-import-warning.png)
+
+3. Once the import is finished you can edit the new VM settings or just start it right away by clicking **Power On**.
+
+   ![Screenshot of VMWare manager window](https://assets.bell-sw.com/docs.bell-sw.com/static/e9248a6f799afc65f910c81aa39b642e3d6cbbf78856e143e875ab41f893406a/c15e7/vmware-040-imported.png)
+
+</Steps>
+
+After a few seconds you can log in to your new VM with the username `alpaquita` and password `alpaquita`, and do the necessary setup and configuration inside your VM.
+
+![Screenshot of VMWare VM window](https://assets.bell-sw.com/docs.bell-sw.com/static/58c8b6801f641a66132e915b085d35399caafb28bb2ea9ba5536348ded418717/c15e7/vmware-050-vm-login.png)

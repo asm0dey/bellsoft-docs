@@ -1,8 +1,68 @@
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
 ## Pull
 
 ```bash
 docker pull bellsoft/liberica-runtime-container:jdk-all-21-glibc
 ```
+
+## Registries
+
+Liberica runtime container images are published on all major container
+registries. The repository name is the same across registries; only the
+pull-URL prefix differs.
+
+| Registry                     | Pull-URL prefix                                          | Authentication |
+|------------------------------|----------------------------------------------------------|----------------|
+| Docker Hub                   | `bellsoft/<repository>:<tag>`                            | No             |
+| GitHub Container Registry    | `ghcr.io/bell-sw/<repository>:<tag>`                     | No             |
+| Microsoft Container Registry | `bellsoft.azurecr.io/<repository>:<tag>`                 | No             |
+| Google Container Registry    | `us-docker.pkg.dev/bellsoft/gcr.io/<repository>:<tag>`   | Yes            |
+| Amazon ECR                   | `public.ecr.aws/bellsoft/<repository>:<tag>`             | No             |
+
+<Aside type="note">
+Pulling from Google Container Registry requires authentication. Run `gcloud auth configure-docker` before pulling.
+</Aside>
+
+The following examples pull the same image from each registry:
+
+<Tabs syncKey="registry">
+<TabItem label="Docker Hub">
+
+```bash
+docker pull bellsoft/liberica-runtime-container:jdk-all-21-glibc
+```
+
+</TabItem>
+<TabItem label="GitHub CR">
+
+```bash
+docker pull ghcr.io/bell-sw/liberica-runtime-container:jdk-all-21-glibc
+```
+
+</TabItem>
+<TabItem label="Microsoft CR">
+
+```bash
+docker pull bellsoft.azurecr.io/liberica-runtime-container:jdk-all-21-glibc
+```
+
+</TabItem>
+<TabItem label="Google CR">
+
+```bash
+docker pull us-docker.pkg.dev/bellsoft/gcr.io/liberica-runtime-container:jdk-all-21-glibc
+```
+
+</TabItem>
+<TabItem label="Amazon ECR">
+
+```bash
+docker pull public.ecr.aws/bellsoft/liberica-runtime-container:jdk-all-21-glibc
+```
+
+</TabItem>
+</Tabs>
 
 ## Run
 

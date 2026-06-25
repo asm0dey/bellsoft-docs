@@ -1,0 +1,125 @@
+---
+title: "Alpaquita Linux: Getting started with Azure image"
+slug: alpaquita/stream/virtualization/azure-walkthrough
+description: Find, create, and connect to an Alpaquita Linux virtual machine in the Microsoft Azure Marketplace.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+Microsoft Azure now offers [instances with Alpaquita Linux](https://azuremarketplace.microsoft.com/en/marketplace/apps/bellsoft1582871421940.alpaquita-linux?tab=Overview), an Alpine-based Linux distribution with numerous optimizations for enterprise development. You can use Alpaquita Stream for free and pay for Azure VMs only, or you can subscribe to commercial support with LTS releases and 24/7 service.
+
+## Finding the image in the Marketplace
+
+<Steps>
+
+1. Go to the [Azure portal](https://portal.azure.com/#home) and click the **Create a resource** button under **Azure services**.
+
+   ![Screenshot of Azure portal](https://assets.bell-sw.com/docs.bell-sw.com/static/2e622d07b2fb584a50e23ddda5205665b9d9ac9107cb55209d4470c5d528b4fb/c15e7/010-portal-create-resource.png)
+
+2. Type Alpaquita in the search field in the Azure Marketplace and click **Alpaquita Linux** in the drop-down menu with the search results.
+
+   ![Screenshot of marketplace search](https://assets.bell-sw.com/docs.bell-sw.com/static/8a67c97c80b1576aaf04a841dbf42a79ebf9115ab9b48e2a9fe12eba49dca57e/c15e7/020-search-marketplace-for-alpaquita.png)
+
+3. Choose the image type in the **Create** menu at the bottom of the card.
+
+   ![Screenshot of market place search results](https://assets.bell-sw.com/docs.bell-sw.com/static/2c853cca3976690bcaf5eccabcc0216b9c2f0e7c3c52e909e412ac87c9c4722f/c15e7/030-search-results.png)
+
+   Or you can click the card to view the description and select the image type on the **Alpaquita Linux** page.
+
+   ![Screenshot of image description](https://assets.bell-sw.com/docs.bell-sw.com/static/63275a896ba981a2bd6ae96f3005cca9a64b64805881686e0c953bb6e0d7b699/c15e7/040-image-description.png)
+
+</Steps>
+
+## Creating a VM form
+
+Once you choose the image, Azure VM creation form appears. You need to fill some data though default values are suitable for the most cases. The following parts describe some key settings that you might want to change.
+
+### Basic tab
+
+#### Name and size
+
+Provide a name for your new VM and select the **Size** of your VM, that determines the number of CPUs and the amount of RAM.
+
+![Screenshot of VM details](https://assets.bell-sw.com/docs.bell-sw.com/static/1c8eec02712905c5955e646d3fbe2f672543f4e861744f1e127ca1ddd88940bb/c15e7/080-create-basic-details.png)
+
+#### Resource group
+
+An Azure VM comprises several resources, like disks, public IP addresses, network firewall rules, etc. Azure groups these resources into *resource groups* for easier overview and management. Azure form automatically suggests to create a new resource group named after the newly created VM. You can change the suggested name of the new group or use an existing group instead.
+
+#### Account and SSH key
+
+A user is created automatically. The default name is `azureuser`. You can change the name in the **Username** field.
+
+![Screenshot of user name and key](https://assets.bell-sw.com/docs.bell-sw.com/static/d8ea2c6debc347f37e1e11ba170ef509812bf7cbb42d3509719c8f0523863f9d/c15e7/090-create-basic-account.png)
+
+The created user does not have a conventional password. To access the VM as that user you must identify yourself with an SSH key. You can choose to generate a new key, or you can use your existing key in the **SSH public key source**.
+
+![Screenshot of SSH key choices](https://assets.bell-sw.com/docs.bell-sw.com/static/3733e4f6be38cb1e0f57e6f773754cdc34f3e2c4258dde0ee215e7438f928a34/c15e7/100-create-basic-ssh-key.png)
+
+Now click **Next** to proceed to the Disks tab.
+
+### Disks tab
+
+Select the storage type as a primary OS disk in **OS disk type**.
+
+![Screenshot of the Disks tab](https://assets.bell-sw.com/docs.bell-sw.com/static/41638a5ae324f3b14f2e903ebec9fe29c601f6f41a87dd5485386d8f7c57aa2e/c15e7/120-create-disks.png)
+
+If you have data disks that you want to attach, you can do it in this step. You can also create a new unformatted data disks to attach to the new VM.
+
+![Screenshot of add data disk](https://assets.bell-sw.com/docs.bell-sw.com/static/1b7bef1b292b7eab4e2b64f0b07df64d885133bcff201adc4bb2d622b3efd52c/c15e7/130-create-disks-add-data.png)
+
+### Networking tab
+
+You might want to check the networking tab next. For a simple demo, use the default values. You can open the advanced settings for the NIC security group and edit the firewall rules, or use the existing ones. You can also select the **Delete NIC when VM is deleted** option for this demo.
+
+### Advanced tab
+
+Alpaquita supports Microsoft Azure Linux Agent and you can specify custom data for the newly created VM on the Advanced tab. The custom data are applied once when VM is provisioned. For example, you can provide a shell script to run once.
+
+![Screenshot of Advanced tab](https://assets.bell-sw.com/docs.bell-sw.com/static/9c08791202e62ca994303b629d7821d0197a818d489071c1974a29215fa5d8e9/c15e7/160-create-advanced.png)
+
+### Review and create
+
+You are ready to create the VM. Go to the **Review+Create** tab and click **Create**.
+
+![Screenshot of Review and Create tab](https://assets.bell-sw.com/docs.bell-sw.com/static/222363e96c4e86fdec728f8c37d2bbbf96d512e62efeb6f4a1337e20537f84bc/c15e7/180-create-review.png)
+
+It takes some time for your new VM to be deployed.
+
+![Screenshot of deployment in progress](https://assets.bell-sw.com/docs.bell-sw.com/static/325830d0fe21748fa4a5db663a935280ab1a0d4dfc7b424fe0e7048af885c169/c15e7/190-create-in-progress.png)
+
+When the deployment process is complete, click **Go to the resource**.
+
+![Screenshot of completed deployment](https://assets.bell-sw.com/docs.bell-sw.com/static/16644719ece0aa5c7ed6740038f898ab63b800b43976ed4302ad0003e19ef0d8/c15e7/200-create-complete.png)
+
+## Reviewing your new VM
+
+This page provides an overview of your new VM. Note and copy its public IP address.
+
+![Screenshot of VM overview](https://assets.bell-sw.com/docs.bell-sw.com/static/6225272dcb8f9b8f01f3f42d8b81a0538bf62f45ccde271b8633a69fe2fbed88/c15e7/210-vm-overview-ip.png)
+
+### Reviewing the console log (optional)
+
+Click the Boot diagnostics item in the left sidebar (you might need to scroll down the page).
+
+![Screenshot of Boot diagnostic tab](https://assets.bell-sw.com/docs.bell-sw.com/static/8d87863f9b647e2e6559f9bf265361d614b7208dc3b8b67e3dac1d362b02bc78/c15e7/220-boot-diagnostic.png)
+
+To review and identify any problems, switch to the Serial log tab that shows the complete output from the boot process.
+
+![Screenshot of Serial console log](https://assets.bell-sw.com/docs.bell-sw.com/static/e4c6ff143266e8a888886e50e4c70d742708d1e7bc57d5e55e1a1f1af75e5107/c15e7/230-serial-console-log.png)
+
+### Importing SSH key into your new VM
+
+Start your `ssh` client in your terminal to log into your new VM. If you changed the username adjust the `-l` option argument accordingly.
+
+The command in this example also instructs ssh to accept and ignore the host key, sets up agent forwarding, and creates port-forwarding back to the ssh server on your host so that you can copy files from the cloud VM back to your host even if it is behind a corporate firewall.
+
+You can use `sudo` without a password, because your cloud user does not have one.
+
+You can also see that the custom data shell script was executed.
+
+![Screenshot of successful slogin](https://assets.bell-sw.com/docs.bell-sw.com/static/f51075400097310ac1321fadee07284d66026fd19625b195708f8f6862710c84/c15e7/250-slogin-done.png)
+
+Now you can connect to the Azure VM running Alpaquita Linux.

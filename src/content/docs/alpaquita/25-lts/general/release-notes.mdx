@@ -1,0 +1,92 @@
+---
+title: "Alpaquita Linux: Release Notes"
+slug: alpaquita/25-lts/general/release-notes
+description: Late-breaking information about the BellSoft Alpaquita Linux 25 (LTS) release, including kernel version, supported architectures, new features, and package updates.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+The release notes give you late-breaking information about the BellSoft Alpaquita Linux 25 (LTS) release. Please read this document carefully, as it contains information that is not included in other BellSoft Alpaquita documents.
+
+### Kernel version
+
+Alpaquita Linux 25 (LTS) ships the 6.12 LTS kernel, selected for its extended support lifecycle and a configuration optimized for smaller size, better security, and performance. This kernel version continues to receive required security and major functional fixes. The release supports smooth kernel updates, where the previous kernel version is not deleted right away and can be used for boot or rollback.
+
+### Architecture
+
+This release supports the following processors for all deliverables — ISO, minirootfs, package repositories, and Docker images.
+
+| Processor       | Baseline    |
+| --------------- | ----------- |
+| Intel           | x86-64-v2   |
+| AMD 64-bit      | x86-64-v2   |
+| AArch64 (ARM64) | ARMv8-A     |
+
+Modern CPUs can provide optimal extensions for better performance in the core system libraries. x86-64-v2 provides proper support for new CPU features (CMPXCHG16B, LAHF-SAHF, POPCNT, SSE3, SSE4_1, SSE4_2, SSSE3), vector instructions up to Streaming SIMD Extensions 4.2 (SSE4.2), Supplemental Streaming SIMD Extensions 3 (SSSE3), the POPCNT instruction (useful for data analysis and bit-fiddling in some data structures), and CMPXCHG16B (a two-word compare-and-swap instruction useful for concurrent algorithms).
+
+## New Features and Changes
+
+This section lists the features introduced in the Alpaquita Linux 25 (LTS) release.
+
+### Kernel changes
+
+- **EEVDF scheduler** — the Completely Fair Scheduler is replaced with the Earliest Eligible Virtual Deadline First (EEVDF) scheduler for improved latency and mixed-workload performance.
+- **Networking** — the `netkit` device for high-performance container networking and `devmem` TCP for device-to-device transfers.
+- **New syscalls** — `mseal`, `cachestat`, `listmount`, and `statmount` for enhanced memory protection and filesystem operations.
+- **vDSO** — `getrandom` added to the virtual dynamic shared object to eliminate syscall overhead.
+
+### Platform changes
+
+- **All x86-64 packages** are compiled with `-fno-plt` by default, reducing function-call overhead to shared libraries.
+- **OpenRC 0.62** now defaults to cgroups v2.
+- **MicroVM support** — pre-built `vmlinux` and rootfs optimized for Firecracker and QEMU enable rapid microVM deployment.
+- **Security scanning** — an adapted OSV-Scanner is integrated for scanning OS images and generating SBOM reports across the BellSoft ecosystem.
+
+### Core libraries
+
+- **glibc 2.39** — `libxcrypt` replaces the removed `libcrypt`.
+- **musl 1.2.5** — `musl-perf` now uses mimalloc v2.
+- **malloc** — BellSoft versions with jemalloc, mimalloc, and rpmalloc implementations.
+
+### Noticeable package updates
+
+| Package           | Version  |
+| ----------------- | -------- |
+| GCC               | [14.3](https://gcc.gnu.org/) |
+| LLVM              | [20](https://releases.llvm.org/) (default), 19 with Perf JIT support |
+| Go                | [1.23](https://go.dev/) |
+| Rust              | [1.87](https://github.com/rust-lang/rust/blob/stable/RELEASES.md) |
+| Node.js           | [22](https://nodejs.org/en) |
+| Python            | [3.12](https://www.python.org/downloads/) |
+| PHP               | [8.3](https://www.php.net/releases/) |
+| Ruby              | [3.4](https://www.ruby-lang.org/) |
+| Perl              | [5.40](https://www.perl.org/get.html) |
+| PostgreSQL        | [17](https://www.postgresql.org/download/) |
+| MariaDB           | [11](https://mariadb.org/download/) |
+| Redis             | [8.0](https://redis.io/) |
+| Docker            | [28.3](https://www.docker.com/) |
+| Nginx             | [1.28](https://nginx.org/) |
+
+### Liberica product family
+
+JRE and JDK packages are provided for the latest 8, 11, 17, 21, 24, and 25 versions. OpenJDK 22 and 23 are no longer included.
+
+## Notable Removals
+
+Several packages became unavailable in the glibc variant due to native utmp/wtmp support: `execline`, `s6`, `skalibs`, and `utmps`.
+
+## Known Issues
+
+No known issues are reported for this release.
+
+Report issues to [support@bell-sw.com](mailto:support@bell-sw.com).
+
+## Security Bug Fixes
+
+This release includes a number of bug and security fixes.
+
+## Installation Process
+
+Alpaquita installation procedures are described in the [Alpaquita Linux Installation Guide](/bellsoft-docs/alpaquita/25-lts/general/install-guide/). The typical process for installing from the ISO image requires access to a command-line interpreter and contains several steps.

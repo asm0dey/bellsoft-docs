@@ -1,0 +1,230 @@
+---
+title: "Alpaquita Linux: Installation Guide"
+slug: alpaquita/stream/general/install-guide
+description: Install Alpaquita Linux interactively, headlessly, or as a WSL distribution, and learn about its performance improvement features.
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+[Alpaquita Linux](https://bell-sw.com/alpaquita-linux/) is a lightweight operating system that requires a small amount of resources to install and run. The minimal requirements for Alpaquita Linux installation are:
+
+| Resource | Minimum |
+| -------- | ------- |
+| RAM      | 512 MB  |
+| CPU      | 1       |
+| Storage  | 5 GB    |
+
+[BellSoft](https://bell-sw.com/) provides two types of Alpaquita: one is based on musl libc and the other is based on glibc libc, therefore, there are two types of installers available. See [Performance improvement features](#performance-improvement-features) for more information.
+
+Start with downloading the installation media from the [download page](https://bell-sw.com/pages/downloads/alpaquita/#downloads) on the BellSoft website selecting the release version, architecture, and media to download. Once the download is complete, the ISO file should look similar to the following:
+
+```
+alpaquita-standard-stream-latest-glibc-x86_64.iso
+```
+
+Copy the checksum for integrity check for each installation file by clicking the **SHA512** link next to the corresponding installation file.
+
+![Download links and links to copy checksums](https://assets.bell-sw.com/docs.bell-sw.com/static/377b37f1c8811b138416d46a5d1a6b003d03f3ee5cde42bcd042fbe655586290/c15e7/sha-link.png)
+
+You can copy the ISO file to a portable media, such as a USB flash drive to install Alpaquita on a bare-metal server/PC, on a virtual machine, such as VirtualBox, or a machine emulator and virtualizer, such as QEMU. For more information, see [Install Alpaquita Linux in Virtualized Environments](/bellsoft-docs/alpaquita/stream/virtualization/virtual-images/).
+
+This guide covers the following:
+
+- [Interactive Installation](#interactive-installation)
+- [Headless Installation](#headless-installation)
+- [Installing WSL version](#installing-wsl-version)
+- [Performance improvement features](#performance-improvement-features)
+
+<Aside type="tip">
+For information on how to get started with Alpaquita Linux Docker images, see [Getting Started with Images](/bellsoft-docs/alpaquita/stream/how-to/images-getting-started-guide/).
+</Aside>
+
+## Interactive Installation
+
+The following steps will guide you through Alpaquita Linux interactive installation process. Note that the set of options is different for different versions of installer.
+
+<Steps>
+
+1. Prepare the installation media and make sure the machine boots from the media containing the Alpaquita installation `.iso` file.
+
+2. Start the machine. Alpaquita installation starts after initial boot.
+
+3. Read and accept the User License Agreement.
+
+4. Edit the name of the computer (default: `localhost`) and select a network interface to connect to the Internet. Internet connection is required to download selected components.
+
+   - **Add VLAN**: Creates a VLAN-tagged interface based on the selected network interface.
+   - **Create bond interface**: Adds a bond interface for multiple network cards to provide more bandwidth or provide link redundancy in case of failure. In the **Create bond** dialog box, specify the bond's **Name**, select the interface, and select the **Bond mode**. Alpaquita Linux supports several bond modes.
+
+     If you have a DHCP service running on your network, the default option is appropriate in most cases. If you do not want to have a dynamic IP address assigned, but rather need a static one, press **Edit** next to **IPv4** and specify necessary options. To enable IPv6 interface, press **Edit** next to **IPv6**, select **Static** instead of **Disabled**, and specify necessary options in the **Edit IPv6 Configuration** dialog box.
+
+     If you select a wireless interface for internet connection, you can configure SSID and WPA2 passphrase to connect to Wi-Fi in the **Edit WiFi configuration** dialog box.
+
+     Save the settings when done. Press **Next**.
+
+5. Set up HTTP proxy for internet connection if necessary (default: none). Press **Next**.
+
+6. Keep the default repository URL to use the BellSoft repositories for installation or specify some other repository server URLs to download and install the packages. Press **Next**.
+
+7. Select packages to install.
+
+   - **Linux kernel**
+     - **Install firmware and extra modules** (selected by default on standard ISO and unselected on virt ISO): Select this option to install some extra modules, such as wireless, Bluetooth, sound, and others, which are not included in the minimal configuration, but may be required for the hardware you use. Clearing this option conserves disk space and speeds up the system boot process.
+   - **Java**: Select JDK and other kits to install.
+     - **Liberica Standard JDK**: Select a version of [Liberica JDK](https://bell-sw.com/libericajdk/) required for your environment and applications.
+     - **Liberica Native Image Kit**: Select to install a utility that compiles JVM-based applications into platform native executables with the ahead-of-time compiler. For more information, see [Liberica Native Image Kit](https://bell-sw.com/liberica-native-image-kit/).
+   - **libc**: Select this option to install `musl-perf` for added performance using some processor-level features. The optimized `musl-perf` provides support for running applications compiled with the Function multi-versioning in GCC feature. This library provides similar performance as the `glibc` library. If you are installing the glibc version of Alpaquita, this option is disabled. See [Performance improvement features](#performance-improvement-features) for more information.
+   - **Other components**:
+     - **Enable SSH access**: Select to install the Secure Shell network server that provides a secure way to access a computer over an unsecured network.
+     - **Install GNU Core Utilities**: Select to install basic file, shell, and text manipulation utilities from the GNU Coreutils project instead of using the ones provided by BusyBox.
+
+     Press **Next**.
+
+8. Select region and city (default: America/New York). Press **Next**.
+
+9. Provide information to create a user account with administrative privileges. Press **Next**. Note that the root account is disabled in the system.
+
+10. Specify the target installation disk and its file system, such as `xfs` or `ext4`. Then select the following options. Note that all data on the selected disk is deleted.
+
+    - **Set up this disk as an LVM group**: Select this option to set up the selected disk as a Logical Volume Management disk. LVM is a form of storage virtualization that offers a more flexible approach to managing disk storage space.
+    - **Enable encryption with LUKS**: Select to turn on the Linux Unified Key Setup hard disk encryption.
+
+      Click **Next**. If you are running this setup on a machine that contains UEFI firmware, you can select to enable the Secure Boot feature on the next step. Otherwise, this is the final step, and the installation process downloads and sets up all selected components.
+
+11. Select **Install Secure Boot required packages to sign with own keys** to enable the Secure Boot feature. Secure boot is a security standard that helps a device to boot using only trusted software. Note that you can currently use Secure Boot with your own trusted keys in the UEFI Secure Boot database. See "Secure Boot Getting Started Guide" for details.
+
+</Steps>
+
+After installation is complete, you can see the installation log and reboot or power off your computer.
+
+## Headless Installation
+
+The installer provides a means to automate the installation process by creating a file in the YAML format that describes the installation parameters and passing this file to the installer using the `-f` option. The `alpaquita-installer` command is added to the system after you install the alpaquita-installer package.
+
+For example:
+
+```bash
+alpaquita-installer -f installer-setup.yaml
+```
+
+For detailed parameters description, install the `alpaquita-installer-doc` package and open the `/usr/share/doc/alpaquita-installer/AUTOMATING_INSTALLATION.md` file.
+
+<Aside type="note">
+The installer saves the YAML configuration file of the current installation to `/root/setup.yaml` on the installed system. You can use this file to repeat the installation on similar systems or as a starting point for customization.
+</Aside>
+
+## Installing WSL version
+
+The Windows Subsystem for Linux (WSL) lets developers run a GNU/Linux environment - including most command-line tools, utilities, and applications - directly on Windows, unmodified, without the overhead of a traditional virtual machine or dual-boot setup.
+
+If WSL is not yet installed on your Windows instance, make sure it meets all the WSL requirements specified at the [How to install Linux on Windows with WSL](https://docs.microsoft.com/en-us/windows/wsl/install) page and install WSL by running the following command in an administrator PowerShell or Windows Command Prompt:
+
+```powershell
+wsl.exe --install
+```
+
+<Aside type="note">
+All the following shell commands are executed using non-administrator PowerShell or Windows Command Prompt.
+</Aside>
+
+Before installing a new Alpaquita WSL instance, remove the existing instance for the same Alpaquita release and libc flavor using the following commands:
+
+```powershell
+wsl.exe --list
+wsl.exe --unregister <distribution-name>
+```
+
+Download the Alpaquita WSL installer from the [download page](https://bell-sw.com/pages/downloads/alpaquita/#downloads) on the [BellSoft website](https://bell-sw.com/). The installation package is represented as an `.appx` file.
+
+<Aside type="note">
+Different installers represent different libc types.
+</Aside>
+
+To install Alpaquita Linux, you can use the graphical installer or PowerShell.
+
+<Tabs syncKey="install-method">
+  <TabItem label="Graphical installer">
+
+    <Steps>
+
+    1. Double-click the downloaded `.appx` file. The **Install Alpaquita** window opens.
+
+    2. Click **Install**, wait for the installation process to complete and supply necessary information when the Linux shell opens.
+
+    </Steps>
+
+  </TabItem>
+  <TabItem label="PowerShell">
+
+    To install Alpaquita Linux using Windows PowerShell, run the following command specifying the path to and the installation filename:
+
+    ```powershell
+    Add-AppxPackage -Path "Full_path_to_installation_file"
+    ```
+
+    For example:
+
+    ```powershell
+    Add-AppxPackage -Path "C:\Users\jane123\Downloads\AlpaquitaGlibc_latest_x64.appx"
+    ```
+
+    To complete the installation, start the installed Alpaquita app from the Windows Start menu.
+
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+Once the installation is complete, you can see the Alpaquita Linux distribution in the list after running the `wsl.exe --list` command.
+</Aside>
+
+You can start the installed Alpaquita app from the Windows Start menu or in the PowerShell. To start Alpaquita Linux in the PowerShell, run the `wsl.exe -d` command with the distribution name, for example:
+
+```powershell
+wsl.exe -d Alpaquita-Glibc
+```
+
+To remove the WSL instance of Alpaquita Linux, right-click the Alpaquita app on the Windows Start menu and select **Uninstall**.
+
+<Aside type="note">
+You might need to terminate Alpaquita Linux using the `wsl -t Alpaquita-<libc-version>` before removing it.
+</Aside>
+
+For more information, see the official [Microsoft WSL documentation](https://docs.microsoft.com/en-us/windows/wsl/).
+
+## Performance improvement features
+
+### libc implementations
+
+Alpaquita Linux has two standard C library implementations: optimized musl (musl-perf) and glibc. Each supported libc implementation is represented by its own installation file, therefore, you must choose the required implementation before downloading the installation package.
+
+For more information, see [Alpaquita Linux: Libc implementations](/bellsoft-docs/alpaquita/stream/how-to/libc-diff/).
+
+### malloc implementations
+
+Alpaquita Linux provides several malloc implementations for better performance with various workloads:
+
+- rpmalloc
+- mimalloc
+- mimalloc-secure
+- jemalloc
+
+For more information, see [Alpaquita Linux: Selecting a malloc implementation](/bellsoft-docs/alpaquita/stream/how-to/malloc/).
+
+### Other features
+
+Alpaquita Linux implements the following features to make it small and efficient:
+
+- Busybox is a set of command-line utilities of only 1 MB in size. It contains a set of 400 Unix utilities thus providing a small yet complete environment for system maintenance. In addition, developers can add or remove components as needed. For those who require a more sophisticated set of command-line options, we provide coreutils on-demand.
+- [apk tools](/bellsoft-docs/alpaquita/stream/how-to/apk-guide/) is a small package manager providing additional size optimization.
+- [OpenRC](/bellsoft-docs/alpaquita/stream/how-to/openrc-for-systemd-adepts/) is an init system without any unnecessary features, which makes it smaller than other Linux init systems, but efficient.
+- Alpaquita Linux is compatible with Docker. You can select from a variety of [ready-to-go container images](https://bell-sw.com/alpaquita-containers/#docker-hub-images) on the BellSoft's profile on Docker Hub. It also supports QEMU, which is used for emulation and virtualization.
+- Alpaquita Linux was designed as an efficient platform for Java. The package includes a large set of [Java versions](https://bell-sw.com/pages/downloads/) and support for [Native Image Kit](https://bell-sw.com/pages/downloads/native-image-kit/) based on GraalVM.
+- [AppArmor](https://apparmor.net/) is part of Alpaquita Linux and is an implementation of a mandatory access control system (MAC). AppArmor is not installed by default, but you can install it from the package repository. After installing and configuring AppArmor, enable it to start after reboots using the following command:
+
+  ```bash
+  rc-service apparmor start; rc-update add apparmor boot
+  ```
+
+For more information, see [Alpaquita Linux documentation](/bellsoft-docs/alpaquita/).

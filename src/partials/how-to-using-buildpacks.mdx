@@ -1,0 +1,204 @@
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Introduction
+
+Cloud Native Buildpacks turn application source code into a container image without a Dockerfile. They detect the language and build tooling automatically, provision a JVM, manage layers and dependencies, and produce an optimized, reproducible OCI image. You keep build logic in your project instead of maintaining hand-written Dockerfiles.
+
+Spring Boot integrates Cloud Native Buildpacks directly into its build plugins, so you can containerize an application with a single command. By default the Spring Boot builder uses Liberica JDK as the runtime, which means the images you produce already run on a verified, fully OpenJDK-compatible JVM.
+
+This guide shows how to build an OCI image for a Spring Boot application, how to customize the JVM and base image, and how to run the result.
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- A Spring Boot project built with Maven or Gradle.
+- A running container daemon (Docker, or a compatible alternative such as Podman) that the build can talk to.
+
+<Aside type="note">
+The build plugin connects to your local container daemon to assemble and store the image. No Dockerfile is involved at any point.
+</Aside>
+
+## Building an image
+
+Spring Boot's build plugins ship with buildpack support out of the box. There is nothing extra to add for a standard build.
+
+<Tabs syncKey="build-tool">
+<TabItem label="Maven">
+
+The `spring-boot-maven-plugin` is already present in a project generated from [start.spring.io](https://start.spring.io/):
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+</plugin>
+```
+
+Build the image with the `build-image` goal:
+
+```bash
+mvn spring-boot:build-image
+```
+
+</TabItem>
+<TabItem label="Gradle">
+
+The `bootBuildImage` task comes with the Spring Boot Gradle plugin:
+
+```groovy
+plugins {
+    java
+    id("org.springframework.boot") version "3.3.4"
+}
+```
+
+Build the image with:
+
+```bash
+gradle bootBuildImage
+```
+
+</TabItem>
+</Tabs>
+
+When the build finishes, the buildpack reports the name of the image it created. By default the name is derived from the project's artifact ID and version, for example `docker.io/library/buildpacks-demo:0.0.1-SNAPSHOT`.
+
+## Running the image
+
+Run the generated OCI image like any other container. Publish the application port and, optionally, set a memory limit so the JVM can size its heap to the container:
+
+```bash
+docker run --rm -p 8080:8080 -m 1g docker.io/library/buildpacks-demo:0.0.1-SNAPSHOT
+```
+
+The application starts on the JVM provided by the buildpack and is reachable on the published port.
+
+## Customizing the JVM
+
+Buildpacks are configured through environment variables passed at build time. The `BP_JVM_VERSION` variable selects the major Java version installed into the image.
+
+<Tabs syncKey="build-tool">
+<TabItem label="Maven">
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <image>
+            <env>
+                <BP_JVM_VERSION>21</BP_JVM_VERSION>
+            </env>
+        </image>
+    </configuration>
+</plugin>
+```
+
+</TabItem>
+<TabItem label="Gradle">
+
+```groovy
+tasks.named<BootBuildImage>("bootBuildImage") {
+    environment.putAll(mapOf(
+        "BP_JVM_VERSION" to "21"
+    ))
+}
+```
+
+</TabItem>
+</Tabs>
+
+Other useful build-time variables:
+
+- `BP_JVM_VERSION` — the major Java version to install (for example `17`, `21`).
+- `BP_JVM_TYPE` — whether to install a `JDK` or a `JRE`.
+- `BP_SPRING_AOT_ENABLED` — enable Spring ahead-of-time processing.
+- `BP_JVM_CDS_ENABLED` — enable Class Data Sharing for faster startup.
+
+To pass runtime JVM flags into the image, set `JAVA_TOOL_OPTIONS`. For example, to select the Z Garbage Collector:
+
+```xml
+<image>
+    <env>
+        <JAVA_TOOL_OPTIONS>-XX:+UseZGC</JAVA_TOOL_OPTIONS>
+    </env>
+</image>
+```
+
+<Aside type="tip">
+`JAVA_TOOL_OPTIONS` is read by the JVM at launch, so the same flags also apply when you run the resulting image. See [Configuring the JVM and heap](../jvm-memory-configuration/) for guidance on sizing memory in containers.
+</Aside>
+
+## Using a BellSoft builder image
+
+The default Spring Boot builder already runs on Liberica JDK. To produce smaller images built on a musl libc base, point the build at the BellSoft Alpaquita builder image. It pairs Liberica JDK with the lightweight Alpaquita Linux base.
+
+<Tabs syncKey="build-tool">
+<TabItem label="Maven">
+
+```xml
+<configuration>
+    <image>
+        <builder>bellsoft/buildpacks.builder:musl</builder>
+    </image>
+</configuration>
+```
+
+</TabItem>
+<TabItem label="Gradle">
+
+```groovy
+bootBuildImage {
+    builder = "bellsoft/buildpacks.builder:musl"
+}
+```
+
+</TabItem>
+</Tabs>
+
+The builder image determines both the build environment and the base of the final runtime image, so switching to the Alpaquita builder changes the JVM and operating system layers of the produced image without any other changes to your project.
+
+## Building a native image
+
+If you have configured GraalVM Native Image support, buildpacks can produce a native executable image instead of a JVM image.
+
+<Tabs syncKey="build-tool">
+<TabItem label="Maven">
+
+Add the GraalVM native build plugin and build with the `native` profile:
+
+```xml
+<plugin>
+    <groupId>org.graalvm.buildtools</groupId>
+    <artifactId>native-maven-plugin</artifactId>
+</plugin>
+```
+
+```bash
+mvn spring-boot:build-image -Pnative
+```
+
+</TabItem>
+<TabItem label="Gradle">
+
+Add the GraalVM native build plugin and run the standard task:
+
+```groovy
+plugins {
+    id("org.graalvm.buildtools.native") version "0.10.3"
+}
+```
+
+```bash
+gradle bootBuildImage
+```
+
+</TabItem>
+</Tabs>
+
+The resulting image contains a native executable with a short startup time and a reduced memory footprint, and you run it with the same `docker run` command shown above. For a deeper walkthrough of native images, see the [Liberica Native Image Kit documentation](/bellsoft-docs/liberica-nik/).
+
+## Further reading
+
+Download Liberica JDK builds for your platform from the [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/).

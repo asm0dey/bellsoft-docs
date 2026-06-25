@@ -1,0 +1,144 @@
+---
+title: "BellSoft Hardened Images"
+slug: alpaquita/stream/hardened/overview
+description: Near-zero-CVE hardened container images — standard, nonroot, and distroless variants.
+---
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+BellSoft Hardened Images are minimized container images based on Alpaquita Linux that strip out package managers and non-essential components. With a locked configuration that cannot be modified, they minimize the risk of attackers introducing malware or tampering with the runtime.
+
+The images are continuously patched for CVEs, which keeps them close to zero known vulnerabilities. Hardened images are available for the following languages and runtimes, all built on Alpaquita Linux:
+
+- Java (Liberica JDK Lite)
+- GraalVM (Liberica Native Image Kit)
+- Python
+- Node.js
+- Go
+- C/C++ (GCC)
+
+Hardened images are published on Docker Hub, GitHub Container Registry (GHCR), Microsoft Container Registry (MCR), Google Container Registry (GCR), and Amazon Elastic Container Registry (ECR).
+
+For the list of available repositories and their tags, see [Hardened Image Catalog](/bellsoft-docs/alpaquita/stream/hardened/catalog/).
+
+## Hardened image types
+
+The images are shipped with one of the following utilities and components: Liberica JDK, Liberica Native Image Kit (GraalVM), Python, Node.js, Go, or GCC/C++.
+
+There are several types of images, each offering a different balance between debugging and security: **standard**, **nonroot**, and **distroless**. The differences between them are summarized in the table below:
+
+|                        | standard | nonroot | distroless  |
+|------------------------|----------|---------|-------------|
+| user                   | root     | appuser | appuser     |
+| command line available | yes      | yes     | no          |
+| entrypoint             | /bin/sh  | /bin/sh | application |
+
+- Tools for installing new software (apk-tools) have been removed from all images.
+- The **nonroot** and **distroless** images have an unprivileged user named `appuser` with a home directory. This user is used to run the entrypoint.
+- **Distroless** images are shipped without a command line and with only a minimal set of libraries and other dependencies required to run applications.
+- All three image types are hosted in the same repository, but with different tags. If the tag contains the word `nonroot`, it is a nonroot image; if `distroless`, it is a distroless image; otherwise, it is a standard image.
+
+## Getting started
+
+The following steps use the Docker tool. Podman provides a similar command-line interface and can be used in place of Docker.
+
+<Steps>
+
+1. **Pull an image** from any supported container registry:
+
+   ```shell
+   docker pull bellsoft/<repository>:<image_tag>
+   ```
+
+2. **Run a container** from the pulled image:
+
+   ```shell
+   docker run --name my-app bellsoft/<repository>:<image_tag>
+   ```
+
+3. **Use as a base image** in your Dockerfile:
+
+   ```dockerfile
+   FROM bellsoft/<repository>:<image_tag>
+   ```
+
+</Steps>
+
+For example, with the hardened Liberica JDK runtime:
+
+```shell
+# Pull the latest hardened Java runtime
+docker pull bellsoft/hardened-liberica-runtime-container:jdk-21-glibc
+
+# Run with your application
+docker run -v /path/to/app:/app bellsoft/hardened-liberica-runtime-container:jdk-21-glibc java -jar /app/myapp.jar
+
+# Use in a Dockerfile
+FROM bellsoft/hardened-liberica-runtime-container:jdk-21-glibc
+```
+
+<Aside type="note">
+If the `:<image_tag>` part is omitted, it is implicitly substituted with `:latest`.
+</Aside>
+
+## Registries
+
+Hardened images are published on all major container registries. The repository names are the same across registries; only the pull-URL prefix differs.
+
+| Registry                    | Pull-URL prefix                              | Authentication |
+|-----------------------------|----------------------------------------------|----------------|
+| Docker Hub                  | `bellsoft/<repository>:<tag>`                | No             |
+| GitHub Container Registry   | `ghcr.io/bell-sw/<repository>:<tag>`         | No             |
+| Microsoft Container Registry| `bellsoft.azurecr.io/<repository>:<tag>`     | No             |
+| Google Container Registry   | `us-docker.pkg.dev/bellsoft/gcr.io/<repository>:<tag>` | Yes  |
+| Amazon ECR                  | `public.ecr.aws/bellsoft/<repository>:<tag>`| No             |
+
+<Aside type="note">
+Pulling from Google Container Registry requires authentication. Run `gcloud auth configure-docker` before pulling.
+</Aside>
+
+The following examples pull the hardened base image from each registry:
+
+<Tabs syncKey="registry">
+<TabItem label="Docker Hub">
+
+```shell
+docker pull bellsoft/hardened-base:glibc
+docker pull bellsoft/hardened-base:musl
+```
+
+</TabItem>
+<TabItem label="GitHub CR">
+
+```shell
+docker pull ghcr.io/bell-sw/hardened-base:glibc
+docker pull ghcr.io/bell-sw/hardened-base:musl
+```
+
+</TabItem>
+<TabItem label="Microsoft CR">
+
+```shell
+docker pull bellsoft.azurecr.io/hardened-base:glibc
+docker pull bellsoft.azurecr.io/hardened-base:musl
+```
+
+</TabItem>
+<TabItem label="Google CR">
+
+```shell
+docker pull us-docker.pkg.dev/bellsoft/gcr.io/hardened-base:glibc
+docker pull us-docker.pkg.dev/bellsoft/gcr.io/hardened-base:musl
+```
+
+</TabItem>
+<TabItem label="Amazon ECR">
+
+```shell
+docker pull public.ecr.aws/bellsoft/hardened-base:glibc
+docker pull public.ecr.aws/bellsoft/hardened-base:musl
+```
+
+</TabItem>
+</Tabs>

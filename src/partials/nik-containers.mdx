@@ -1,4 +1,4 @@
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## Liberica NIK container images
 
@@ -30,5 +30,63 @@ GraalVM Runtime Environment Liberica-NIK-23.1.11-1 (build 21.0.11+12-LTS)
 Substrate VM Liberica-NIK-23.1.11-1 (build 21.0.11+12-LTS, serial gc)
 ```
 
+
+## Registries
+
+Liberica NIK container images are published on all major container registries.
+The repository name is the same across registries; only the pull-URL prefix
+differs.
+
+| Registry                     | Pull-URL prefix                                          | Authentication |
+|------------------------------|----------------------------------------------------------|----------------|
+| Docker Hub                   | `bellsoft/<repository>:<tag>`                            | No             |
+| GitHub Container Registry    | `ghcr.io/bell-sw/<repository>:<tag>`                     | No             |
+| Microsoft Container Registry | `bellsoft.azurecr.io/<repository>:<tag>`                 | No             |
+| Google Container Registry    | `us-docker.pkg.dev/bellsoft/gcr.io/<repository>:<tag>`   | Yes            |
+| Amazon ECR                   | `public.ecr.aws/bellsoft/<repository>:<tag>`             | No             |
+
+<Aside type="note">
+Pulling from Google Container Registry requires authentication. Run `gcloud auth configure-docker` before pulling.
+</Aside>
+
+The following examples pull the same image from each registry:
+
+<Tabs syncKey="registry">
+<TabItem label="Docker Hub">
+
+```shell
+docker pull bellsoft/liberica-native-image-kit-container:jdk-21-nik-23-musl
+```
+
+</TabItem>
+<TabItem label="GitHub CR">
+
+```shell
+docker pull ghcr.io/bell-sw/liberica-native-image-kit-container:jdk-21-nik-23-musl
+```
+
+</TabItem>
+<TabItem label="Microsoft CR">
+
+```shell
+docker pull bellsoft.azurecr.io/liberica-native-image-kit-container:jdk-21-nik-23-musl
+```
+
+</TabItem>
+<TabItem label="Google CR">
+
+```shell
+docker pull us-docker.pkg.dev/bellsoft/gcr.io/liberica-native-image-kit-container:jdk-21-nik-23-musl
+```
+
+</TabItem>
+<TabItem label="Amazon ECR">
+
+```shell
+docker pull public.ecr.aws/bellsoft/liberica-native-image-kit-container:jdk-21-nik-23-musl
+```
+
+</TabItem>
+</Tabs>
 
 For near-zero-CVE nonroot and distroless NIK images, see [Hardened Images](./hardened/).

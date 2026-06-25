@@ -122,7 +122,7 @@ test('productOf also matches shared and landing pages of a versioned product', (
   assert.equal(productOf('/liberica-nik/'), 'liberica-nik'); // landing
   assert.equal(productOf('/liberica-jdk/how-to/ide/'), 'liberica-jdk'); // shared
   assert.equal(productOf('/liberica-jdk/debugging/jcmd/'), 'liberica-jdk');
-  assert.equal(productOf('/alpaquita/'), null); // not path-versioned
+  assert.equal(productOf('/alpaquita/'), 'alpaquita'); // versioned product, landing page
 });
 
 test('defaultVersionOf returns the latest (first) version slug', () => {
@@ -140,7 +140,7 @@ test('filterSidebarForVersion with a default slug keeps the latest version on sh
 });
 
 test('PRODUCT_VERSIONS holds the showcase registry', () => {
-  assert.deepEqual(Object.keys(PRODUCT_VERSIONS), ['liberica-jdk', 'liberica-nik']);
+  assert.deepEqual(Object.keys(PRODUCT_VERSIONS), ['liberica-jdk', 'liberica-nik', 'alpaquita']);
   assert.deepEqual(
     PRODUCT_VERSIONS['liberica-jdk'].map((v) => v.slug),
     ['25.0.3b11', '21.0.6b10']

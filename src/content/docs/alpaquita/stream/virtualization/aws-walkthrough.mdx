@@ -1,0 +1,83 @@
+---
+title: "Alpaquita Linux: Getting started with AWS images"
+slug: alpaquita/stream/virtualization/aws-walkthrough
+description: Select, launch, and log in to an Alpaquita Linux Amazon Machine Image (AMI) on AWS EC2.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+BellSoft provides Alpaquita Linux images for the AWS Cloud. Alpaquita Linux is an Alpine-based distribution with two libc options (improved musl and glibc) and several performance and security optimizations. Alpaquita cloud images enable developers to build microcontainers and significantly reduce cloud costs.
+
+## Selecting an image
+
+Use Bell-SW [AWS page](https://bell-sw.com/pages/downloads/alpaquita-cloud-image/) to select the Amazon Machine Image (AMI) with the combination of parameters that you are interested in.
+
+<Aside type="note">
+AMI is a master image for creating virtual servers, known as EC2 instances, in the Amazon Web Services (AWS) environment.
+</Aside>
+
+![Screenshot of the BellSoft AWS page](https://assets.bell-sw.com/docs.bell-sw.com/static/a1f4e3b060343ac0aa64943878152004543e5b37071d067afa2ba5ef4e06a1e2/c15e7/bell-sw-aws-page.png)
+
+Clicking **Image details** of the image you want to launch opens the AWS web interface (you need to provide authentication information if you have not logged in to the AWS web interface). The image details page provides all the information about the image. The "Launch instance from AMI" button opens the forms page to set up the VM instance.
+
+![Screenshot of the AWS AMI details page](https://assets.bell-sw.com/docs.bell-sw.com/static/58c968b9ec27bae698397f3c1519765a8e0d1ceee9ec757039479aa11e4d6376/c15e7/aws-ami-details.png)
+
+## Launching the virtual machine instance
+
+Click the "Launch instance from AMI" button to open the launch page with a set of forms. Fill in the forms for the selected image.
+
+<Steps>
+
+1. **Instance Name**
+
+   Type in a name for your instance in the **Name** field.
+
+   ![Screenshot of the instance name form](https://assets.bell-sw.com/docs.bell-sw.com/static/cf9bdd4b37ec1717ce37c3490cc114fd9adc2a7dcccec3cc055c2155036a4c78/c15e7/launch-01-name.png)
+
+2. **The source AMI**
+
+   This form is pre-filled with the information from the AMI you have selected on the previous step. Leave the default values.
+
+   ![Screenshot of the AMI form](https://assets.bell-sw.com/docs.bell-sw.com/static/f50ec18c3361a67a5198a44437676fe161a65449474c11bb3eb58d0f61abc684/c15e7/launch-02-ami.png)
+
+3. **Instance Type**
+
+   Virtual machines in the cloud come in many shapes and sizes. In the next form, select the instance type you want. You can leave the default selection for a quick introduction.
+
+   <Aside type="note">
+   See the [instance types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html) documentation from Amazon for more information.
+   </Aside>
+
+   ![Screenshot of the instance type form](https://assets.bell-sw.com/docs.bell-sw.com/static/3eae70dcbc57d37f1733b4bcd277e16812a35ab10b4ac005311527847f71127d/c15e7/launch-03-instance-type.png)
+
+4. **Networking**
+
+   Fill in the form to access your cloud instance.
+
+   ![Screenshot of the instance networking form](https://assets.bell-sw.com/docs.bell-sw.com/static/5fb66515dfc4c7c009a4e3b4603a4ff6565d09d3b1b03826fd2e2cb9a8b48e24/c15e7/launch-04-network.png)
+
+   Use an existing [SSH key pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html), or create a new one. This key pair provides identification when you connect to the created instance.
+
+   Select **Allow SSH traffic from** to enable the SSH traffic to connect to your instance.
+
+   If you plan to start a networking server in your instance, configure the relevant firewall rules in this form.
+
+5. **Storage**
+
+   The next form helps you select the amount of disk space your instance can occupy. If you only want to do some basic testing, leave the default value. If you want to install some apps and test them, you might want to increase the space. In this example we have increased the amount of available disk space form 1GB to 5GB for demonstration purposes.
+
+   ![Screenshot of the instance storage form](https://assets.bell-sw.com/docs.bell-sw.com/static/cf18f1b30aafc90fc4870956c992fd839ed5071557b3d1fcfd55d7275fdaf356/c15e7/launch-05-storage.png)
+
+6. **Review and launch**
+
+   You are ready to launch your instance. Review the summary of your settings and click the **Launch instance** button.
+
+   ![Screenshot of the instance summary form](https://assets.bell-sw.com/docs.bell-sw.com/static/462f5f8b46455464fdb0c1396496e8469070d9c534fda71bc0ab0f3e54da6c05/115f4/launch-06-summary.png)
+
+</Steps>
+
+## Logging in
+
+When the instance is launched, you can [log in](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstances.html) with an SSH client using the *default username* `alpaquita` and the SSH key pair you specified when configuring the instance.

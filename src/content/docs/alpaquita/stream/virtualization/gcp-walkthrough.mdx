@@ -1,0 +1,215 @@
+---
+title: "Alpaquita Linux: Getting started with GCP images"
+slug: alpaquita/stream/virtualization/gcp-walkthrough
+description: Select Alpaquita Linux GCP images, create Compute Engine instances with the gcloud CLI, log in, view logs, and configure your VM.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+BellSoft provides Alpaquita Linux images for the Google Cloud. Alpaquita Linux is an Alpine-based distribution with two libc options (improved musl and glibc) and several performance and security optimizations. Alpaquita cloud images enable developers to build microcontainers and significantly reduce cloud costs.
+
+## Selecting an image
+
+BellSoft maintains 6 flavors or variations of Alpaquita Linux in GCP:
+
+- `alpaquita-glibc-aarch64`
+- `alpaquita-glibc-x86-64-bios`
+- `alpaquita-glibc-x86-64-uefi`
+- `alpaquita-musl-aarch64`
+- `alpaquita-musl-x86-64-bios`
+- `alpaquita-musl-x86-64-uefi`
+
+In GCP, these flavors of Alpaquita Linux exist as image families. That means users can create VM instances by specifying a family name and the latest image in the image family will be used to create the VM.
+
+Use [BellSoft GCP page](https://bell-sw.com/pages/downloads/alpaquita-gcp/) to select the GCP OS Images with the combination of parameters that you are interested in.
+
+On the web page you can see all the available images and copy image names.
+
+![images-website-list](https://assets.bell-sw.com/docs.bell-sw.com/static/dcb69155cea8dc4720d61c6bafc8dffb73463f6723d7dc1eb6a7e3df59f9818c/c15e7/images-website-list.png)
+
+It is possible to filter the list by the C library implementation (musl or glibc), firmware, and architecture.
+
+In this document we will use the `musl` C library variant with x86_64 architecture and UEFI firmware.
+
+![001-filter-images-bell-sw-website](https://assets.bell-sw.com/docs.bell-sw.com/static/9d410a61bb2e504c10ed419ad6cf52cd34ea661acb86578723143db0c7be352b/c15e7/001-filter-images-bell-sw-website.png)
+
+After filtering the parameters, you can copy the image name by clicking the **Copy Image Name** button on the right of the filtered entry. After obtaining the image name, you can proceed with creating a VM instance of the Alpaquita image. We will show how to use the `gcloud` command line interface to achieve that.
+
+## Creating a VM instance
+
+<Aside type="caution" title="Important">
+This part assumes that you have created a project, enabled Compute Engine API, and completed other required setup. Also, we assume that you have installed and configured `gcloud` CLI tool. For more information, see [gcloud documentation](https://cloud.google.com/sdk/docs/install) and [Compute Engine instances docs](https://cloud.google.com/compute/docs/instances).
+</Aside>
+
+### Creating a VM instance using the image name
+
+First lets see how to create an instance using the image name. Use `gcloud` CLI tool to create an instance as follows:
+
+```bash
+gcloud compute instances create <instance_name> \
+    --project=<your_project>
+    --machine-type=<machine_type> \
+    --zone=<zone> \
+    --image-project=alpaquita-cloud \
+    --image=<image_name>
+```
+
+Specify your project name in the `--project` parameter. For this demo we use `alpaquita-public` name. Make sure you have a compatible machine type for your image architecture, such as, if you have an `aarch64` machine, select aarch64-compatible machine type like `c4a` for your image in GCP.
+
+See [Regions and zones](https://cloud.google.com/compute/docs/regions-zones) for more information on zones.
+
+`--image-project` is the project where the image that you are using to create a VM instance is located. All BellSoft Alpaquita Linux images reside in the `alpaquita-cloud` project.
+
+```bash
+$ gcloud compute instances create alpq-instance-image-name-demo \
+  --project=alpaquita-public \
+  --machine-type=e2-micro \
+  --zone=us-central1-c \
+  --image-project=alpaquita-cloud \
+  --image=alpaquita-musl-x86-64-uefi-2025-03-14-16-22
+
+
+Created [https://www.googleapis.com/compute/v1/projects/alpaquita-public/zones/us-central1-c/instances/alpq-instance-image-name-demo].
+NAME                           ZONE           MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP   STATUS
+alpq-instance-image-name-demo  us-central1-c  e2-micro                   10.128.0.3   [REDACTED]    RUNNING
+```
+
+As the command output above shows, `alpq-instance-image-name-demo` instance is created.
+
+After creating the VM using the `glcloud` CLI, you should be able to see it in GCP web interface:
+
+![004-created-instance-at-gcp](https://assets.bell-sw.com/docs.bell-sw.com/static/104348c946c4f2761d044c1ee2fe6dbbb385da534e140b130f7b7b6bf63ac71d/c15e7/004-created-instance-at-gcp.png)
+
+Although this is a valid method to create an instance, if you want to get the latest image in the image family instead of obtaining the image name manually, GCP provides a better alternative described in the next part.
+
+### Creating a VM instance using the image family name
+
+The Alpaquita Linux image names are as follows: `<image_family>-<timestamps>`. By simply removing the timestamps, you can get the image family.
+
+In automated scripts or in case you want to get the latest image of an image family, `gcloud` provides a useful option to use image families to create a VM instance:
+
+```bash
+$ gcloud compute instances create alpq-instance-image-family-demo \
+       --image-project=alpaquita-cloud \
+       --image-family=alpaquita-musl-x86-64-uefi \
+       --project=alpaquita-public
+Created [https://www.googleapis.com/compute/v1/projects/alpaquita-public/zones/us-central1-c/instances/alpq-instance-image-family-demo].
+NAME                             ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
+alpq-instance-image-family-demo  us-central1-c  n1-standard-1               10.128.0.7   [REDACTED]     RUNNING
+```
+
+The created instance should appear in the GCP web interface:
+
+![005-created-instance-with-img-family](https://assets.bell-sw.com/docs.bell-sw.com/static/2e7c22fd95ec661a5ab9187106aca7868d929301f23440ce939e0d370245ef5f/c15e7/005-created-instance-with-img-family.png)
+
+## Logging in to the instance
+
+### Log in using browser
+
+If you click the **SSH** button on your image info page, GCP will connect to your instance by creating an [ephemeral SSH key pair](https://cloud.google.com/compute/docs/instances/ssh#metadata) for you.
+
+![008-instance-detail-ssh-button](https://assets.bell-sw.com/docs.bell-sw.com/static/06a3126bbc1d43be0826bcac77f006e09b3813e334098a4cf4011fa2dae3e7f7/c15e7/008-instance-detail-ssh-button.png)
+
+After that you can start using your instance in your browser:
+
+![009-instance-ssh-using-browser](https://assets.bell-sw.com/docs.bell-sw.com/static/168323cae5d5f94837a5add812e5332c23774997860952e2e81d8b935feaf9a1/c15e7/009-instance-ssh-using-browser.png)
+
+<Aside type="note">
+It is also possible to create you own SSH keys, log in using OSLogin or serial console, and connect to your instance using the `gcloud` CLI tool. See [Connect to Linux VMs document](https://cloud.google.com/compute/docs/instances/connecting-to-instance) for more information.
+</Aside>
+
+## Viewing logs
+
+### Introduction to serial log
+
+GCP's serial port logs provide an important diagnostic tool for analysis of OS instance boot process. These logs offer insights into various stages of system initialization, making them valuable tool for troubleshooting boot-related issues.
+
+For Alpaquita Linux instances, the serial port logs detailed information from the bootloader, kernel, and hardware initialization systems, among other critical components. By examining these logs, users can identify point of failure or analyze unexpected behavior during the boot sequence.
+
+### Logs explorer
+
+Apart from the boot-related logs, the Logs explorer helps you examine the overall statistics, insights, and data about the instance. See the following example.
+
+Click **Logging** on the instance detail page.
+
+![logging instance info](https://assets.bell-sw.com/docs.bell-sw.com/static/c0aa497cbf74468d4d35c624509120097d8ec1c8da7f74832fd21ee270f53f41/c15e7/logging-instance-info.png)
+
+After clicking the link, the Logs explorer opens. The example below highlights the following items.
+
+1. Using the web interface you can filter the logs in the Logs explorer by the instance ID.
+2. You can adjust the time frame of the logs.
+3. The logs themselves are listed in the lower right part of the page.
+
+![logs explorer](https://assets.bell-sw.com/docs.bell-sw.com/static/930c57452afa52b528b3cd24a98e77cd4d72240cd92a3751841042c21e9a9c0d/c15e7/logs-explorer.png)
+
+As an example, we clicked a log entry that informs about a failed startup script. You can see in-depth information in the log entry such as timestamp, instance name, severity, and so on.
+
+See [Startup scripts](#startup-scripts) part for more information about startup scripts.
+
+![log entry detail](https://assets.bell-sw.com/docs.bell-sw.com/static/0b6afeb80ddb7d925b1c2ea180d5396726d94bc5977fe85684d62f2607ccb771/c15e7/log-entry-detail.png)
+
+## Configuring the VM instance
+
+### Startup scripts
+
+The pattern of executing a command during startup of the VM instance is useful for updating the system, installing a software, and so on.
+
+With Alpaquita Linux in GCP it is possible to do that using metadata by web interface or the `gcloud` CLI tool. We will show how to do it using the web interface.
+
+<Steps>
+
+1. First, click **Edit** on the instance details page:
+
+   ![010-edit-instance](https://assets.bell-sw.com/docs.bell-sw.com/static/b2e83eb9aeacba763c85fdce9ee771059fa0b6e24e6c04472dd267a9dc599bf3/c15e7/010-edit-instance.png)
+
+2. Then write the startup script in the **Startup script** text field:
+
+   ![011-add-startup-script](https://assets.bell-sw.com/docs.bell-sw.com/static/8986132fa3b5d8bd1f2d8ec9c7739b899a769e96a4543a389a6a400dcd8dfeac/c15e7/011-add-startup-script.png)
+
+   For demonstration purposes, we changed the hostname, wrote a string to the `/tmp/hello` file, and installed Liberica JDK 21.
+
+   <Aside type="note">
+   You can use other shebang lines for `python`, `perl` or any other interpreter.
+   </Aside>
+
+3. Stop the instance by clicking **Stop** on the instance details page:
+
+   ![012-instance-stop](https://assets.bell-sw.com/docs.bell-sw.com/static/0412656c0832eafc3424765289bde1ea93d1479a4076f486020890542024a76d/c15e7/012-instance-stop.png)
+
+   ![013-instance-stopped-info](https://assets.bell-sw.com/docs.bell-sw.com/static/d2e6b0dafabd42c2def25493a37719d0261b7f0062cef542ad4fc81904b78c54/c15e7/013-instance-stopped-info.png)
+
+4. After re-starting the instance, the startup script should be executed at the later stage of the booting process of the instance.
+
+</Steps>
+
+Let's verify that the startup script worked as expected:
+
+![014-startup-script-proof](https://assets.bell-sw.com/docs.bell-sw.com/static/8e2dc15ba63659e642d4e769af32df548c76178b74595a0e1b39a9ce1fd477bd/c15e7/014-startup-script-proof.png)
+
+We can see that the hostname is changed to `alpq-startup-script`, the `/tmp/hello` file contains the text we typed, and `liberica21` is installed.
+
+### Adding a new disk
+
+You can add a separate disk if needed by clicking the **Edit** button on the instance details page we have used earlier.
+
+<Steps>
+
+1. Click **Add new disk** in the **Edit** section:
+
+   ![015-add-new-disk-button](https://assets.bell-sw.com/docs.bell-sw.com/static/0b407876093e089b4c06e07fb53eb618a16e93bc947d05c0c29c7112615b221a/f5672/015-add-new-disk-button.png)
+
+2. Fill in the details, such as disk type, name, size, and region:
+
+   ![016-add-new-disk-form](https://assets.bell-sw.com/docs.bell-sw.com/static/e191a5630d0528811a5b81f19ab4c4d9fdfcf224a35b7b902f5a8cfa927f1513/c15e7/016-add-new-disk-form.png)
+
+3. After saving the changes in the **Edit** section, it should be ready to use in the instance:
+
+   ![016-add-new-disk-proof](https://assets.bell-sw.com/docs.bell-sw.com/static/be230f9dd1683f6d564529b793274bf25097f146fc076afa164c9996eaf812fa/c15e7/016-add-new-disk-proof.png)
+
+</Steps>
+
+### Other configurations
+
+For more information regarding configuration of Compute Engine instances, see [GCP documentation](https://cloud.google.com/compute/docs/overview).

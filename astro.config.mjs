@@ -54,6 +54,7 @@ export default defineConfig({
                     'liberica-jdk/25.0.3b11/how-to/choosing-flavor',
                     'liberica-jdk/25.0.3b11/how-to/performance-edition-overview',
                     'liberica-jdk/25.0.3b11/how-to/perf-getting-started',
+                    'liberica-jdk/25.0.3b11/how-to/release-types',
                   ]},
                   { label: 'Container Images', items: [
                     'liberica-jdk/25.0.3b11/containers',
@@ -65,7 +66,8 @@ export default defineConfig({
                   { label: 'How To', items: [
                     'liberica-jdk/25.0.3b11/how-to/use-ide',
                     'liberica-jdk/25.0.3b11/how-to/jvm-memory-configuration',
-                    'liberica-jdk/25.0.3b11/how-to/using-crac',
+                    'liberica-jdk/25.0.3b11/how-to/using-cds',
+                    'liberica-jdk/25.0.3b11/how-to/using-buildpacks',
                     'liberica-jdk/25.0.3b11/how-to/updating-time-zone-data',
                   ]},
                   { label: 'Debugging and Optimization', collapsed: true, items: [
@@ -90,6 +92,7 @@ export default defineConfig({
                     'liberica-jdk/21.0.6b10/how-to/choosing-flavor',
                     'liberica-jdk/21.0.6b10/how-to/performance-edition-overview',
                     'liberica-jdk/21.0.6b10/how-to/perf-getting-started',
+                    'liberica-jdk/21.0.6b10/how-to/release-types',
                   ]},
                   { label: 'Container Images', items: [
                     'liberica-jdk/21.0.6b10/containers',
@@ -102,6 +105,8 @@ export default defineConfig({
                     'liberica-jdk/21.0.6b10/how-to/use-ide',
                     'liberica-jdk/21.0.6b10/how-to/jvm-memory-configuration',
                     'liberica-jdk/21.0.6b10/how-to/using-crac',
+                    'liberica-jdk/21.0.6b10/how-to/using-cds',
+                    'liberica-jdk/21.0.6b10/how-to/using-buildpacks',
                     'liberica-jdk/21.0.6b10/how-to/updating-time-zone-data',
                   ]},
                   { label: 'Debugging and Optimization', collapsed: true, items: [
@@ -172,6 +177,7 @@ export default defineConfig({
                     'liberica-nik/25.0.3b11/how-to/containerize-native-images',
                     'liberica-nik/25.0.3b11/how-to/select-gc',
                     'liberica-nik/25.0.3b11/how-to/using-nik-with-desktop-applications',
+                    'liberica-nik/25.0.3b11/how-to/javafx-native-image',
                   ]},
                 ],
               },
@@ -189,6 +195,7 @@ export default defineConfig({
                     'liberica-nik/21.0.6b10/how-to/containerize-native-images',
                     'liberica-nik/21.0.6b10/how-to/select-gc',
                     'liberica-nik/21.0.6b10/how-to/using-nik-with-desktop-applications',
+                    'liberica-nik/21.0.6b10/how-to/javafx-native-image',
                   ]},
                 ],
               },
@@ -202,45 +209,90 @@ export default defineConfig({
           },
           {
             label: 'Alpaquita Linux',
-            link: '/alpaquita/',
+            link: '/alpaquita/stream/general/install-guide/',
             icon: 'linux',
             items: [
               'alpaquita',
-              { label: 'Release Information', items: [
-                'alpaquita/general/install-guide',
-                'alpaquita/general/release-notes',
-              ]},
-              { label: 'How To', items: [
-                'alpaquita/how-to/apk-guide',
-                'alpaquita/how-to/images-getting-started-guide',
-                'alpaquita/how-to/libc-diff',
-                'alpaquita/how-to/malloc',
-                'alpaquita/how-to/openrc-for-systemd-adepts',
-                'alpaquita/how-to/deploying-java-on-alpaquita-with-ansible',
-              ]},
-              { label: 'Containers', items: [
-                'alpaquita/containers/build-applications-with-buildpacks',
-                'alpaquita/containers/java-in-resource-constrained-containers',
-                'alpaquita/containers/modify-alpaquita-image',
-                'alpaquita/containers/remote-debug',
-              ]},
-              { label: 'Security', items: [
-                'alpaquita/containers/keeping-your-containers-secure',
-                'alpaquita/how-to/cosign-guide',
-                'alpaquita/how-to/osvscanner-quickstart',
-                'alpaquita/how-to/use-own-keys-in-secureboot',
-              ]},
-              { label: 'Hardened Images', items: [
-                'alpaquita/hardened/overview',
-                'alpaquita/hardened/catalog',
-              ]},
-              { label: 'Virtualization', items: [
-                'alpaquita/virtualization/virtual-images',
-                'alpaquita/virtualization/aws-walkthrough',
-                'alpaquita/virtualization/azure-walkthrough',
-                'alpaquita/virtualization/gcp-walkthrough',
-                'alpaquita/virtualization/firecracker-qemu-vm',
-              ]},
+              {
+                label: 'Stream',
+                items: [
+                  { label: 'Release Information', items: [
+                    'alpaquita/stream/general/install-guide',
+                    'alpaquita/stream/general/release-notes',
+                  ]},
+                  { label: 'How To', items: [
+                    'alpaquita/stream/how-to/apk-guide',
+                    'alpaquita/stream/how-to/images-getting-started-guide',
+                    'alpaquita/stream/how-to/libc-diff',
+                    'alpaquita/stream/how-to/malloc',
+                    'alpaquita/stream/how-to/openrc-for-systemd-adepts',
+                    'alpaquita/stream/how-to/deploying-java-on-alpaquita-with-ansible',
+                  ]},
+                  { label: 'Containers', items: [
+                    'alpaquita/stream/containers/build-applications-with-buildpacks',
+                    'alpaquita/stream/containers/java-in-resource-constrained-containers',
+                    'alpaquita/stream/containers/modify-alpaquita-image',
+                    'alpaquita/stream/containers/remote-debug',
+                  ]},
+                  { label: 'Hardened Images', items: [
+                    'alpaquita/stream/hardened/overview',
+                    'alpaquita/stream/hardened/catalog',
+                  ]},
+                  { label: 'Security', items: [
+                    'alpaquita/stream/containers/keeping-your-containers-secure',
+                    'alpaquita/stream/how-to/cosign-guide',
+                    'alpaquita/stream/how-to/osvscanner-quickstart',
+                    'alpaquita/stream/how-to/use-own-keys-in-secureboot',
+                  ]},
+                  { label: 'Virtualization', items: [
+                    'alpaquita/stream/virtualization/virtual-images',
+                    'alpaquita/stream/virtualization/aws-walkthrough',
+                    'alpaquita/stream/virtualization/azure-walkthrough',
+                    'alpaquita/stream/virtualization/gcp-walkthrough',
+                    'alpaquita/stream/virtualization/firecracker-qemu-vm',
+                  ]},
+                ],
+              },
+              {
+                label: '25 (LTS)',
+                items: [
+                  { label: 'Release Information', items: [
+                    'alpaquita/25-lts/general/install-guide',
+                    'alpaquita/25-lts/general/release-notes',
+                  ]},
+                  { label: 'How To', items: [
+                    'alpaquita/25-lts/how-to/apk-guide',
+                    'alpaquita/25-lts/how-to/images-getting-started-guide',
+                    'alpaquita/25-lts/how-to/libc-diff',
+                    'alpaquita/25-lts/how-to/malloc',
+                    'alpaquita/25-lts/how-to/openrc-for-systemd-adepts',
+                    'alpaquita/25-lts/how-to/deploying-java-on-alpaquita-with-ansible',
+                  ]},
+                  { label: 'Containers', items: [
+                    'alpaquita/25-lts/containers/build-applications-with-buildpacks',
+                    'alpaquita/25-lts/containers/java-in-resource-constrained-containers',
+                    'alpaquita/25-lts/containers/modify-alpaquita-image',
+                    'alpaquita/25-lts/containers/remote-debug',
+                  ]},
+                  { label: 'Hardened Images', items: [
+                    'alpaquita/25-lts/hardened/overview',
+                    'alpaquita/25-lts/hardened/catalog',
+                  ]},
+                  { label: 'Security', items: [
+                    'alpaquita/25-lts/containers/keeping-your-containers-secure',
+                    'alpaquita/25-lts/how-to/cosign-guide',
+                    'alpaquita/25-lts/how-to/osvscanner-quickstart',
+                    'alpaquita/25-lts/how-to/use-own-keys-in-secureboot',
+                  ]},
+                  { label: 'Virtualization', items: [
+                    'alpaquita/25-lts/virtualization/virtual-images',
+                    'alpaquita/25-lts/virtualization/aws-walkthrough',
+                    'alpaquita/25-lts/virtualization/azure-walkthrough',
+                    'alpaquita/25-lts/virtualization/gcp-walkthrough',
+                    'alpaquita/25-lts/virtualization/firecracker-qemu-vm',
+                  ]},
+                ],
+              },
             ],
           },
         ]),

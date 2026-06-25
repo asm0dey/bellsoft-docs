@@ -16,8 +16,10 @@ export function withBase(pathname, base = '/') {
 
 // Single source of truth for path-versioned products. Order = dropdown order.
 // slug = URL segment (bell-sw.com style: `+` -> `b`); label = display string.
-// Containers (Docker tags) and Alpaquita (streams) are intentionally absent —
-// they are not path-versioned, so the dropdown never appears on them.
+// Containers (Docker tags) are intentionally absent — they are not
+// path-versioned, so the dropdown never appears on them. Alpaquita is versioned
+// by release stream (`stream`, `25-lts`); its landing page (`/alpaquita/`) is
+// shared and shows no dropdown.
 export const PRODUCT_VERSIONS = {
   'liberica-jdk': [
     { slug: '25.0.3b11', label: '25.0.3+11' },
@@ -26,6 +28,10 @@ export const PRODUCT_VERSIONS = {
   'liberica-nik': [
     { slug: '25.0.3b11', label: '25.0.3+11' },
     { slug: '21.0.6b10', label: '21.0.6+10' },
+  ],
+  'alpaquita': [
+    { slug: 'stream', label: 'Stream' },
+    { slug: '25-lts', label: '25 (LTS)' },
   ],
 };
 

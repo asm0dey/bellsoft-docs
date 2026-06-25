@@ -1,0 +1,145 @@
+---
+title: "Getting started with OSV-Scanner"
+slug: alpaquita/stream/how-to/osvscanner-quickstart
+description: Scan Alpaquita Linux packages and container images for vulnerabilities with OSV-Scanner.
+---
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+OSV-Scanner is a security tool for scanning software images and getting security vulnerabilities list for a given image. The OSV tool and its documentation is available at the [OSV-Scanner](https://google.github.io/osv-scanner/) website. In most cases using OSV-Scanner with BellSoft Hardened Containers and Alpaquita Linux is similar to using it with any other Linux OS or application image in the supported format.
+
+The document provides instructions on how to scan the Alpaquita Linux packages using the OSV-Scanner tool.
+
+## OSV database
+
+OSV-Scanner is specifically created to employ the [OSV database](https://osv.dev/) data. OSV database is a vulnerability database available online. You can view available vulnerability information for [BellSoft Hardened Containers](https://osv.dev/list?q=&ecosystem=BellSoft+Hardened+Containers) or [Alpaquita](https://osv.dev/list?q=&ecosystem=Alpaquita) products using your web browser.
+
+## Using OSV-Scanner
+
+To use the OSV-Scanner, install it either by means of your OS or manually as follows:
+
+<Steps>
+
+1. Download the binaries from [https://github.com/google/osv-scanner/releases](https://github.com/google/osv-scanner/releases)
+
+2. Run the following command to install it in Alpaquita Linux: `apk add osv-scanner`
+
+</Steps>
+
+OSV-Scanner can scan and analyze images with software inside, such as OS or application images.
+
+<Aside type="note">
+There are other OSV-Scanner modes, but they are unrelated to this guide and out of its scope.
+</Aside>
+
+The supported image format is Docker image. OSV-Scanner also supports scanning the Docker export type archives. For more information, consult the official documentation on how to use it if necessary. To use Docker format images, install Docker in the same OS (`apk add docker` in Alpaquita Linux).
+
+OSV-Scanner processes local docker images. In case you specify an image that is not available locally, the scanner tries to pull the image from the network (for example, Docker Hub) according to Docker settings.
+
+### Basic scan
+
+In the following example the `osv-scanner scan image` command scans the `bellsoft/alpaquita-linux-go:1.25.0-glibc` image for available vulnerabilities.
+
+![basic scan](https://assets.bell-sw.com/docs.bell-sw.com/static/ba21664b0d3f85d3a44f3a390dd6a3ce5f923cad2862b6483d070d103d74b558/c15e7/basic-scan.png)
+
+The above result shows that the (quite old) image `bellsoft/alpaquita-linux-go:1.25.0-glibc` has 16 vulnerabilities that are already fixed in Alpaquita Linux Stream.
+
+### Advanced scanner options
+
+Running OSV-Scanner with advanced options may be useful for some use cases. For example, the following command produces a well-formatted HTML file with some more useful information.
+
+```shell
+osv-scanner scan image -f html --output /tmp/osvs-report.html bellsoft/alpaquita-linux-go:1.25.0-glibc
+```
+
+![osv report](https://assets.bell-sw.com/docs.bell-sw.com/static/20d34177e5055dcd3b951e5dee3971dd728d87ff948fcda79a349ba6c86ce0e9/c15e7/osv-report.png)
+
+*Figure 1. OSV-scan report in HTML format*
+
+The next command produces a very detailed JSON file containing elaborate information on vulnerabilities.
+
+```shell
+osv-scanner scan image --all-packages -f json --output /tmp/osvs-report.json bellsoft/alpaquita-linux-go:1.25.0-glibc
+```
+
+You can find a lot of useful information by examining the report in JSON file:
+
+```json
+  "image_metadata": {
+    "os": "BellSoft Alpaquita Linux Stream (glibc)",
+  ...
+  }
+```
+
+The `image_metadata` section contains detailed information that helps you clearly identify which image was scanned including all (Docker) layers information.
+
+```json
+  "results": [
+    {
+      "source": { ... }
+    }
+  ]
+```
+
+The `results` section contains all scan results, such as the OS and the language modules/libraries (Go, Pyhton, etc.) found in the image.
+
+```json
+  "results": [
+    ...
+    {
+      "source": {
+        "path": "var/lib/apk/db/installed",
+        "type": "os"
+      },
+      "packages": [
+      ...
+      ]
+    }
+  ]
+```
+
+This part of the `results` section shows information specific to BellSoft Operating Systems.
+
+Another useful scanner option is `--all-packages` as in the following example:
+
+```shell
+osv-scanner scan image --all-packages -f json --output /tmp/osvs-report.json bellsoft/alpaquita-linux-go:1.25.0-glibc
+```
+
+This option adds information about all packages to the report, even those that have no known vulnerabilities. This report contains data about the installed OS packages, their versions, and some more information.
+
+### Report formats
+
+As described above, the OSV-Scanner can show the results directly in the console and create reports in different formats, such as HTML and JSON. The following output formats are currently supported:
+
+1. table (console output)
+2. html
+3. vertical (console output)
+4. json 5
+5. markdown
+6. sarif
+7. gh-annotations
+8. cyclonedx-1-4
+9. cyclonedx-1-5
+10. spdx-2-3
+
+## Other functions
+
+### SBOM
+
+One additional function of OSV-Scanner is producing SBOM data for an image: either in the JSON (own) format or in industry-standard SPDX or CycloneDX formats.
+
+## FAQ
+
+**Q: I don't have Docker to manipulate images. Can I still use OSV-Scanner?**
+
+A: Yes. Export the image you want to scan to another computer or VM to create an archive. Scanning the archive does not require Docker installed. Also, there are other modes of OSV-Scanner that do not require Docker.
+
+**Q: Can I use the scanner in the "offline" mode?**
+
+A: Yes. Use the following options:
+
+- `--offline` - disables any features requiring network access.
+- `--download-offline-databases` - downloads a copy of the OSV database.
+- `--offline-vulnerabilities` - uses the locally stored OSV database.
