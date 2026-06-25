@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
+import { pluginLanguageBadge } from 'expressive-code-language-badge';
 
 export default defineConfig({
   site: 'https://asm0dey.github.io',
@@ -25,6 +26,10 @@ export default defineConfig({
         { icon: 'external', label: 'bell-sw.com', href: 'https://bell-sw.com/' },
       ],
       customCss: ['./src/styles/custom.css'],
+      expressiveCode: {
+        // `text`-tagged blocks are command output, not a language — no badge for them.
+        plugins: [pluginLanguageBadge({ excludeLanguages: ['text'] })],
+      },
       routeMiddleware: './src/toc-partials.ts',
       components: {
         Sidebar: './src/components/VersionSwitcher.astro',
