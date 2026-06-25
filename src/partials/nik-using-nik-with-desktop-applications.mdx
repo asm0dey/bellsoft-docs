@@ -24,7 +24,7 @@ You are now ready to compile Java applications natively. You have several option
 
 In all three cases, your application is likely to use resources such as icons or images. These resources must be made known to native-image so that it includes them in the resulting executable. There are two options to include and exclude resource identifiers, and you can use wildcards there:
 
-```
+```text
 -H:IncludeResources='com.fxapp.resources.images.*'
 -H:ExcludeResources='com.fxapp.resources.unused.*'
 ```

@@ -77,7 +77,7 @@ CR: Checkpoint ...
 
 The application console output:
 
-```
+```text
 Counter: 1(passed 1007 ms)
 Counter: 2(passed 1010 ms)
 Counter: 3(passed 1001 ms)
@@ -91,7 +91,7 @@ Killed
 
 Now, let's try to restore the application. Run the following command (please note that only the `-XX:CRaCRestoreFrom` option is passed as the java argument):
 
-```
+```text
 java -XX:CRaCRestoreFrom=checkpoint-dir
 Output:
 Counter: 7(passed 91124 ms)
@@ -150,7 +150,7 @@ CR: Checkpoint ...
 
 The output is the following:
 
-```
+```text
 Counter: 0(passed 1007 ms)
 Counter: 1(passed 999 ms)
 Counter: 2(passed 1000 ms)
@@ -169,7 +169,7 @@ Killed
 
 Now, let's try to restore the application:
 
-```
+```text
 java -XX:CRaCRestoreFrom=checkpoint-dir
 Counter: 11(passed 64673 ms)
 ```
@@ -257,7 +257,7 @@ CR: Checkpoint ...
 
 Finally, let's restore our application:
 
-```
+```text
 java -XX:CRaCRestoreFrom=checkpoint-dir
 ExampleWithCRaCRestore$ExampleWithCRaCRestoreResource restore.
 Counter: 7(passed 61407 ms)
@@ -279,7 +279,7 @@ After pulling the project, build the `jar` file with `mvn package` and use the f
 java -XX:CRaCCheckpointTo=cr -jar ./target/spring-petclinic-3.2.0-SNAPSHOT.jar
 ```
 
-```
+```text
               |\      _,,,--,,_
              /,`.-'`'   ._  \-;;,_
   _______ __|,4-  ) )_   .;.(__`'-'__     ___ __    _ ___ _______
@@ -362,7 +362,7 @@ As a result, Spring Boot 3.2 with Spring Framework 6.1.1 is used for building th
 java -XX:CRaCCheckpointTo=cr -jar ./target/spring-petclinic-3.2.0-SNAPSHOT.jar
 ```
 
-```
+```text
               |\      _,,,--,,_
              /,`.-'`'   ._  \-;;,_
   _______ __|,4-  ) )_   .;.(__`'-'__     ___ __    _ ___ _______
@@ -411,7 +411,7 @@ CR: Checkpoint ...
 
 The application output is as follows:
 
-```
+```text
 2023-11-24T02:29:39.847-08:00  INFO 17325 --- [Attach Listener] jdk.crac                                 : Starting checkpoint
 2023-11-24T02:29:39.876-08:00  INFO 17325 --- [Attach Listener] o.s.b.j.HikariCheckpointRestoreLifecycle : Evicting Hikari connections
 Killed
@@ -419,7 +419,7 @@ Killed
 
 We can check that the cr directory is created and contains a lot of files:
 
-```
+```text
 ls cr
 ...  core-17415.img  core-17419.img  files.img      mm-17325.img       pstree.img    tty-info.img
 ...  core-17416.img  cppath          fs-17325.img   pagemap-17325.img  seccomp.img
@@ -431,7 +431,7 @@ These files represent the dumped HotSpot JVM memory with all the necessary infor
 
 Finally, let's restore the Petclinic app:
 
-```
+```text
 java -XX:CRaCRestoreFrom=cr
 
 2023-11-24T02:30:59.012-08:00  WARN 17325 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m33s725ms577µs950ns).

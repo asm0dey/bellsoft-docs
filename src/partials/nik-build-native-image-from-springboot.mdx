@@ -20,7 +20,7 @@ It would be best to utilize a powerful computer with several gigabytes of RAM to
 
 3. Check that Liberica NIK is installed:
 
-   ```
+   ```text
    java -version
    openjdk version "17.0.5" 2022-10-18 LTS
    OpenJDK Runtime Environment GraalVM 22.3.0 (build 17.0.5+8-LTS)
@@ -41,7 +41,7 @@ The easiest way to create a new Spring Boot project is to generate one with [Spr
 
 Build the project and verify that everything is working:
 
-```
+```text
 time java -jar ./target/native-image-demo-0.0.1-SNAPSHOT.jar
 
 real    0m1.404s
@@ -61,7 +61,7 @@ The resulting native image is in the target directory.
 
 Check how fast the native image starts up:
 
-```
+```text
 time /home/username/test/native-image-demo/target/native-image-demo
 
 real    0m0.026s
