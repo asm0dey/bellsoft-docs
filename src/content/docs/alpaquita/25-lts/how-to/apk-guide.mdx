@@ -221,12 +221,12 @@ The following examples are based on the Alpaquita Linux Stream version.
 </Aside>
 
 ```shell
-$ apk info | grep musl
+apk info | grep musl
 musl-utils
 musl-default
 musl-default-dev
 
-$ sudo apk add musl-perf
+sudo apk add musl-perf
 fetch https://packages.bell-sw.com/alpaquita/musl/stream/core/x86_64/APKINDEX.tar.gz
 fetch https://packages.bellsw.com/alpaquita/musl/stream/universe/x86_64/APKINDEX.tar.gz
 (1/4) Installing musl-perf (1.2.3-r6)
@@ -235,7 +235,7 @@ fetch https://packages.bellsw.com/alpaquita/musl/stream/universe/x86_64/APKINDEX
 (4/4) Purging musl-default (1.2.3-r3)
 OK: 552 MiB in 186 packages
 
-$ apk info | grep musl
+apk info | grep musl
 musl-utils
 musl-perf
 musl-perf-dev

@@ -66,7 +66,7 @@ Overall, it is a well-known and suitable application for use as an example.
 Use the following command to clone the sample application.
 
 ```bash
-$ git clone https://github.com/spring-projects/spring-petclinic.git
+git clone https://github.com/spring-projects/spring-petclinic.git
 ```
 
 #### Dockerfile
@@ -147,8 +147,8 @@ ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
 Use the following commands to build the `petclinic-liberica` image.
 
 ```bash
-$ cd spring-petclinic
-$ docker build --tag petclinic-liberica .
+cd spring-petclinic
+docker build --tag petclinic-liberica .
 ```
 
 In this section we have created the example production image that we want to debug.
@@ -201,8 +201,8 @@ ENV JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} \
 Use the following commands to build the debugging image. Remember to expose the port that was specified, in this case `5005`, defined in the `JAVA_TOOL_OPTIONS` environment variable.
 
 ```bash
-$ docker build --tag petclinic-liberica-debug -f Dockerfile.debug .
-$ docker run -p8080:8080 -p5005:5005 petclinic-liberica-debug
+docker build --tag petclinic-liberica-debug -f Dockerfile.debug .
+docker run -p8080:8080 -p5005:5005 petclinic-liberica-debug
 Picked up JAVA_TOOL_OPTIONS:  -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
 Listening for transport dt_socket at address: 5005
 ...
@@ -313,7 +313,7 @@ Skip this section if you already have a python image of your application and rep
 The final structure of the sample project should look like the following:
 
 ```text
-$ tree
+tree
 .
 ├── Dockerfile
 ├── Dockerfile.debug
@@ -329,7 +329,7 @@ $ tree
 We have a simple application that returns the roots of the following quadratic equation $ax^2 + bx + c = 0$.
 
 ```bash
-$ curl -s \
+curl -s \
     --request GET \
     --url 'http://localhost:8000/solve_quadratic?a=1&b=-8&c=15' \
     | jq
@@ -417,7 +417,7 @@ uvicorn
 Build your image with the following command.
 
 ```bash
-$ docker build --tag fastapi-app .
+docker build --tag fastapi-app .
 ```
 
 ### Building a debugging image
@@ -594,7 +594,7 @@ We will use `gdbserver`, which is a lightweight debugging server for [`gdb`](htt
 Upon completion of this section, you should have the following directory structure:
 
 ```text
-$ tree
+tree
 .
 ├── Dockerfile
 ├── Makefile
@@ -609,7 +609,7 @@ We have a simple application that takes a string of characters from standard inp
 Let's provide the input "noel sees leon" to the program.
 
 ```text
-$ docker run -it reverser:latest
+docker run -it reverser:latest
 noel sees leon
 Reversed string:
 noel sees leon
@@ -736,10 +736,10 @@ int main(const int argc, char *argv[]) {
 The modified code prints out the "wrong usage" error:
 
 ```text
-$ docker build --tag reverser-arg .
+docker build --tag reverser-arg .
 [+] Building 0.8s (15/15) FINISHED
 ...
-$ docker run --rm -it reverser-arg:latest "noel sees leon"
+docker run --rm -it reverser-arg:latest "noel sees leon"
 Usage: ./reverser <string>
 ```
 
@@ -826,9 +826,9 @@ Additionally, Docker's default seccomp profile blocks several system calls essen
 Then, run the `gdbserver` with the options explained above passing the string, "noel sees leon" as the first argument to the program.
 
 ```bash
-$ docker build --tag reverser-arg-debug -f Dockerfile.debug .
+docker build --tag reverser-arg-debug -f Dockerfile.debug .
 
-$ docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
     -p2159:2159 reverser-arg-debug:latest "noel sees leon"
 
 Process ./reverser.debug created; pid = 9
@@ -902,7 +902,7 @@ The program now continues without exiting with a usage message. Click **Step ove
 Upon finishing the program, it should display the reversed string and `gdbserver` exits.
 
 ```text
-$ docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
     -p2159:2159 reverser-arg-debug:latest "noel sees leon"
 
 Process ./reverser.debug created; pid = 9

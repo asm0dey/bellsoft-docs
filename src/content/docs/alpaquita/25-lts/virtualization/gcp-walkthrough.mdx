@@ -63,7 +63,7 @@ See [Regions and zones](https://cloud.google.com/compute/docs/regions-zones) for
 `--image-project` is the project where the image that you are using to create a VM instance is located. All BellSoft Alpaquita Linux images reside in the `alpaquita-cloud` project.
 
 ```bash
-$ gcloud compute instances create alpq-instance-image-name-demo \
+gcloud compute instances create alpq-instance-image-name-demo \
   --project=alpaquita-public \
   --machine-type=e2-micro \
   --zone=us-central1-c \
@@ -91,7 +91,7 @@ The Alpaquita Linux image names are as follows: `<image_family>-<timestamps>`. B
 In automated scripts or in case you want to get the latest image of an image family, `gcloud` provides a useful option to use image families to create a VM instance:
 
 ```bash
-$ gcloud compute instances create alpq-instance-image-family-demo \
+gcloud compute instances create alpq-instance-image-family-demo \
        --image-project=alpaquita-cloud \
        --image-family=alpaquita-musl-x86-64-uefi \
        --project=alpaquita-public

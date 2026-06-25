@@ -241,14 +241,14 @@ At this step, the Secure Boot is activated and Alpaquita Linux boots in lockdown
 Enter the following command to verify that Secure Boot is enabled.
 
 ```shell
-$ mokutil --sb-state
+mokutil --sb-state
 SecureBoot enabled
 ```
 
 `dmesg` should contain the following lines indicating that secure boot is enabled and the kernel is locked down.
 
 ```text
-$ sudo dmesg | grep Secure
+sudo dmesg | grep Secure
 [    0.000000] Kernel is locked down from EFI Secure Boot; see man kernel_lockdown.7
 [    0.000000] secureboot: Secure boot enabled
 [    0.207058] integrity: Loaded X.509 cert 'BellSoft: Alpaquita Secure Boot CA: 3a793ac1906e33e9e12f28ca97c0f5b9652eae24'
