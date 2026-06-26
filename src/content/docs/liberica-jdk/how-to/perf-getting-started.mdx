@@ -1,0 +1,83 @@
+---
+title: "Getting Started with Performance Edition"
+slug: liberica-jdk/how-to/perf-getting-started
+description: How to deploy and configure Liberica JDK Performance Edition to bring JVM 17/21 performance to legacy JDK 8 and 11 codebases.
+---
+import VersionLink from '@components/VersionLink.astro';
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+## Introduction to Liberica JDK Performance Edition
+
+[Liberica JDK Performance Edition](https://bell-sw.com/libericajdk-performance-edition/) (or liberica-perf) brings some of the performance of JVM 17 and JVM 21 to projects that cannot afford complete migration out of JDK 8 or JDK 11. Liberica JDK Performance Edition offers versions of JDK 8 and JDK 11 that have the core JVM and HotSpot from JDK 21 baked into the legacy JDK 8 and JDK 11 builds.
+
+Liberica JDK Performance Edition is available for all platforms the Liberica JDK 8 and 11 are available for.
+
+## Features and Enhancements
+
+Several JVM runtime options were added from JDK 17 and 21, and some were removed. The following list summarizes the changes in liberica-perf. For the full list of changes, see Changes to JVM Runtime Options in the Performance Edition Overview.
+
+Liberica JDK Performance Edition includes the following features:
+
+- **Z Garbage Collector** (new in JDK 8, improved in JDK 11): a scalable, low-latency garbage collector.
+- **Compact Strings** (new in JDK 8): a space-efficient internal representation of strings, which reduces memory footprint and garbage collection activity; it's enabled by default.
+- **Unified JVM Logging** (new in JDK 8): replaces JDK options that print details about the JVM with `-Xlog` options.
+
+In addition, Liberica JDK Performance Edition includes the following enhancements:
+
+- **Garbage-First (G1) Garbage Collector**: targeted for multiprocessor machines scaling to a large amount of memory. This is the default garbage collector for all versions of Liberica JDK Performance Edition.
+- **G1 String Deduplication**: reduces the memory footprint of String objects on the Java heap by taking advantage of the fact that many String objects are identical. It's disabled by default, but you can enable it with the `-XX:+UseStringDeduplication` option.
+- **Class Data Sharing (CDS)**: helps reduce the startup time and memory footprint between multiple JVMs. It's enabled by default in Liberica JDK Performance Edition. To disable it, see [Manually Controlling Class Data Sharing](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html#GUID-882DC523-706D-403E-8A06-FBBB0E1B2128).
+- **Enhanced Java Flight Recorder**: a tool for collecting diagnostic and profiling data for a running Java application.
+
+<Aside type="note">
+Concurrent Mark Sweep Garbage Collector is absent in liberica-perf 8 and 11.
+</Aside>
+
+## Deploying Liberica JDK Performance Edition
+
+<Steps>
+
+1. **Develop a Migration Plan**
+
+   Consult either Changes to JVM Runtime Options in the Performance Edition Overview or Appendix I in the [Liberica JDK Performance Edition](https://assets.bell-sw.com/pdf/liberica-jdk-performance-edition.pdf) document to compile a thorough inventory of JVM options and features introduced or removed in liberica-perf. Use this information to create a detailed list of components in your application requiring tuning or replacement.
+
+2. **Install Liberica JDK Performance Edition**
+
+   Download the `tar.gz` package containing the Liberica JDK Performance Edition bundle. Install it as you would install any other Java version.
+
+3. **Test Your Application**
+
+   Run tests to ensure a smooth operation. If you encounter any issues, reach out to our support team.
+
+4. **Optimize JVM and Resource Utilization**
+
+   Fine-tune JVM settings to reduce resource consumption or enhance the performance of your JDK 8 & 11-based services. Our engineers are committed to helping you optimize the performance of your services and minimize resource usage.
+
+</Steps>
+
+### Installing Liberica JDK Performance Edition
+
+Liberica JDK Performance Edition builds are supported on x86_64 and AArch64 Linux, macOS, and Windows systems.
+
+Download the package with the Liberica JDK Performance Edition bundle and install it like any other Java version. Running the `java -version` command after you install liberica-perf should show output similar to the following:
+
+```text
+openjdk version "11.0.27" 2025-04-15 LTS
+OpenJDK Runtime Environment (build 11.0.27+9-LTS)
+OpenJDK 64-Bit Server VM (build 21.0.7+9-LTS, mixed mode)
+```
+
+For more information about installing Liberica JDK, see the <VersionLink to="install-guide">Liberica JDK Installation Guide</VersionLink>.
+
+## Configuration and usage
+
+Most workloads from your production environment can be migrated to Liberica JDK Performance Edition without substantial changes, but in some cases additional configuration is required. Some libraries in Liberica JDK Performance Edition behave differently and some are absent, therefore we recommend testing your application compatibility with Liberica JDK Performance Edition before deploying it in a production environment.
+
+<Aside type="caution">
+A JDK 8 application that is using the ConcurrentMarkSweep Garbage Collector (`-XX:+UseConcMarkSweepGC` option) must be configured to use any other available GC after migrating to Liberica JDK Performance Edition. We recommend using the G1 GC (`-XX:+UseG1GC` option), especially if your application is running on a multiprocessor machine.
+</Aside>
+
+For more information about JVM memory and GC usage, see the Guide to JVM memory configuration options. See the Performance Edition Overview for details on JVM options and features introduced or removed in liberica-perf.
+
+Contact our support team if you have any additional questions.

@@ -1,0 +1,928 @@
+---
+title: "Performance Edition Overview"
+slug: liberica-jdk/how-to/performance-edition-overview
+description: Features, enhancements, and the full list of JVM runtime option changes in Liberica JDK Performance Edition 8 and 11.
+---
+import VersionLink from '@components/VersionLink.astro';
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Introduction to Liberica JDK Performance Edition
+
+Liberica JDK Performance Edition (or liberica-perf) brings some of the performance of JVM 17 and JVM 21 to projects that can't afford complete migration out of JDK 8 or JDK 11. Liberica JDK Performance Edition is available for all platforms the Liberica JDK 8 and 11 are available for.
+
+## Features and Enhancements
+
+Liberica JDK Performance Edition includes the following features:
+- Z Garbage Collector (new in JDK 8, improved in JDK 11): a scalable, low latency garbage collector.
+- Compact Strings (new in JDK 8): a space-efficient internal representation of strings, which reduces memory footprint and garbage collection activity; it's enabled by default.
+- Unified JVM Logging (new in JDK 8): replaces JDK options that print details about the JVM with `-Xlog` options.
+
+In addition, Liberica JDK Performance Edition includes the following enhancements:
+- Garbage-First (G1) Garbage Collector: targeted for multiprocessor machines scaling to a large amount of memory. This is the default garbage collector for all versions of Liberica JDK Performance Edition.
+- G1 String Deduplication: reduces the memory footprint of String objects on the Java heap by taking advantage of the fact that many String objects are identical. It's disabled by default, but you can enable it with the `-XX:+UseStringDeduplication` option.
+- Class Data Sharing (CDS): helps reduce the startup time and memory footprint between multiple JVMs. It's enabled by default in Liberica JDK Performance Edition. To disable it, see [Manually Controlling Class Data Sharing](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html#GUID-882DC523-706D-403E-8A06-FBBB0E1B2128).
+- Enhanced Java Flight Recorder: a tool for collecting diagnostic and profiling data for a running Java application.
+
+:::note
+Concurrent Mark Sweep Garbage Collector is absent in liberica-perf 8 and 11.
+:::
+
+  
+## Installing Liberica JDK Performance Edition
+
+Installation procedure for Liberica JDK Performance Edition is similar to Liberica JDK. For detailed Liberica JDK installation and configuration instructions, see _Installation Guide_ for the corresponding <VersionLink to="install-guide">Liberica JDK version</VersionLink>.
+
+## Changes to JVM Runtime Options
+
+Several JVM runtime options were added from JDK 17 and JDK 21, some were removed. See the tables below for additional information.
+
+### Changes to runtime options in JDK 11 Performance Edition
+
+#### Added options in liberica-perf 11 based on JVM 17
+
+The following is a list of options available in liberica-perf 11, but absent in JDK 11. For more information on these parameters, see [the official documentation](https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html).
+
+<details>
+<summary>Added options in liberica-perf 11 based on JVM 17 — full table (29 options)</summary>
+
+| Option | Description |
+|---|---|
+| AdjustStackSizeForTLS | Increases the thread stack size to include space for glibc static thread-local storage (TLS) if true. |
+| AllowRedefinitionToAddDeleteMethods | Allows redefinition to add and delete private static or final methods for compatibility with old releases. |
+| ArchiveClassesAtExit | Specifies the path and name of the dynamic archive file. |
+| AsyncLogBufferSize | Specifies the memory in bytes for the intermediate buffer. |
+| C1InlineStackLimit | Limits stack frame size impact for inlining decisions for C1 JIT compiler. |
+| C1MaxInlineLevel | Specifies the maximum number of nested calls that are inlined by C1 JIT compiler. |
+| C1MaxInlineSize | Specifies the maximum bytecode size of a method to be inlined by C1 JIT compiler. |
+| C1MaxRecursiveInlineLevel | Specifies the maximum number of nested recursive calls that are inlined by C1 JIT compiler. |
+| C1MaxTrivialSize | Specifies the maximum bytecode size of a trivial method to be inlined by C1 JIT compiler. |
+| CompilationMode | Sets C1 JIT compiler compilation mode, such as `default`, `quick-only`, `high-only`, `high-only-quick-internal`. |
+| DynamicDumpSharedSpaces | Dynamic archive |
+| G1PeriodicGCInterval | Determines a minimum interval in ms at which G1 Garbage Collector considers performing a garbage collection. |
+| G1PeriodicGCInvokesConcurrent | If set, periodic garbage collections trigger a concurrent marking or continue the existing collection cycle, otherwise trigger a Full GC. |
+| G1PeriodicGCSystemLoadThreshold | Sets a threshold for the current system load as returned by the hosts `getloadavg()` call to determine whether a periodic garbage collection should be triggered. |
+| G1RSetRegionEntries | Sets the max number of regions. |
+| G1RSetSparseRegionEntries | Sets the eager reclaim threshold. If set the humongous objects are reclaimed only if their remembered set has less than the specified number of entries. |
+| HeapDumpGzipLevel | Sets the level of compressing the heap dump. |
+| MetaspaceReclaimPolicy | Reclaims memory after purging and returns it to the Operating System. This switch controls fine-tuning of metaspace reclamation (`balanced` `aggressive` `none`). |
+| MinHeapSize | Sets the minimum size (in bytes) of the memory allocation pool. |
+| RecordDynamicDumpInfo | Records a separate dynamically-generated archive on top of the default system for each application. |
+| ShowCodeDetailsInExceptionMessages | Enables printing of improved NullPointerException messages. |
+| SweeperThreshold | Sets the cache sweeper threshold value. |
+| UseContainerCpuShares | Takes cpu.shares into account when determining how many threads to allocate to the various thread pools. |
+| UseEmptySlotsInSupers | Allows allocating fields in empty slots of super-classes. |
+| UseNotificationThread | If set uses Notification Thread. |
+| ZMarkStackSpaceLimit | Sets the maximum number of bytes allocated for mark stacks. |
+| ZProactive | Enables proactive GC cycles. |
+| ZUncommit | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZUncommitDelay | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+
+</details>
+
+  
+#### Removed and renamed options in liberica-perf 11 based on JVM 17
+
+The table below lists options unavailable in liberica-perf 11 and the options that were renamed.
+
+<details>
+<summary>Removed and renamed options in liberica-perf 11 based on JVM 17 — full table (78 options)</summary>
+
+| JDK 11 option | Resolution in liberica-perf 11 |
+|---|---|
+| AggressiveOpts | Deleted |
+| AllowJNIEnvProxy | Deleted |
+| AllowNonVirtualCalls | Deleted |
+| AssertOnSuspendWaitFailure | Deleted |
+| AssumeMP | Deleted |
+| BindGCTaskThreadsToCPUs | Deleted |
+| BranchOnRegister | Deleted |
+| BytecodeVerificationLocal | Moved to the diagnostic flags category. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| BytecodeVerificationRemote | Moved to the diagnostic flags category. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| CMS* | CMS GC is not supported in liberica-perf 11 |
+| CalculateClassFingerprint | AOT is not supported in liberica-perf 11 |
+| CompactFields | Deleted |
+| CompilationPolicyChoice | Deleted |
+| CompilerThreadHintNoPreempt | Deleted |
+| Debugging | Deleted |
+| DeoptimizeRandom | Moved to the non-product category. Not available in release build. |
+| ErrorReportServer | Deleted |
+| FLSAlwaysCoalesceLarge | CMS GC is not supported in liberica-perf 11 |
+| FLSCoalescePolicy | CMS GC is not supported in liberica-perf 11 |
+| FLSLargestBlockCoalesceProximity | CMS GC is not supported in liberica-perf 11 |
+| FailOverToOldVerifier | Deleted |
+| FieldsAllocationStyle | Deleted |
+| ForceNUMA | Deleted |
+| G1RSetRegionEntries | Deleted |
+| G1RSetScanBlockSize | Deleted |
+| G1RSetSparseRegionEntries | Deleted |
+| GCLockerInvokesConcurrent | Deleted |
+| GCTaskTimeStampEntries | Deleted |
+| InitialBootClassLoaderMetaspaceSize | Deleted |
+| InsertMemBarAfterArraycopy | Deleted |
+| LIRFillDelaySlots | Deleted |
+| MonitorBound | Deleted |
+| MonitorInUseLists | Deleted |
+| NeedsDeoptSuspend | Deleted |
+| OldPLABWeight | Deleted |
+| ParGCDesiredObjsFromOverflowList | Deleted |
+| ParGCTrimOverflow | Deleted |
+| ParGCUseLocalOverflow | Deleted |
+| PrintJNIResolving | Functionality moved to unified logging. Use `-Xlog:jni+resolve` instead |
+| PrintSafepointStatistics | Functionality moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsCount | Functionality moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsTimeout | Functionality moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintVMQWaitTime | Deleted |
+| ProfileIntervals | Deleted |
+| ProfileIntervalsTicks | Deleted |
+| ProfileVM | Deleted |
+| ProfilerPrintByteCodeStatistics | Deleted |
+| ProfilerRecordPC | Deleted |
+| ResizeOldPLAB | Deleted |
+| ShenandoahSoftMaxHeapSize | Known as SoftMaxHeapSize in liberica-perf 11 |
+| StressLdcRewrite | Moved to the diagnostic flags category. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| SuspendRetryCount | Deleted |
+| SuspendRetryDelay | Deleted |
+| ThreadLocalHandshakes | Deleted |
+| Tier3AOTBackEdgeThreshold | AOT is not supported in liberica-perf 11 |
+| Tier3AOTCompileThreshold | AOT is not supported in liberica-perf 11 |
+| Tier3AOTInvocationThreshold | AOT is not supported in liberica-perf 11 |
+| Tier3AOTMinInvocationThreshold | AOT is not supported in liberica-perf 11 |
+| TraceSuspendWaitFailures | Deleted |
+| TransmitErrorReport | Deleted |
+| UnlinkSymbolsALot | Deleted |
+| UseAdaptiveGCBoundary | Deleted |
+| UseCMSBestFit | CMS GC is not supported in liberica-perf 11 |
+| UseCMSInitiatingOccupancyOnly | CMS GC is not supported in liberica-perf 11 |
+| UseConcMarkSweepGC | CMS GC is not supported in liberica-perf 11 |
+| UseGCTaskAffinity | Deleted |
+| UseLWPSynchronization | Deleted |
+| UseLargePagesInMetaspace | Deleted |
+| UseLegacyJNINameEscaping | Deleted |
+| UseMembar | Deleted |
+| UseOSErrorReporting | Deleted |
+| UseRDPCForConstantTableBase | Deleted |
+| VMThreadHintNoPreempt | Deleted |
+| VerifyMergedCPBytecodes | Deleted |
+| ZMarkStacksMax | Deleted |
+| Zpath | Deleted |
+| ZStallOnOutOfMemory | Deleted |
+| ZStatisticsInterval | Deleted |
+
+</details>
+
+  
+#### Added options in liberica-perf 11 based on JVM 21
+
+The table below lists options added to liberica-perf 11 based on JVM 21.
+
+<details>
+<summary>Added options in liberica-perf 11 based on JVM 21 — full table (35 options)</summary>
+
+| Option | Description |
+|---|---|
+| AdjustStackSizeForTLS | Increases the thread stack size to include space for glibc static thread-local storage (TLS) if true. |
+| AllowRedefinitionToAddDeleteMethods | Allows redefinition to add and delete private static or final methods for compatibility with old releases. |
+| ArchiveClassesAtExit | Specifies the path and name of the dynamic archive file. |
+| AsyncLogBufferSize | Specifies the memory in bytes for the intermediate buffer. |
+| AutoCreateSharedArchive | Automatically creates Dynamic CDS Archive File. The specified archive file is created if it does not exist, or if it was generated by a different JDK version. |
+| C1InlineStackLimit | Limits stack frame size impact for inlining decisions for C1 JIT compiler. |
+| C1MaxInlineLevel | Specifies the maximum number of nested calls that are inlined by C1 JIT compiler. |
+| C1MaxInlineSize | Specifies the maximum bytecode size of a method to be inlined by C1 JIT compiler. |
+| C1MaxRecursiveInlineLevel | Specifies the maximum number of nested recursive calls that are inlined by C1 JIT compiler. |
+| C1MaxTrivialSize | Specifies the maximum bytecode size of a trivial method to be inlined by C1 JIT compiler. |
+| CompilationMode | Sets C1 JIT compiler compilation mode, such as `default`, `quick-only`, `high-only`, `high-only-quick-internal`. |
+| G1PeriodicGCInterval | Determines a minimum interval in ms at which G1 Garbage Collector considers performing a garbage collection. |
+| G1PeriodicGCInvokesConcurrent | If set, periodic garbage collections trigger a concurrent marking or continue the existing collection cycle, otherwise trigger a Full GC. |
+| G1PeriodicGCSystemLoadThreshold | Sets a threshold for the current system load as returned by the hosts `getloadavg()` call to determine whether a periodic garbage collection should be triggered. |
+| G1RSetRegionEntries | Sets the max number of regions. |
+| G1RSetSparseRegionEntries | Sets the eager reclaim threshold. If set the humongous objects are reclaimed only if their remembered set has less than the specified number of entries. |
+| GCCardSizeInBytes | Specifies the size of the remembered set entries. |
+| HeapDumpGzipLevel | Sets the level of compressing the heap dump. |
+| MinHeapSize | Sets the minimum size (in bytes) of the memory allocation pool. |
+| RecordDynamicDumpInfo | Records a separate dynamically-generated archive on top of the default system for each application. |
+| ShowCodeDetailsInExceptionMessages | Enables printing of improved NullPointerException messages. |
+| SweeperThreshold | Sets the cache sweeper threshold value. |
+| UseCodeAging | Inserts a counter to measure the age of a method when it is compiled. |
+| UseContainerCpuShares | Takes `cpu.shares` into account when determining how many threads to allocate to the various thread pools. |
+| UseEmptySlotsInSupers | Allows allocating fields in empty slots of super-classes. |
+| UseNotificationThread | If set uses Notification Thread. |
+| ZCollectionIntervalMajor | If set forces GC at a fixed time interval (in seconds). |
+| ZCollectionIntervalMinor | If set forces Minor GC at a fixed time interval (in seconds). |
+| ZCollectionIntervalOnly | If set the GC only uses timers for GC heuristics. |
+| ZGenerational | Uses the Generational ZGC. |
+| ZMarkStackSpaceLimit | Sets the maximum number of bytes allocated for mark stacks. |
+| ZProactive | Enables proactive GC cycles. |
+| ZUncommit | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZUncommitDelay | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZYoungCompactionLimit | Sets the maximum allowed garbage in young pages. Default: 25.0 (range between 0-100%). |
+
+</details>
+
+  
+#### Removed and renamed options in liberica-perf 11 based on JVM 21
+
+The table below lists options that were added and renamed in liberica-perf 11 based on JVM 21.
+
+<details>
+<summary>Removed and renamed options in liberica-perf 11 based on JVM 21 — full table (103 options)</summary>
+
+| JDK 11 option | Resolution in liberica-perf 11 |
+|---|---|
+| AggressiveOpts | Deleted |
+| AliasLevel | Deleted |
+| AllowJNIEnvProxy | Deleted |
+| AllowNonVirtualCalls | Deleted |
+| AlwaysLockClassLoader | Deleted |
+| AssertOnSuspendWaitFailure | Deleted |
+| AssumeMP | Deleted |
+| BiasedLockingBulkRebiasThreshold | Deleted |
+| BiasedLockingBulkRevokeThreshold | Deleted |
+| BiasedLockingDecayTime | Deleted |
+| BiasedLockingStartupDelay | Deleted |
+| BindGCTaskThreadsToCPU | Deleted |
+| BranchOnRegister | Deleted |
+| BytecodeVerificationLocal | Moved to diagnostic mode. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| BytecodeVerificationRemote | Moved to diagnostic mode. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| CalculateClassFingerprint | AOT is not supported in Express builds |
+| CMS* | CMS GC was removed along with its parameters |
+| CompactFields | Deleted |
+| CompilationPolicyChoice | Deleted |
+| CompilerThreadHintNoPreempt | Deleted |
+| CriticalJNINatives | Deleted |
+| Debugging | Deleted |
+| DeoptimizeRandom | Not available in product(release) builds |
+| DumpSharedSpaces | Deleted |
+| ErrorReportServer | Deleted |
+| ExtendedDTraceProbes | Deleted |
+| FailOverToOldVerifier | Deleted |
+| FieldsAllocationStyle | Deleted |
+| FilterSpuriousWakeups | Deleted |
+| FLSAlwaysCoalesceLarge | Deleted |
+| FLSCoalescePolicy | Deleted |
+| FLSLargestBlockCoalesceProximity | Deleted |
+| ForceNUMA | Deleted |
+| G1ConcRefinementGreenZone | Deleted |
+| G1ConcRefinementRedZone | Deleted |
+| G1ConcRefinementServiceIntervalMillis | Deleted |
+| G1ConcRefinementThresholdStep | Deleted |
+| G1ConcRefinementYellowZone | Deleted |
+| G1ConcRSHotCardLimit | Deleted |
+| G1ConcRSLogCacheSize | Deleted |
+| G1RSetScanBlockSize | Deleted |
+| G1UseAdaptiveConcRefinement | Deleted |
+| GCLockerInvokesConcurrent | Deleted |
+| GCTaskTimeStampEntries | Deleted |
+| InitialBootClassLoaderMetaspaceSize | Deleted |
+| InsertMemBarAfterArraycopy | Deleted |
+| LIRFillDelaySlots | Deleted |
+| MinInliningThreshold | Deleted |
+| MonitorBound | Deleted |
+| MonitorInUseLists | Deleted |
+| NeedsDeoptSuspend | Deleted |
+| OldPLABWeight | Deleted |
+| ParGCDesiredObjsFromOverflowList | Deleted |
+| ParGCTrimOverflow | Deleted |
+| ParGCUseLocalOverflow | Deleted |
+| PreferContainerQuotaForCPUCount | Deleted |
+| PrefetchFieldsAhead | Deleted |
+| PrintJNIResolving | Moved to unified logging. Use `-Xlog:jni+resolve` instead |
+| PrintSafepointStatistics | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsCount | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsTimeout | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintVMQWaitTime | Deleted |
+| ProfileIntervals | Deleted |
+| ProfileIntervalsTicks | Deleted |
+| ProfilerPrintByteCodeStatistics | Deleted |
+| ProfilerRecordPC | Deleted |
+| ProfileVM | Deleted |
+| RefDiscoveryPolicy | Deleted |
+| RequireSharedSpaces | Deleted |
+| ResizeOldPLAB | Deleted |
+| ShenandoahSoftMaxHeapSize | Use SoftMaxHeapSize in jdk express instead |
+| SoftMaxHeapSize | instead of old ShenandoahSoftMaxHeapSize |
+| StressLdcRewrite | Moved to diagnostic mode. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| ThreadLocalHandshakes | Deleted |
+| Tier3AOTBackEdgeThreshold | AOT is not supported in Express builds |
+| Tier3AOTCompileThreshold | AOT is not supported in Express builds |
+| Tier3AOTInvocationThreshold | AOT is not supported in Express builds |
+| Tier3AOTMinInvocationThreshold | AOT is not supported in Express builds |
+| TraceSuspendWaitFailures | Deleted |
+| TransmitErrorReport | Deleted |
+| TrimNativeHeapInterval | Moved to be available in product(release) builds |
+| UnlinkSymbolsALot | Deleted |
+| UseAdaptiveGCBoundary | Deleted |
+| UseBiasedLocking | Deleted |
+| UseCMSBestFit | CMS GC was removed along with its parameters |
+| UseCMSInitiatingOccupancyOnly | CMS GC was removed along with its parameters |
+| UseConcMarkSweepGC | CMS GC was removed along with its parameters |
+| UseGCTaskAffinity | Deleted |
+| UseHeavyMonitors | Deleted |
+| UseLargePagesInMetaspace | Deleted |
+| UseLegacyJNINameEscaping | Deleted |
+| UseLWPSynchronization | Deleted |
+| UseMembar | Deleted |
+| UseOSErrorReporting | Deleted |
+| UseRDPCForConstantTableBase | Deleted |
+| UseSharedSpaces | Deleted |
+| UseSystemMemoryBarrier | Moved to be available in product(release) builds |
+| VerifyMergedCPBytecodes | Deleted |
+| VMThreadHintNoPreempt | Deleted |
+| ZMarkStacksMax | Deleted |
+| Zpath | Deleted |
+| ZStallOnOutOfMemory | Deleted |
+| ZStatisticsInterval | Deleted |
+
+</details>
+
+  
+### Changes to Runtime Options in JDK 8 Performance Edition
+
+#### Added runtime options in liberica-perf 8 based on JVM 17
+
+The following is a list of options available in liberica-perf 8, but absent in JDK 8.
+
+<details>
+<summary>Added runtime options in liberica-perf 8 based on JVM 17 — full table (77 options)</summary>
+
+| Option | Description |
+|---|---|
+| AdjustStackSizeForTLS | Increases the thread stack size to include space for glibc static thread-local storage (TLS) if true. |
+| AllocateHeapAt | Specifies a path to the directory where a temporary file is created to use as the backup store for Java Heap. |
+| AllowRedefinitionToAddDeleteMethods | Allows redefinition to add and delete private static or final methods for compatibility with old releases. |
+| AllowVectorizeOnDemand | Globally suppresses vectorization set in `VectorizeMethod`. |
+| ArchiveClassesAtExit | Specifies the path and name of the dynamic archive file. |
+| ArrayCopyLoadStoreMaxElem | Specifies the maximum number of arraycopy elements inlined as a sequence of loads/stores. |
+| AsyncLogBufferSize | Specifies the memory in bytes for the intermediate buffer. |
+| C1InlineStackLimit | Limits stack frame size impact for inlining decisions for C1 JIT compiler. |
+| C1MaxInlineLevel | Specifies the maximum number of nested calls that are inlined by C1 JIT compiler. |
+| C1MaxInlineSize | Specifies the maximum bytecode size of a method to be inlined by C1 JIT compiler. |
+| C1MaxRecursiveInlineLevel | Specifies the maximum number of nested recursive calls that are inlined by C1 JIT compiler. |
+| C1MaxTrivialSize | Specifies the maximum bytecode size of a trivial method to be inlined by C1 JIT compiler. |
+| CompactStrings | Disables the Compact Strings feature. By default, this option is enabled. When this option is enabled, Java Strings containing only single-byte characters are internally represented and stored as single-byte-per-character Strings using ISO-8859-1 / Latin-1 encoding. |
+| CompilationMode | Sets C1 JIT compiler compilation mode, such as `default`, `quick-only`, `high-only`, `high-only-quick-internal`. |
+| CompileThresholdScaling | Provides unified control of first compilation. This option controls when methods are first compiled for both the tiered and the nontiered modes of operation. |
+| CreateCoredumpOnCrash | Creates core/mini dump on VM fatal error. |
+| DoReserveCopyInSuperWord | Creates reserve copy of graph in SuperWord. |
+| DynamicDumpSharedSpaces | Dynamic archive |
+| EnableDynamicAgentLoading | Allows dynamic loading of agents into a running JVM. |
+| ErrorLogTimeout | Timeout, in seconds, to limit the time spent on writing an error log in case of a crash. |
+| ExecutingUnitTests | Specifies whether the JVM can run unit tests or not. |
+| ExtensiveErrorReports | Enables the reporting of more extensive error information in the ErrorFile. |
+| G1PeriodicGCInterval | Determines a minimum interval in ms at which G1 Garbage Collector considers performing a garbage collection. |
+| G1PeriodicGCInvokesConcurrent | If set, periodic garbage collections trigger a concurrent marking or continue the existing collection cycle, otherwise trigger a Full GC. |
+| G1PeriodicGCSystemLoadThreshold | Sets a threshold for the current system load as returned by the hosts `getloadavg()` call to determine whether a periodic garbage collection should be triggered. |
+| G1UseAdaptiveIHOP | Controls adaptive calculation of the old generation occupancy to start background work preparing for an old generation collection. |
+| HeapDumpGzipLevel | Sets the compression level of the heap dump. |
+| HeapSearchSteps | Heap allocation steps through preferred address regions to find where it can allocate the heap. Number of steps to take per region. |
+| LoopPercentProfileLimit | Unrolls loop bodies with the percent node count of profile limit. |
+| LoopStripMiningIter | Controls the number of iterations in the inner strip mined loop. |
+| LoopStripMiningIterShortLoop | Controls loop strip mining optimization. |
+| MetaspaceReclaimPolicy | Reclaims memory after purging and returns it to the Operating System. This switch controls fine-tuning of metaspace reclamation (`balanced` `aggressive` `none`). |
+| MinHeapSize | Sets the minimum size (in bytes) of the memory allocation pool. |
+| NonNMethodCodeHeapSize | Sets the size in bytes of the code segment containing nonmethod code. |
+| NonProfiledCodeHeapSize | Sets the size in bytes of the code segment containing nonprofiled methods. |
+| OptoRegScheduling | Instruction Scheduling before register allocation for pressure. |
+| PreTouchParallelChunkSize | The size of the chunk of memory for each thread when using parallel memory pre-touch. |
+| PrintExtendedThreadInfo | Prints more information in thread dump. |
+| PrintFlagsRanges | Prints the range specified and allows automatic testing of the values. |
+| ProfiledCodeHeapSize | Sets the size in bytes of the code segment containing profiled methods. |
+| RecordDynamicDumpInfo | Records a separate dynamically-generated archive on top of the default system for each application. |
+| RestrictReservedStack | Restricts @ReservedStackAccess to trusted classes. |
+| SegmentedCodeCache | Enables segmentation of the code cache. |
+| SharedArchiveConfigFile | Specifies additional shared data added to the archive file. |
+| SharedArchiveFile | Specifies the path and name of the class data sharing (CDS) archive file. |
+| SharedSymbolTableBucketSize | Sets the average number of symbols per bucket in shared table. |
+| ShenandoahGCHeuristics | Sets the GC heuristics to use. This option fine-tunes the selected GC mode by choosing when to start the GC, how much to process on each cycle, and what other features to automatically enable. |
+| ShenandoahGCMode | Sets the GC mode to use. Among other things, this defines which barriers are in use. |
+| ShowCodeDetailsInExceptionMessages | Enables printing of improved NullPointerException messages. |
+| ShrinkHeapInSteps | When disabled, informs the GC to shrink the Java heap directly to the target size at the next full GC rather than requiring smaller steps during multiple full GCs. |
+| SoftMaxHeapSize | Sets the soft limit for maximum heap size (in bytes). |
+| StackReservedPages | Sets the number of the reserved zone (reserved to annotated methods) pages of 4KB size. If pages are bigger, reserved zone is aligned respectively. |
+| StartAggressiveSweepingAt | Force stack scanning of active methods to aggressively remove unused code when only the given percentage of the code cache is free. For a segmented code cache, it is the percentage of the non-profiled heap and for a non-segmented code cache, it is the percentage of the total code cache. |
+| SuperWordLoopUnrollAnalysis | Maps the number of unrolls for the main loop via Superword Level Parallelism analysis. |
+| SuperWordReductions | Enables reductions support when using SuperWords. |
+| SweeperThreshold | Sets the cache sweeper threshold value. |
+| UseBASE64Intrinsics | Controls the use of accelerated BASE64 encoding routines for java.util.Base64. |
+| UseCMoveUnconditionally | Generates CMove (scalar and vector) instructions regardless of profitability analysis. |
+| UseCodeAging | Inserts a counter to measure the age of a method when it is compiled. |
+| UseContainerCpuShares | Takes cpu.shares into account when determining how many threads to allocate to the various thread pools. |
+| UseDynamicNumberOfCompilerThreads | Dynamically creates compiler thread up to the limit specified by `-XX:CICompilerCount`. |
+| UseEmptySlotsInSupers | Allows allocating fields in empty slots of super-classes. |
+| UseFMA | Enables hardware-based FMA intrinsics for hardware where FMA instructions are available (such as, Intel and ARM64). |
+| UseNotificationThread | If set uses Notification Thread. |
+| UseProfiledLoopPredicate | Moves predicates out of loops based on profiling data. |
+| UseShenandoahGC | Enables the use of the Shenandoah garbage collector. |
+| UseSubwordForMaxVector | Uses Subword Analysis to set the maximum vector size. |
+| UseVectorCmov | Uses Vectorized Cmov. |
+| UseXMMForObjInit | Uses XMM/YMM MOVDQU instruction for Object Initialization. |
+| UseZGC | Enables the use of the Z garbage collector (ZGC). |
+| ZAllocationSpikeTolerance | Sets the allocation spike tolerance for ZGC. |
+| ZCollectionInterval | Sets the maximum interval (in seconds) between two GC cycles when using ZGC. |
+| ZFragmentationLimit | Sets the maximum acceptable heap fragmentation (in percent) for ZGC. |
+| ZMarkStackSpaceLimit | Sets the maximum number of bytes allocated for mark stacks. |
+| ZProactive | Enables proactive GC cycles. |
+| ZUncommit | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZUncommitDelay | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+
+</details>
+
+  
+#### Removed and renamed runtime options in liberica-perf 8 based on JVM 17
+
+The table below lists options unavailable in liberica-perf 8 and the options that were renamed.
+
+<details>
+<summary>Removed and renamed runtime options in liberica-perf 8 based on JVM 17 — full table (180 options)</summary>
+
+| JDK 8 option | Resolution in liberica-perf 8 |
+|---|---|
+| AdaptiveSizePausePolicy | Deleted |
+| AdjustConcurrency | Deleted |
+| AggressiveOpts | Deleted |
+| AllowJNIEnvProxy | Deleted |
+| AllowNonVirtualCalls | Deleted |
+| AssertOnSuspendWaitFailure | Deleted |
+| AssumeMP | Deleted |
+| AutoGCSelectPauseMillis | Deleted |
+| BackEdgeThreshold | Deleted. Use `-XX:OnStackReplacePercentage` |
+| BindGCTaskThreadsToCPUs | Deleted |
+| BranchOnRegister | Deleted |
+| BytecodeVerificationLocal | Is now a diagnostic option |
+| BytecodeVerificationRemote | Is now a diagnostic option |
+| CheckEndorsedAndExtDirs | Deleted |
+| ClearFPUAtPark | Deleted |
+| CMS* | CMS GC removed as well as its flags |
+| CodeCacheMinimumFreeSpace | Deleted |
+| CollectGen0First | Deleted |
+| CompactFields | Deleted |
+| CompilationPolicyChoice | Deleted |
+| CompilerThreadHintNoPreempt | Deleted |
+| ConvertSleepToYield | Deleted |
+| ConvertYieldToSleep | Deleted |
+| CreateMinidumpOnCrash | Deleted. Use `CreateCoredumpOnCrash` instead |
+| Debugging | Deleted |
+| DefaultMaxRAMFraction | Deleted. Use `MaxRAMFraction` instead |
+| DefaultThreadPriority | Deleted |
+| DeferPollingPageLoopCount | Deleted |
+| DeferThrSuspendLoopCount | Deleted |
+| DeoptimizeRandom | Only available in non-product builds |
+| EmitSync | Deleted |
+| EnableTracing | Deleted |
+| ErrorReportServer | Deleted |
+| ExplicitGCInvokesConcurrentAndUnloadsClasses | Deleted |
+| FailOverToOldVerifier | Deleted |
+| FastTLABRefill | Deleted |
+| FenceInstruction | Deleted |
+| FieldsAllocationStyle | Deleted |
+| FLSAlwaysCoalesceLarge | Deleted |
+| FLSCoalescePolicy | Deleted |
+| FLSLargestBlockCoalesceProximity | Deleted |
+| ForceNUMA | Deleted |
+| G1RSetScanBlockSize | Deleted |
+| GCLockerInvokesConcurrent | Deleted |
+| GCLogFileSize | Deleted |
+| GCTaskTimeStampEntries | Deleted |
+| InitialBootClassLoaderMetaspaceSize | Deleted |
+| InsertMemBarAfterArraycopy | Deleted |
+| JNIDetachReleasesMonitors | Deleted |
+| LazyBootClassLoader | Deleted |
+| LIRFillDelaySlots | Deleted |
+| LogJFR | Deleted |
+| MonitorBound | Deleted |
+| MonitorInUseLists | Deleted |
+| MustCallLoadClassInternal | Deleted |
+| NeedsDeoptSuspend | Deleted |
+| NmethodSweepCheckInterval | Deleted |
+| NmethodSweepFraction | Deleted |
+| NumberOfGCLogFiles | Deleted |
+| OldPLABWeight | Deleted |
+| ParallelGCVerbose | Deleted |
+| ParGCDesiredObjsFromOverflowList | Deleted |
+| ParGCTrimOverflow | Deleted |
+| ParGCUseLocalOverflow | Deleted |
+| PreInflateSpin | Deleted |
+| PrintAdaptiveSizePolicy | Deleted |
+| PrintClassHistogramAfterFullGC | Deleted |
+| PrintClassHistogramBeforeFullGC | Deleted |
+| PrintCMSInitiationStatistics | Deleted |
+| PrintCMSStatistics | Deleted |
+| PrintFLSCensus | Deleted |
+| PrintFLSStatistics | Deleted |
+| PrintGCApplicationConcurrentTime | Deleted |
+| PrintGCApplicationStoppedTime | Deleted |
+| PrintGCCause | Deleted |
+| PrintGCDateStamps | Deleted |
+| PrintGCID | Deleted |
+| PrintGCTaskTimeStamps | Deleted |
+| PrintGCTimeStamps | Deleted |
+| PrintHeapAtGC | Deleted |
+| PrintHeapAtGCExtended | Deleted |
+| PrintJNIGCStalls | Deleted |
+| PrintJNIResolving | Deleted |
+| PrintOldPLAB | Deleted |
+| PrintOopAddress | Deleted |
+| PrintParallelOldGCPhaseTimes | Deleted |
+| PrintPLAB | Deleted |
+| PrintPromotionFailure | Deleted |
+| PrintReferenceGC | Deleted |
+| PrintSafepointStatistics | Deleted |
+| PrintSafepointStatisticsCount | Deleted |
+| PrintSafepointStatisticsTimeout | Deleted |
+| PrintSharedSpaces | Deleted |
+| PrintStringDeduplicationStatistics | Deleted |
+| PrintTenuringDistribution | Deleted |
+| PrintTLAB | Deleted |
+| PrintVMQWaitTime | Deleted |
+| ProfileIntervals | Deleted |
+| ProfileIntervalsTicks | Deleted |
+| ProfilerPrintByteCodeStatistics | Deleted |
+| ProfilerRecordPC | Deleted |
+| ProfileVM | Deleted |
+| ReadPrefetchInstr | Deleted |
+| ReflectionWrapResolutionErrors | Deleted |
+| ResizeOldPLAB | Deleted |
+| SafepointPollOffset | Deleted |
+| SafepointSpinBeforeYield | Deleted |
+| SharedMiscCodeSize | Deleted |
+| SharedMiscDataSize | Deleted |
+| SharedReadOnlySize | Deleted |
+| SharedReadWriteSize | Deleted |
+| SpecialEncodeISOArray | Moved to diagnostic flags |
+| StarvationMonitorInterval | Deleted |
+| StressLdcRewrite | Moved to diagnostic flags |
+| SuspendRetryCount | Deleted |
+| SuspendRetryDelay | Deleted |
+| SyncFlags | Deleted |
+| SyncKnobs | Deleted |
+| SyncVerbose | Deleted |
+| ThreadSafetyMargin | Deleted |
+| TraceBiasedLocking | Deleted |
+| TraceClassLoading | Deleted |
+| TraceClassLoadingPreorder | Deleted |
+| TraceClassPaths | Deleted |
+| TraceClassResolution | Deleted |
+| TraceClassUnloading | Deleted |
+| TraceDynamicGCThreads | Deleted |
+| TraceExceptions | Deleted |
+| TraceGen0Time | Deleted. Functionality moved to unified logging. |
+| TraceGen1Time | Deleted. Functionality moved to unified logging. |
+| TraceLoaderConstraints | Deleted |
+| TraceMetadataHumongousAllocation | Deleted |
+| TraceMonitorInflation | Deleted |
+| TraceParallelOldGCTasks | Deleted |
+| TraceRedefineClasses | Deleted |
+| TraceSafepointCleanupTime | Deleted |
+| TraceSuspendWaitFailures | Deleted |
+| TransmitErrorReport | Deleted |
+| UnlinkSymbolsALot | Deleted |
+| UnlockCommercialFeatures | Deleted |
+| Use486InstrsOnly | Deleted |
+| UseAdaptiveGCBoundary | Deleted |
+| UseAESIntrinsics | Moved to diagnostic flags |
+| UseAltSigs | Deleted |
+| UseAutoGCSelectPolicy | Deleted |
+| UseBoundThreads | Deleted |
+| UseCMSBestFit | Deleted |
+| UseCMSCollectionPassing | Deleted |
+| UseCMSCompactAtFullCollection | Deleted |
+| UseCMSInitiatingOccupancyOnly | Deleted |
+| UseCompilerSafepoints | Deleted |
+| UseConcMarkSweepGC | Deleted |
+| UseCRC32Intrinsics | Moved to diagnostic flags |
+| UseFastAccessorMethods | Deleted |
+| UseFastEmptyMethods | Deleted |
+| UseGCLogFileRotation | Deleted |
+| UseGCTaskAffinity | Deleted |
+| UseGHASHIntrinsics | Moved to diagnostic flags |
+| UseLargePagesInMetaspace | Deleted |
+| UseLegacyJNINameEscaping | Deleted |
+| UseLockedTracing | Deleted |
+| UseLWPSynchronization | Deleted |
+| UseMathExactIntrinsics | Moved to diagnostic flags |
+| UseMembar | Deleted |
+| UseMontgomeryMultiplyIntrinsic | Moved to diagnostic flags |
+| UseMontgomerySquareIntrinsic | Moved to diagnostic flags |
+| UseMulAddIntrinsic | Moved to diagnostic flags |
+| UseMultiplyToLenIntrinsic | Moved to diagnostic flags |
+| UseOSErrorReporting | Deleted from linux build |
+| UseParallelOldGC | Deleted |
+| UseParNewGC | Deleted |
+| UseRDPCForConstantTableBase | Deleted |
+| UseSHA1Intrinsics | Moved to diagnostic flags |
+| UseSHA256Intrinsics | Moved to diagnostic flags |
+| UseSHA512Intrinsics | Moved to diagnostic flags |
+| UseSquareToLenIntrinsic | Moved to diagnostic flags |
+| UseVMInterruptibleIO | Deleted |
+| VerifyMergedCPBytecodes | Deleted |
+| VMThreadHintNoPreempt | Deleted |
+| WorkAroundNPTLTimedWaitHang | Deleted |
+
+</details>
+
+  
+#### Added runtime options in liberica-perf 8 based on JVM 21
+
+The following is a list of options available in liberica-perf 8, but absent in JDK 8.
+
+<details>
+<summary>Added runtime options in liberica-perf 8 based on JVM 21 — full table (81 options)</summary>
+
+| Option | Description |
+|---|---|
+| AdjustStackSizeForTLS | Increases the thread stack size to include space for glibc static thread-local storage (TLS) if true. |
+| AllocateHeapAt | Specifies a path to the directory where a temporary file is created to use as the backup store for Java Heap. |
+| AllowRedefinitionToAddDeleteMethods | Allows redefinition to add and delete private static or final methods for compatibility with old releases. |
+| AllowVectorizeOnDemand | Globally suppresses vectorization set in `VectorizeMethod`. |
+| ArchiveClassesAtExit | Specifies the path and name of the dynamic archive file. |
+| ArrayCopyLoadStoreMaxElem | Specifies the maximum number of arraycopy elements inlined as a sequence of loads/stores. |
+| AsyncLogBufferSize | Specifies the memory in bytes for the intermediate buffer. |
+| AutoCreateSharedArchive | Automatically creates Dynamic CDS Archive File. The specified archive file is created if it does not exist, or if it was generated by a different JDK version. |
+| C1InlineStackLimit | Limits stack frame size impact for inlining decisions for C1 JIT compiler. |
+| C1MaxInlineLevel | Specifies the maximum number of nested calls that are inlined by C1 JIT compiler. |
+| C1MaxInlineSize | Specifies the maximum bytecode size of a method to be inlined by C1 JIT compiler. |
+| C1MaxRecursiveInlineLevel | Specifies the maximum number of nested recursive calls that are inlined by C1 JIT compiler. |
+| C1MaxTrivialSize | Specifies the maximum bytecode size of a trivial method to be inlined by C1 JIT compiler. |
+| CompactStrings | Disables the Compact Strings feature. By default, this option is enabled. When this option is enabled, Java Strings containing only single-byte characters are internally represented and stored as single-byte-per-character Strings using ISO-8859-1 / Latin-1 encoding. |
+| CompilationMode | Sets C1 JIT compiler compilation mode, such as `default`, `quick-only`, `high-only`, `high-only-quick-internal`. |
+| CompileThresholdScaling | Provides unified control of first compilation. This option controls when methods are first compiled for both the tiered and the nontiered modes of operation. |
+| DoReserveCopyInSuperWord | Creates reserve copy of graph in SuperWord. |
+| EnableDynamicAgentLoading | Allows dynamic loading of agents into a running JVM. |
+| ErrorLogTimeout | Timeout, in seconds, to limit the time spent on writing an error log in case of a crash. |
+| ExecutingUnitTests | Specifies whether the JVM can run unit tests or not. |
+| ExtensiveErrorReports | Enables the reporting of more extensive error information in the ErrorFile. |
+| G1PeriodicGCInterval | Determines a minimum interval in ms at which G1 Garbage Collector considers performing a garbage collection. |
+| G1PeriodicGCInvokesConcurrent | If set, periodic garbage collections trigger a concurrent marking or continue the existing collection cycle, otherwise trigger a Full GC. |
+| G1PeriodicGCSystemLoadThreshold | Sets a threshold for the current system load as returned by the hosts `getloadavg()` call to determine whether a periodic garbage collection should be triggered. |
+| G1UseAdaptiveIHOP | Controls adaptive calculation of the old generation occupancy to start background work preparing for an old generation collection. |
+| GCCardSizeInBytes | Specifies the size of the remembered set entries. |
+| HeapDumpGzipLevel | Sets the compression level of the heap dump. |
+| HeapSearchSteps | Heap allocation steps through preferred address regions to find where it can allocate the heap. Number of steps to take per region. |
+| LoopPercentProfileLimit | Unrolls loop bodies with the percent node count of profile limit. |
+| LoopStripMiningIter | Controls the number of iterations in the inner strip mined loop. |
+| LoopStripMiningIterShortLoop | Controls loop strip mining optimization. |
+| MinHeapSize | Sets the minimum size (in bytes) of the memory allocation pool. |
+| NonNMethodCodeHeapSize | Sets the size in bytes of the code segment containing nonmethod code. |
+| NonProfiledCodeHeapSize | Sets the size in bytes of the code segment containing nonprofiled methods. |
+| OptoRegScheduling | Instruction Scheduling before register allocation for pressure. |
+| PreTouchParallelChunkSize | The size of the chunk of memory for each thread when using parallel memory pre-touch. |
+| PrintExtendedThreadInfo | Prints more information in thread dump. |
+| PrintFlagsRanges | Prints the range specified and allows automatic testing of the values. |
+| ProfiledCodeHeapSize | Sets the size in bytes of the code segment containing profiled methods. |
+| RecordDynamicDumpInfo | Records a separate dynamically-generated archive on top of the default system for each application. |
+| RestrictReservedStack | Restricts @ReservedStackAccess to trusted classes. |
+| SegmentedCodeCache | Enables segmentation of the code cache. |
+| SharedArchiveConfigFile | Specifies additional shared data added to the archive file. |
+| SharedArchiveFile | Specifies the path and name of the class data sharing (CDS) archive file. |
+| SharedSymbolTableBucketSize | Sets the average number of symbols per bucket in shared table. |
+| ShenandoahGCHeuristics | Sets the GC heuristics to use. This option fine-tunes the selected GC mode by choosing when to start the GC, how much to process on each cycle, and what other features to automatically enable. |
+| ShenandoahGCMode | Sets the GC mode to use. Among other things, this defines which barriers are in use. |
+| ShowCodeDetailsInExceptionMessages | Enables printing of improved NullPointerException messages. |
+| ShrinkHeapInSteps | When disabled, informs the GC to shrink the Java heap directly to the target size at the next full GC rather than requiring smaller steps during multiple full GCs. |
+| SoftMaxHeapSize | Sets the soft limit for maximum heap size (in bytes). |
+| StackReservedPages | Sets the number of the reserved zone (reserved to annotated methods) pages of 4KB size. If pages are bigger, reserved zone is aligned respectively. |
+| StartAggressiveSweepingAt | Force stack scanning of active methods to aggressively remove unused code when only the given percentage of the code cache is free. For a segmented code cache, it is the percentage of the non-profiled heap and for a non-segmented code cache, it is the percentage of the total code cache. |
+| SuperWordLoopUnrollAnalysis | Maps the number of unrolls for the main loop via Superword Level Parallelism analysis. |
+| SuperWordReductions | Enables reductions support when using SuperWords. |
+| SweeperThreshold | Sets the cache sweeper threshold value. |
+| TrimNativeHeapInterval | It allows the JVM to trim the native heap at periodic intervals. This option is only available on Linux with glibc. |
+| UseAppCDS | Enables the use of Class Data Sharing (CDS) in your java application. |
+| UseCMoveUnconditionally | Generates CMove (scalar and vector) instructions regardless of profitability analysis. |
+| UseDynamicNumberOfCompilerThreads | Dynamically creates compiler thread up to the limit specified by `-XX:CICompilerCount`. |
+| UseEmptySlotsInSupers | Allows allocating fields in empty slots of super-classes. |
+| UseFMA | Enables hardware-based FMA intrinsics for hardware where FMA instructions are available (such as, Intel and ARM64). |
+| UseNotificationThread | If set uses Notification Thread. |
+| UseProfiledLoopPredicate | Moves predicates out of loops based on profiling data. |
+| UseShenandoahGC | Enables the use of the Shenandoah garbage collector. |
+| UseSubwordForMaxVector | Uses Subword Analysis to set the maximum vector size. |
+| UseSystemMemoryBarrier | Enable system memory barrier if supported by OS. |
+| UseVectorCmov | Uses Vectorized Cmov. |
+| UseXMMForObjInit | Uses XMM/YMM MOVDQU instruction for Object Initialization. |
+| UseZGC | Enables the use of the Z garbage collector (ZGC). |
+| ZAllocationSpikeTolerance | Sets the allocation spike tolerance for ZGC. |
+| ZCollectionInterval | Sets the maximum interval (in seconds) between two GC cycles when using ZGC. |
+| ZCollectionIntervalMajor | If set forces GC at a fixed time interval (in seconds). |
+| ZCollectionIntervalMinor | If set forces Minor GC at a fixed time interval (in seconds). |
+| ZCollectionIntervalOnly | If set the GC only uses timers for GC heuristics. |
+| ZFragmentationLimit | Sets the maximum acceptable heap fragmentation (in percent) for ZGC. |
+| ZGenerational | Uses the Generational ZGC. |
+| ZMarkStackSpaceLimit | Sets the maximum number of bytes allocated for mark stacks. |
+| ZProactive | Enables proactive GC cycles. |
+| ZUncommit | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZUncommitDelay | Uncommit memory if it has been unused for the specified amount of time (in seconds). |
+| ZYoungCompactionLimit | Sets the maximum allowed garbage in young pages. Default: 25.0 (range between 0-100%). |
+
+</details>
+
+  
+#### Removed and renamed runtime options in liberica-perf 8 based on JVM 21
+
+The table below lists options unavailable in liberica-perf 8 and the options that were renamed.
+
+<details>
+<summary>Removed and renamed runtime options in liberica-perf 8 based on JVM 21 — full table (200 options)</summary>
+
+| JDK 8 option | Resolution in liberica-perf 8 |
+|---|---|
+| AdaptiveSizePausePolicy | Deleted |
+| AdjustConcurrency | Deleted |
+| afepointPollOffset | Deleted |
+| AggressiveOpts | Deleted |
+| AliasLevel | Deleted |
+| AllowJNIEnvProxy | Deleted |
+| AllowNonVirtualCalls | Deleted |
+| AlwaysLockClassLoader | Deleted |
+| AssertOnSuspendWaitFailure | Deleted |
+| AssumeMP | Deleted |
+| AutoGCSelectPauseMillis | Deleted |
+| BackEdgeThreshold | Deleted |
+| BiasedLockingBulkRebiasThreshold | Deleted |
+| BiasedLockingBulkRevokeThreshold | Deleted |
+| BiasedLockingDecayTime | Deleted |
+| BiasedLockingStartupDelay | Deleted |
+| BindGCTaskThreadsToCPU | Deleted |
+| BranchOnRegister | Deleted |
+| BytecodeVerificationLocal | Moved to diagnostic mode. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| BytecodeVerificationRemote | Moved to diagnostic mode. Use with `-XX:+UnlockDiagnosticVMOptions` |
+| CheckEndorsedAndExtDirs | Deleted |
+| ClearFPUAtPark | Deleted |
+| CMS* | CMS GC was removed along with its parameters |
+| CodeCacheMinimumFreeSpace | Deleted |
+| CollectGen0First | Deleted |
+| CompactFields | Deleted |
+| CompilationPolicyChoice | Deleted |
+| CompilerThreadHintNoPreempt | Deleted |
+| ContendedPaddingWidth | Deleted |
+| ConvertSleepToYield | Deleted |
+| ConvertYieldToSleep | Deleted |
+| CreateMinidumpOnCrash | Renamed to CreateCoredumpOnCrash |
+| CriticalJNINatives | Deleted |
+| Debugging | Deleted |
+| DefaultMaxRAMFraction | Deleted |
+| DefaultThreadPriority | Deleted |
+| DeferPollingPageLoopCount | Deleted |
+| DeferThrSuspendLoopCount | Deleted |
+| DeoptimizeRandom | Not available in product(release) builds |
+| DumpSharedSpaces | Deleted |
+| EmitSync | Deleted |
+| EnableTracing | Deleted |
+| ErrorReportServer | Deleted |
+| ExplicitGCInvokesConcurrentAndUnloadsClasses | Deleted |
+| ExtendedDTraceProbes | Deleted |
+| FailOverToOldVerifier | Deleted |
+| FastTLABRefill | Deleted |
+| FenceInstruction | Deleted |
+| FieldsAllocationStyle | Deleted |
+| FilterSpuriousWakeups | Deleted |
+| FLSAlwaysCoalesceLarge | Deleted |
+| FLSCoalescePolicy | Deleted |
+| FLSLargestBlockCoalesceProximity | Deleted |
+| ForceNUMA | Deleted |
+| G1ConcRefinementGreenZone | Deleted |
+| G1ConcRefinementRedZone | Deleted |
+| G1ConcRefinementServiceIntervalMillis | Deleted |
+| G1ConcRefinementThresholdStep | Deleted |
+| G1ConcRefinementYellowZone | Deleted |
+| G1ConcRSHotCardLimit | Deleted |
+| G1ConcRSLogCacheSize | Deleted |
+| G1RSetRegionEntries | Deleted |
+| G1RSetScanBlockSize | Deleted |
+| G1RSetSparseRegionEntries | Deleted |
+| G1UseAdaptiveConcRefinement | Deleted |
+| GCLockerInvokesConcurrent | Deleted |
+| GCLogFileSize | Deleted |
+| GCTaskTimeStampEntries | Deleted |
+| hashCode | Deleted |
+| InitialBootClassLoaderMetaspaceSize | Deleted |
+| InsertMemBarAfterArraycopy | Deleted |
+| JNIDetachReleasesMonitors | Deleted |
+| LazyBootClassLoader | Deleted |
+| LIRFillDelaySlots | Deleted |
+| LogJFR | Deleted |
+| MinInliningThreshold | Deleted |
+| MonitorBound | Deleted |
+| MonitorInUseLists | Deleted |
+| MustCallLoadClassInternal | Deleted |
+| NeedsDeoptSuspend | Deleted |
+| NmethodSweepCheckInterval | Deleted |
+| NmethodSweepFraction | Deleted |
+| NumberOfGCLogFiles | Deleted |
+| OldPLABWeight | Deleted |
+| ParallelGCVerbose | Deleted |
+| ParGCDesiredObjsFromOverflowList | Deleted |
+| ParGCTrimOverflow | Deleted |
+| ParGCUseLocalOverflow | Deleted |
+| PreferContainerQuotaForCPUCount | Deleted |
+| PrefetchFieldsAhead | Deleted |
+| PreInflateSpin | Deleted |
+| PrintAdaptiveSizePolicy | Deleted |
+| PrintClassHistogramAfterFullGC | Deleted |
+| PrintClassHistogramBeforeFullGC | Deleted |
+| PrintFLSCensus | Deleted |
+| PrintFLSStatistics | Deleted |
+| PrintGCApplicationConcurrentTime | Deleted |
+| PrintGCApplicationStoppedTime | Deleted |
+| PrintGCCause | Deleted |
+| PrintGCDateStamps | Deleted |
+| PrintGCID | Deleted |
+| PrintGCTaskTimeStamps | Deleted |
+| PrintGCTimeStamps | Deleted |
+| PrintHeapAtGC | Deleted |
+| PrintHeapAtGCExtended | Deleted |
+| PrintJNIGCStalls | Deleted |
+| PrintJNIResolving | Moved to unified logging. Use `-Xlog:jni+resolve` instead |
+| PrintOldPLAB | Deleted |
+| PrintOopAddress | Deleted |
+| PrintParallelOldGCPhaseTimes | Deleted |
+| PrintPLAB | Deleted |
+| PrintPromotionFailure | Deleted |
+| PrintReferenceGC | Deleted |
+| PrintSafepointStatistics | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsCount | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSafepointStatisticsTimeout | Moved to unified logging. Use `-Xlog:safepoint+stats` instead |
+| PrintSharedSpaces | Deleted |
+| PrintStringDeduplicationStatistics | Deleted |
+| PrintTenuringDistribution | Deleted |
+| PrintTLAB | Deleted |
+| PrintVMQWaitTime | Deleted |
+| ProfileIntervals | Deleted |
+| ProfileIntervalsTicks | Deleted |
+| ProfilerPrintByteCodeStatistics | Deleted |
+| ProfilerRecordPC | Deleted |
+| ProfileVM | Deleted |
+| ReadPrefetchInstr | Deleted |
+| RefDiscoveryPolicy | Deleted |
+| ReflectionWrapResolutionErrors | Deleted |
+| RequireSharedSpaces | Deleted |
+| ResizeOldPLAB | Deleted |
+| SafepointSpinBeforeYield | Deleted |
+| SharedMiscCodeSize | Deleted |
+| SharedMiscDataSize | Deleted |
+| SharedReadOnlySize | Deleted |
+| SharedReadWriteSize | Deleted |
+| SpecialEncodeISOArray | Deleted |
+| StarvationMonitorInterval | Deleted |
+| StressLdcRewrite | Deleted |
+| SyncFlags | Deleted |
+| SyncKnobs | Deleted |
+| SyncVerbose | Deleted |
+| ThreadSafetyMargin | Deleted |
+| TraceBiasedLocking | Deleted |
+| TraceClassLoading | Deleted |
+| TraceClassLoadingPreorder | Deleted |
+| TraceClassPaths | Deleted |
+| TraceClassResolution | Deleted |
+| TraceClassUnloading | Deleted |
+| TraceDynamicGCThreads | Deleted |
+| TraceExceptions | Deleted |
+| TraceGen0Time | Deleted |
+| TraceGen1Time | Deleted |
+| TraceLoaderConstraints | Deleted |
+| TraceMetadataHumongousAllocation | Deleted |
+| TraceMonitorInflation | Deleted |
+| TraceParallelOldGCTasks | Deleted |
+| TraceRedefineClasses | Deleted |
+| TraceSafepointCleanupTime | Deleted |
+| TraceSuspendWaitFailures | Deleted |
+| TransmitErrorReport | Deleted |
+| UnlinkSymbolsALot | Deleted |
+| UnlockCommercialFeatures | Deleted |
+| Use486InstrsOnly | Deleted |
+| UseAdaptiveGCBoundary | Deleted |
+| UseAESIntrinsics | Deleted |
+| UseAltSigs | Deleted |
+| UseBASE64Intrinsics | Deleted |
+| UseBiasedLocking | Deleted |
+| UseCompilerSafepoints | Deleted |
+| UseConcMarkSweepGC | Deleted |
+| UseCRC32Intrinsics | Deleted |
+| UseFastAccessorMethods | Deleted |
+| UseFastEmptyMethods | Deleted |
+| UseGCLogFileRotation | Deleted |
+| UseGCTaskAffinity | Deleted |
+| UseGHASHIntrinsics | Deleted |
+| UseHeavyMonitors | Deleted |
+| UseLargePagesInMetaspace | Deleted |
+| UseLegacyJNINameEscaping | Deleted |
+| UseLockedTracing | Deleted |
+| UseLWPSynchronization | Deleted |
+| UseMathExactIntrinsics | Deleted |
+| UseMembar | Deleted |
+| UseMontgomeryMultiplyIntrinsic | Deleted |
+| UseMontgomerySquareIntrinsic | Deleted |
+| UseMulAddIntrinsic | Deleted |
+| UseMultiplyToLenIntrinsic | Deleted |
+| UseOSErrorReporting | Deleted |
+| UseParNewGC | Deleted |
+| UseRDPCForConstantTableBase | Deleted |
+| UseSHA1Intrinsics | Deleted |
+| UseSHA256Intrinsics | Deleted |
+| UseSHA512Intrinsics | Deleted |
+| UseSharedSpaces | Deleted |
+| UseSquareToLenIntrinsic | Deleted |
+| UseVMInterruptibleIO | Deleted |
+| VerifyMergedCPBytecodes | Deleted |
+| VMThreadHintNoPreempt | Deleted |
+| WorkAroundNPTLTimedWaitHang | Deleted |
+
+</details>

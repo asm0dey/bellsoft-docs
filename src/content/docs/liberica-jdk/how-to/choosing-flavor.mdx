@@ -1,0 +1,70 @@
+---
+title: "Choosing Liberica JDK Flavor"
+slug: liberica-jdk/how-to/choosing-flavor
+description: Overview of Liberica JDK flavors (Standard, Full, Perf, Lite) and JDK vs. JRE packages to help you choose the right build.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+Liberica JDK is compatible with the broadest range of system configurations on the market. In addition, we provide several different flavors: Standard, Full, Perf, and Lite, as well as JRE and JDK builds. This document gives an overview of the available packages so that you can choose the most optimal configuration for your project.
+
+## Liberica JDK packages: Full, Standard, Perf, Lite
+
+### Liberica JDK Standard
+
+Liberica JDK Standard is a standard OpenJDK distribution with only minor adjustments to the codebase. This package includes all the components necessary for writing, compiling, debugging, and running Java applications. The libraries are implemented as is (vanilla builds), with a guarantee of no vendor lock-in. Liberica JDK Standard is perfect for enterprises looking for a tried-and-true, classical JDK for desktop and server deployment.
+
+### Liberica JDK Full
+
+Liberica JDK Full is based on Liberica JDK Standard but also includes LibericaFX, an OpenJFX implementation for building desktop and GUI applications. In addition, the package also contains a Minimal VM for the development of applications for embedded systems.
+
+### Liberica JDK Perf
+
+[Liberica JDK Performance Edition](https://bell-sw.com/libericajdk-performance-edition/) (or liberica-perf) brings some of the performance of JVM 17 to projects that cannot afford complete migration out of JDK 8 or JDK 11. Liberica JDK Performance Edition is only available for Linux x86_64. For more information, see the Performance Edition Overview.
+
+### Liberica JDK Lite
+
+Liberica JDK Lite is a JDK optimized for cloud instances with a minimal footprint. It is a full-fledged, Java SE-compliant runtime but much smaller than any standard Java distribution. We didn't remove any components to trim down its size; instead, we introduced multiple enhancements, such as better compression for modules. As a result, Liberica Lite has a higher compression ratio for modules than a classic JDK, thus reducing static footprint. Furthermore, we integrated several backports from the recent versions into Liberica JDK 11 and 17, including:
+
+- For Liberica JDK 11:
+  - [JEP 346: Promptly Return Unused Committed Memory from G1](https://openjdk.org/jeps/346) — enables G1 GC to automatically return unused Java heap memory to the operating system in the case of low application activity — and its dependent changes.
+  - [JDK-8203469: Faster safepoints](https://bugs.openjdk.org/browse/JDK-8203469) — increases the average CPU time for JavaThreads between safepoints thus accelerating allocation rate for better performance — and its dependent changes.
+  - LTO (link-time optimization) build. Link-time optimization enables the GCC (the GNU Compiler Collection) to write unoptimized intermediate code to object files, which are then optimized by the linker as a single module at link time. LTO support in JDK was added as part of [JEP 297: Unified arm32/arm64 Port](https://bugs.openjdk.org/browse/JDK-8168503) and is aimed at improving performance and reducing the static footprint of shared libraries.
+
+- For Liberica JDK 17:
+  - String deduplication for ZGC, ParallelGC, and SerialGC, first introduced in [JEP 192: String deduplication for G1](https://openjdk.org/jeps/192), and then extended to other garbage collectors in Java 18. If the strings are duplicated, i.e., contain the same bytes in their code and value fields, the GC deletes all but one byte arrays and reassigns references, thus reducing memory footprint.
+  - LTO build.
+  - [Supporting CDS archived heap objects](https://wiki.openjdk.org/display/HotSpot/CDS+Archived+Heap+Improvements) for ParallelGC and SerialGC helps to improve startup because there's no need to create numerous expensive data structures (e.g., the module graph) from scratch.
+
+<Aside type="note">
+All Liberica Lite binaries go through rigorous Q&A tests before each release, including performance regression testing, so there's no difference between Standard and Lite flavors in terms of performance.
+</Aside>
+
+Liberica Lite is the build we use to create the smallest Java containers on the market. Coupled with Alpaquita Linux, it helps reduce the footprint of the Petclinic Spring application compared with other popular Linux and OpenJDK distributions.
+
+The striking difference in container size raises a question: why don't we use a JRE-based container if it is much smaller than the regular one? Well, it depends on your goals. The section below reveals the distinguishing features of JDK and JRE.
+
+## Difference between JDK and JRE packages
+
+JDK and JRE are the essential concepts of Java programming. At the heart of them both is a JVM, Java Virtual Machine. JVM provides a runtime environment to execute the Java code. It makes the key feature of Java programs (WORA, or "write once, run anywhere") a reality by compiling the Java bytecode into machine-specific code.
+
+JRE, or Java Runtime Environment, provides a set of libraries and binaries to execute Java applications. It doesn't contain any development tools such as `javac`, the Java debugger, JShell, etc., so it is an optimal choice if you plan to only run Java apps, for instance, in the cloud.
+
+JDK, or Java Development Kit, is the superset of JRE. It contains everything that is in JRE plus multiple development tools such as a Java interpreter (`java`), a compiler (`javac`), an archiver (`jar`), a documentation generator (`javadoc`), a debugger (`jdb`), and others for developing and debugging Java applications.
+
+To keep your containers slim, use JDK for development and JRE for execution. The Dockerfile below demonstrates how we can build a project with Liberica JDK in a container and then copy the image into another container with Liberica JRE:
+
+```dockerfile
+FROM bellsoft/liberica-runtime-container:jdk-17-stream-musl as builder
+WORKDIR /home/myapp
+ADD docker-image-demo /home/myapp/docker-image-demo
+RUN cd docker-image-demo && ./mvnw package
+FROM bellsoft/liberica-runtime-container:jre-17-stream-musl
+WORKDIR /home/myapp
+COPY --from=builder /home/myapp/docker-image-demo/target .
+CMD ["java", "-jar", "docker-image-demo-0.0.1-SNAPSHOT.jar"]
+```
+
+The resulting JRE-based container with lightweight Alpaquita Linux will be three times smaller than the one with Oracle JDK and Debian. The size reduction is especially relevant for Spring Boot apps, which sometimes can be associated with a significant memory footprint.

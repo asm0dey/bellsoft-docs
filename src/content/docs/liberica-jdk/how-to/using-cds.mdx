@@ -1,0 +1,92 @@
+---
+title: "Reducing Startup Time with Class Data Sharing (CDS)"
+slug: liberica-jdk/how-to/using-cds
+description: Use Class Data Sharing and AppCDS with Liberica JDK to cut JVM startup time and memory footprint.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+## Introduction
+
+Class Data Sharing (CDS) lets the JVM load classes faster and use less memory by mapping a pre-parsed archive of class metadata directly into memory. Instead of locating, parsing, and verifying each class from scratch on every launch, the JVM reads the already-processed representation from a shared archive. Because the archive is memory-mapped, several JVM processes running on the same host can share the same read-only pages, which reduces the overall memory footprint as well as startup time.
+
+CDS is fully supported in Liberica JDK and behaves exactly as in upstream OpenJDK. This guide explains the three flavors of CDS and walks you through creating and using an application archive.
+
+## Flavors of CDS
+
+There are three ways to use CDS, from least to most application-specific:
+
+- **Default CDS archive.** Liberica JDK ships with a built-in archive of the most common JDK classes (those on the bootstrap class path). It is generated at build time and enabled automatically, so you get a portion of the startup benefit with no configuration at all.
+- **Application Class Data Sharing (AppCDS).** Extends archiving to your application and library classes, not just the JDK ones. Historically AppCDS required a separate class-list dump step; modern JDKs simplify this with `-XX:SharedArchiveFile` and `-XX:+AutoCreateSharedArchive`.
+- **Dynamic CDS (JDK 13+).** The most convenient approach. You run your application once with `-XX:ArchiveClassesAtExit`, and the JVM records every class that was actually loaded (JDK, library, and application classes) into a dynamic archive when the process exits. Subsequent runs consume that archive with `-XX:SharedArchiveFile`. No manual class list is needed.
+
+<Aside type="note">
+A CDS archive is tied to the JDK version and platform that produced it, and to the class path layout used during recording. Regenerate the archive whenever you upgrade Liberica JDK or change your application's classes or class path.
+</Aside>
+
+## Creating and using a dynamic archive
+
+The example below uses a runnable JAR (`app.jar`), but the same flags apply to a class path or module path launch.
+
+<Steps>
+
+1. **Record a dynamic archive from a real run.**
+
+   Start your application as usual, adding `-XX:ArchiveClassesAtExit` to point at the archive file to create. Let the application run through a representative workload, then shut it down cleanly so the JVM can write the archive on exit.
+
+   ```bash
+   java -XX:ArchiveClassesAtExit=app.jsa -jar app.jar
+   ```
+
+   When the process exits, `app.jsa` contains metadata for every class that was loaded during the run.
+
+2. **Launch using the archive.**
+
+   On subsequent runs, supply the archive with `-XX:SharedArchiveFile`. The JVM maps it in and skips the work of parsing and verifying the archived classes.
+
+   ```bash
+   java -XX:SharedArchiveFile=app.jsa -jar app.jar
+   ```
+
+3. **Verify that the archive is actually used.**
+
+   Use `-Xlog:class+load=info` to see where each class comes from. Classes served from the archive are tagged `shared`:
+
+   ```bash
+   java -Xlog:class+load=info -XX:SharedArchiveFile=app.jsa -jar app.jar
+   ```
+
+   ```text
+   [0.012s][info][class,load] java.lang.Object source: shared objects file
+   [0.013s][info][class,load] com.example.App source: shared objects file
+   ```
+
+   To make CDS mandatory rather than best-effort, add `-Xshare:on`. The JVM then fails to start if the archive cannot be mapped (for example after a JDK upgrade), instead of silently falling back to loading classes normally:
+
+   ```bash
+   java -Xshare:on -XX:SharedArchiveFile=app.jsa -jar app.jar
+   ```
+
+</Steps>
+
+<Aside type="caution">
+`-Xshare:on` turns a stale or incompatible archive into a hard startup failure. In production it is often safer to leave the default `-Xshare:auto` (fall back gracefully) and instead monitor the `class+load` logs to confirm sharing is in effect.
+</Aside>
+
+## Auto-creating the archive
+
+To avoid the separate recording step, JDK 19 and later support `-XX:+AutoCreateSharedArchive`. Combined with `-XX:SharedArchiveFile`, the JVM creates the archive automatically on the first run if it does not exist (or is incompatible), and reuses it on every later run:
+
+```bash
+java -XX:+AutoCreateSharedArchive -XX:SharedArchiveFile=app.jsa -jar app.jar
+```
+
+The first launch produces `app.jsa` as the process exits; later launches map it in like any other shared archive. This is the simplest way to get AppCDS-level benefits with a single, stable command line.
+
+## CDS in Liberica JDK container images
+
+Liberica JDK container images publish a dedicated `cds` tag variant with a CDS archive baked into the image. Using such an image gives you faster startup out of the box, with no archiving step in your build. See [Container image tags](../containers/tags/) for the available variants and how to choose between them.
+
+## Further reading
+
+Download Liberica JDK builds for your platform from the [Liberica JDK Download Center](https://bell-sw.com/pages/downloads/).
