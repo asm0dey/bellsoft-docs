@@ -1,0 +1,87 @@
+---
+title: "Distribution-based Liberica Images"
+slug: liberica-jdk/containers/distributions
+description: Liberica JDK/JRE container images on Alpine, Debian, CentOS, Rocky, and Windows bases.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+import TagPicker from '@components/TagPicker.astro';
+
+BellSoft publishes Liberica JDK and JRE as ready-to-run container images on
+several base distributions, in addition to the [Alpaquita-based](../) unified
+`liberica-runtime-container`. Pick the base that matches your platform:
+
+| Base | OpenJDK repo | OpenJRE repo |
+| --- | --- | --- |
+| Alpine | `bellsoft/liberica-openjdk-alpine` | `bellsoft/liberica-openjre-alpine` |
+| Alpine (musl) | `bellsoft/liberica-openjdk-alpine-musl` | `bellsoft/liberica-openjre-alpine-musl` |
+| Debian | `bellsoft/liberica-openjdk-debian` | `bellsoft/liberica-openjre-debian` |
+| CentOS | `bellsoft/liberica-openjdk-centos` | `bellsoft/liberica-openjre-centos` |
+| Rocky Linux | `bellsoft/liberica-openjdk-rocky` | `bellsoft/liberica-openjre-rocky` |
+| Windows Server Core | `bellsoft/liberica-openjdk-windowsservercore` | — |
+
+<Aside type="tip">
+New projects on small/secure images should prefer the
+[hardened images](../hardened/) (near-zero-CVE nonroot/distroless) or the
+Alpaquita-based [`liberica-runtime-container`](../) — both are smaller and
+purpose-built for Java. These distribution images exist for compatibility with
+an established base OS.
+</Aside>
+
+## Tag scheme
+
+```text
+<java version>[-cds][-<arch>]
+```
+
+- **java version** — a major line (`8`, `11`, `17`, `21`), a release (`21.0.6`),
+  or a full build (`21.0.6-10`); `latest` tracks the newest.
+- **cds** — image with a prebuilt [Class Data Sharing](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/class-data-sharing.html) archive.
+- **arch** — `x86_64`, `aarch64`, or `armv7l` to pin one architecture; omit it for
+  the multi-arch manifest. (Windows images are `x86_64` only and untagged by arch.)
+
+## Build a tag
+
+<TagPicker mode="distro" />
+
+## Examples
+
+<Tabs syncKey="distro-base">
+  <TabItem label="Alpine">
+
+```bash
+docker run --rm bellsoft/liberica-openjdk-alpine:21 java -version
+```
+
+  </TabItem>
+  <TabItem label="Debian">
+
+```bash
+docker run --rm bellsoft/liberica-openjdk-debian:21.0.6 java -version
+```
+
+  </TabItem>
+  <TabItem label="CentOS">
+
+```bash
+docker run --rm bellsoft/liberica-openjdk-centos:17 java -version
+```
+
+  </TabItem>
+  <TabItem label="Rocky">
+
+```bash
+docker run --rm bellsoft/liberica-openjdk-rocky:21 java -version
+```
+
+  </TabItem>
+  <TabItem label="Windows">
+
+```powershell
+docker run --rm bellsoft/liberica-openjdk-windowsservercore:21 java -version
+```
+
+  </TabItem>
+</Tabs>
+
+For a smaller runtime, use the matching `liberica-openjre-*` repository instead.

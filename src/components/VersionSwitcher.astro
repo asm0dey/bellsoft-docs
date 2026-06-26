@@ -39,8 +39,8 @@ const currentLabel = versions.find((v) => v.slug === displaySlug)?.label ?? '';
 
 // Show only that one version's group in the sidebar.
 const route = Astro.locals.starlightRoute;
-if (product && displaySlug) {
-  route.sidebar = filterSidebarForVersion(route.sidebar, product, displaySlug);
+if (product && active) {
+  route.sidebar = filterSidebarForVersion(route.sidebar, product, active);
 }
 ---
 
@@ -107,13 +107,47 @@ if (product && displaySlug) {
 <Default><slot /></Default>
 
 <script>
-  import { swapVersion, stripBase, withBase, entryPathOf } from '../lib/swapVersion.mjs';
+  import {
+    swapVersion, stripBase, withBase, versionOf, defaultVersionOf,
+    resolveActiveVersion, versionSlugForGroupLabel, versionPagePath,
+  } from '../lib/swapVersion.mjs';
+
   const BASE = import.meta.env.BASE_URL;
   const picker = document.querySelector('.version-picker');
+
+  const storeKey = (product) => `bellsoft:v:${product}`;
+  const getStored = (product) => {
+    try { return localStorage.getItem(storeKey(product)); } catch { return null; }
+  };
+  const setStored = (product, slug) => {
+    try { localStorage.setItem(storeKey(product), slug); } catch {}
+  };
+
+  // Point common-page body links (<VersionLink>) at the active version.
+  function rewriteVlinks(product, slug) {
+    for (const a of document.querySelectorAll('a[data-vlink]')) {
+      if (a.dataset.vproduct && a.dataset.vproduct !== product) continue;
+      a.setAttribute('href', withBase(versionPagePath(product, slug, a.dataset.vlink), BASE));
+    }
+  }
+
+  // On a common page the sidebar holds every version group; show only the active.
+  function showVersionGroup(product, slug) {
+    const groups = document.querySelectorAll('#starlight__sidebar .top-level > li');
+    for (const li of groups) {
+      const summary = li.querySelector(':scope > details > summary');
+      if (!summary) continue;
+      const groupSlug = versionSlugForGroupLabel(product, summary.textContent.trim());
+      if (!groupSlug) continue; // not a version group — leave visible
+      li.hidden = groupSlug !== slug;
+    }
+  }
+
   if (picker instanceof HTMLElement) {
     const product = picker.dataset.product ?? '';
-    // data-path is base-relative (set server-side); fall back to the live path.
     const fromPath = picker.dataset.path ?? stripBase(location.pathname, BASE);
+    const onVersionPage = Boolean(versionOf(fromPath));
+
     const button = picker.querySelector('.version-current');
     const panel = picker.querySelector('.version-panel');
     const search = picker.querySelector('.version-search');
@@ -124,11 +158,7 @@ if (product && displaySlug) {
     const setOpen = (open) => {
       panel.hidden = !open;
       button.setAttribute('aria-expanded', String(open));
-      if (open) {
-        search.value = '';
-        filter('');
-        search.focus();
-      }
+      if (open) { search.value = ''; filter(''); search.focus(); }
     };
     const filter = (q) => {
       const needle = q.trim().toLowerCase();
@@ -140,13 +170,29 @@ if (product && displaySlug) {
       }
       empty.hidden = shown > 0;
     };
+
+    // Common page: reflect a chosen version without navigating.
+    const applyCommonVersion = (slug) => {
+      setStored(product, slug);
+      showVersionGroup(product, slug);
+      rewriteVlinks(product, slug);
+      const label = options.find((li) => li.dataset.slug === slug)?.dataset.label ?? '';
+      const cur = picker.querySelector('.version-current-label');
+      if (cur) cur.textContent = label;
+      for (const li of options) {
+        const on = li.dataset.slug === slug;
+        li.classList.toggle('selected', on);
+        li.setAttribute('aria-selected', String(on));
+      }
+    };
+
     const navigate = (slug) => {
-      const swapped = swapVersion(fromPath, slug);
-      // Version page: same page, new version. Shared/landing page: enter the
-      // chosen version at its install guide. Re-add the base before navigating.
-      const target =
-        swapped !== fromPath ? swapped : entryPathOf(product, slug);
-      location.pathname = withBase(target, BASE);
+      if (onVersionPage) {
+        location.pathname = withBase(swapVersion(fromPath, slug), BASE);
+      } else {
+        applyCommonVersion(slug);
+        setOpen(false);
+      }
     };
 
     button.addEventListener('click', () => setOpen(panel.hidden));
@@ -160,13 +206,20 @@ if (product && displaySlug) {
         const first = options.find((li) => !li.hidden);
         if (first) navigate(first.dataset.slug);
       } else if (event.key === 'Escape') {
-        setOpen(false);
-        button.focus();
+        setOpen(false); button.focus();
       }
     });
     document.addEventListener('click', (event) => {
       if (!picker.contains(event.target)) setOpen(false);
     });
+
+    // Initial state: persist the URL's version (version page) or reflect the
+    // reader's stored choice (common page).
+    if (onVersionPage) {
+      setStored(product, versionOf(fromPath));
+    } else {
+      applyCommonVersion(resolveActiveVersion(product, fromPath, getStored(product)));
+    }
   }
 </script>
 

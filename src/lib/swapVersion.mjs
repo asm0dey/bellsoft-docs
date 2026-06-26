@@ -70,13 +70,31 @@ export function swapVersion(pathname, slug) {
   return pathname.replace(PREFIX, `/$1/${slug}$3`);
 }
 
-// The first content page of a product version — where the version dropdown
-// navigates when switched from a shared/landing page (which has no version
-// segment to swap). Alpaquita's install guide lives under `/general/`; JDK and
-// NIK have it at the version root.
-export function entryPathOf(product, slug) {
-  if (product === 'alpaquita') return `/alpaquita/${slug}/general/install-guide/`;
-  return `/${product}/${slug}/install-guide/`;
+// The version slug whose label matches a sidebar group label, or null. A
+// version group's config label is `<version label> (LTS)`, so match at a word
+// boundary (exact, or label followed by a space) — a plain `includes` would let
+// `25.0.3+1` also match `25.0.3+11 (LTS)`.
+export function versionSlugForGroupLabel(product, groupLabel) {
+  const versions = PRODUCT_VERSIONS[product];
+  if (!versions) return null;
+  const v = versions.find(
+    (ver) => groupLabel === ver.label || groupLabel.startsWith(ver.label + ' ')
+  );
+  return v ? v.slug : null;
+}
+
+// The active version for a page: the URL's version if present, else a valid
+// stored choice, else the product's latest. Pure so it is unit-tested.
+export function resolveActiveVersion(product, pathname, stored) {
+  const fromUrl = versionOf(pathname);
+  if (fromUrl) return fromUrl;
+  const valid = (PRODUCT_VERSIONS[product] ?? []).some((v) => v.slug === stored);
+  return valid ? stored : defaultVersionOf(product);
+}
+
+// Path of a version-specific page (e.g. install-guide) for a product+version.
+export function versionPagePath(product, slug, page) {
+  return `/${product}/${slug}/${page}/`;
 }
 
 // Given a Starlight sidebar entry array, keep only the ACTIVE version's group
@@ -87,17 +105,9 @@ export function entryPathOf(product, slug) {
 export function filterSidebarForVersion(sidebar, product, activeSlug) {
   const versions = PRODUCT_VERSIONS[product];
   if (!versions || !activeSlug) return sidebar;
-  const labels = versions.map((v) => v.label);
-  const activeLabel = versions.find((v) => v.slug === activeSlug)?.label;
-  if (!activeLabel) return sidebar;
-  // A version group's config label is `<version label> (LTS)`, so match the
-  // label at a word boundary (exact, or version-label followed by a space) —
-  // a plain `includes` would let `25.0.3+1` also match `25.0.3+11 (LTS)`.
-  const isLabel = (groupLabel, verLabel) =>
-    groupLabel === verLabel || groupLabel.startsWith(verLabel + ' ');
   return sidebar.filter((entry) => {
     if (entry.type !== 'group') return true;
-    const isVersionGroup = labels.some((l) => isLabel(entry.label, l));
-    return !isVersionGroup || isLabel(entry.label, activeLabel);
+    const groupSlug = versionSlugForGroupLabel(product, entry.label);
+    return groupSlug === null || groupSlug === activeSlug;
   });
 }

@@ -14,19 +14,6 @@ test('switching JDK version lands on the same page', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('21');
 });
 
-test('how-to pages are version-scoped: switching stays on the same page', async ({ page }) => {
-  await page.goto('liberica-jdk/25.0.3b11/how-to/crac/');
-  await pickVersion(page, '21.0.6+10');
-  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/how-to\/crac\/?$/);
-  await expect(page.locator('h1')).toContainText('CRaC');
-});
-
-test('container pages are version-scoped: switching stays on the same page', async ({ page }) => {
-  await page.goto('liberica-jdk/25.0.3b11/containers/usage/');
-  await pickVersion(page, '21.0.6+10');
-  await expect(page).toHaveURL(/\/liberica-jdk\/21\.0\.6b10\/containers\/usage\/?$/);
-});
-
 test('the searchable picker filters versions', async ({ page }) => {
   await page.goto('liberica-jdk/25.0.3b11/install-guide/');
   await page.locator('.version-current').click();
@@ -50,4 +37,27 @@ test('product switcher and active-version-only sidebar render together', async (
   await expect(sidebar.getByRole('link', { name: 'Native Image Kit' })).toBeVisible();
   await expect(sidebar.getByText('25.0.3+11 (LTS)')).toBeVisible();
   await expect(sidebar.getByText('21.0.6+10 (LTS)')).toHaveCount(0);
+});
+
+test('common page: switching version updates sidebar + VersionLink, stays on page', async ({ page }) => {
+  await page.goto('liberica-jdk/how-to/use-ide/');
+
+  const url = page.url();
+
+  // A VersionLink in the body points at the latest version by default.
+  const vlink = page.locator('a[data-vlink="install-guide"]').first();
+  await expect(vlink).toHaveAttribute('href', /\/25\.0\.3b11\/install-guide\//);
+
+  // Switch to 21.0.6+10 via the picker.
+  await pickVersion(page, '21.0.6+10');
+
+  // Still on the same common page (no navigation).
+  expect(page.url()).toBe(url);
+
+  // VersionLink now points at the chosen version.
+  await expect(vlink).toHaveAttribute('href', /\/21\.0\.6b10\/install-guide\//);
+
+  // Sidebar shows the 21.x group and hides the 25.x group.
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '21.0.6+10' })).toBeVisible();
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '25.0.3+11' })).toBeHidden();
 });
