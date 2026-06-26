@@ -60,4 +60,12 @@ test('common page: switching version updates sidebar + VersionLink, stays on pag
   // Sidebar shows the 21.x group and hides the 25.x group.
   await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '21.0.6+10' })).toBeVisible();
   await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '25.0.3+11' })).toBeHidden();
+
+  // The current-page marker follows the visible group — Starlight only stamps
+  // aria-current on one duplicate (the latest group); switching must move it.
+  const current = page.locator('#starlight__sidebar .top-level > li:not([hidden]) a[aria-current="page"]');
+  await expect(current).toHaveAttribute('href', /\/how-to\/use-ide\/$/);
+  await expect(current).toBeVisible();
+  // No marker stranded in the hidden group.
+  await expect(page.locator('#starlight__sidebar .top-level > li[hidden] a[aria-current="page"]')).toHaveCount(0);
 });

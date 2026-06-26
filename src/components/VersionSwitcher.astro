@@ -143,6 +143,19 @@ if (product && active) {
     }
   }
 
+  // Starlight stamps aria-current on only ONE of the duplicate sidebar links for
+  // a common page (the latest group's copy). When another version's group is the
+  // visible one, that marker is in a hidden group — move it to the visible copy.
+  function markCurrent() {
+    const here = location.pathname.replace(/\/+$/, '');
+    for (const a of document.querySelectorAll('#starlight__sidebar a[href]')) {
+      if (a.getAttribute('href').replace(/\/+$/, '') !== here) continue;
+      const li = a.closest('.top-level > li');
+      if (li && li.hidden) a.removeAttribute('aria-current');
+      else a.setAttribute('aria-current', 'page');
+    }
+  }
+
   if (picker instanceof HTMLElement) {
     const product = picker.dataset.product ?? '';
     const fromPath = picker.dataset.path ?? stripBase(location.pathname, BASE);
@@ -175,6 +188,7 @@ if (product && active) {
     const applyCommonVersion = (slug) => {
       setStored(product, slug);
       showVersionGroup(product, slug);
+      markCurrent();
       rewriteVlinks(product, slug);
       const label = options.find((li) => li.dataset.slug === slug)?.dataset.label ?? '';
       const cur = picker.querySelector('.version-current-label');
