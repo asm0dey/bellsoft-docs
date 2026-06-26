@@ -144,7 +144,7 @@ Alpaquita repositories provide [Liberica](https://bell-sw.com/libericajdk/) JRE,
         name: liberica17-lite-jre-no-deps
 ```
 
-In Alpaquita, packages are managed by [APK](/bellsoft-docs/alpaquita/25-lts/how-to/apk-guide/), so you can use the `community.general.apk` Ansible module for package installation.
+In Alpaquita, packages are managed by [APK](/bellsoft-docs/alpaquita/how-to/apk-guide/), so you can use the `community.general.apk` Ansible module for package installation.
 
 Execute the playbook `playbook.yaml` with the following command:
 
@@ -216,7 +216,7 @@ Starting applications as described in the previous section can be useful sometim
 
 Alpaquita uses OpenRC to manage services. Services are defined in shell script files.
 
-See the [OpenRC documentation](https://github.com/OpenRC/openrc/blob/master/service-script-guide.md) and [Setting up OpenRC init system](/bellsoft-docs/alpaquita/25-lts/how-to/openrc-for-systemd-adepts/) for additional information on OpenRC services.
+See the [OpenRC documentation](https://github.com/OpenRC/openrc/blob/master/service-script-guide.md) and [Setting up OpenRC init system](/bellsoft-docs/alpaquita/how-to/openrc-for-systemd-adepts/) for additional information on OpenRC services.
 
 In this case, we create a definition of a new service in `spring-petclinic-service.sh` file.
 

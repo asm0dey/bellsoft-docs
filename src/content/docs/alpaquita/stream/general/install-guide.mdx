@@ -200,7 +200,7 @@ For more information, see the official [Microsoft WSL documentation](https://doc
 
 Alpaquita Linux has two standard C library implementations: optimized musl (musl-perf) and glibc. Each supported libc implementation is represented by its own installation file, therefore, you must choose the required implementation before downloading the installation package.
 
-For more information, see [Alpaquita Linux: Libc implementations](/bellsoft-docs/alpaquita/stream/how-to/libc-diff/).
+For more information, see [Alpaquita Linux: Libc implementations](/bellsoft-docs/alpaquita/how-to/libc-diff/).
 
 ### malloc implementations
 
@@ -211,15 +211,15 @@ Alpaquita Linux provides several malloc implementations for better performance w
 - mimalloc-secure
 - jemalloc
 
-For more information, see [Alpaquita Linux: Selecting a malloc implementation](/bellsoft-docs/alpaquita/stream/how-to/malloc/).
+For more information, see [Alpaquita Linux: Selecting a malloc implementation](/bellsoft-docs/alpaquita/how-to/malloc/).
 
 ### Other features
 
 Alpaquita Linux implements the following features to make it small and efficient:
 
 - Busybox is a set of command-line utilities of only 1 MB in size. It contains a set of 400 Unix utilities thus providing a small yet complete environment for system maintenance. In addition, developers can add or remove components as needed. For those who require a more sophisticated set of command-line options, we provide coreutils on-demand.
-- [apk tools](/bellsoft-docs/alpaquita/stream/how-to/apk-guide/) is a small package manager providing additional size optimization.
-- [OpenRC](/bellsoft-docs/alpaquita/stream/how-to/openrc-for-systemd-adepts/) is an init system without any unnecessary features, which makes it smaller than other Linux init systems, but efficient.
+- [apk tools](/bellsoft-docs/alpaquita/how-to/apk-guide/) is a small package manager providing additional size optimization.
+- [OpenRC](/bellsoft-docs/alpaquita/how-to/openrc-for-systemd-adepts/) is an init system without any unnecessary features, which makes it smaller than other Linux init systems, but efficient.
 - Alpaquita Linux is compatible with Docker. You can select from a variety of [ready-to-go container images](https://bell-sw.com/alpaquita-containers/#docker-hub-images) on the BellSoft's profile on Docker Hub. It also supports QEMU, which is used for emulation and virtualization.
 - Alpaquita Linux was designed as an efficient platform for Java. The package includes a large set of [Java versions](https://bell-sw.com/pages/downloads/) and support for [Native Image Kit](https://bell-sw.com/pages/downloads/native-image-kit/) based on GraalVM.
 - [AppArmor](https://apparmor.net/) is part of Alpaquita Linux and is an implementation of a mandatory access control system (MAC). AppArmor is not installed by default, but you can install it from the package repository. After installing and configuring AppArmor, enable it to start after reboots using the following command:
@@ -228,4 +228,4 @@ Alpaquita Linux implements the following features to make it small and efficient
   rc-service apparmor start; rc-update add apparmor boot
   ```
 
-For more information, see the [Alpaquita Linux release notes](/bellsoft-docs/alpaquita/stream/general/release-notes/) and [how-to guides](/bellsoft-docs/alpaquita/stream/how-to/apk-guide/).
+For more information, see the [Alpaquita Linux release notes](/bellsoft-docs/alpaquita/stream/general/release-notes/) and [how-to guides](/bellsoft-docs/alpaquita/how-to/apk-guide/).

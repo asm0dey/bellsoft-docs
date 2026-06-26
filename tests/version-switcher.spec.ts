@@ -69,3 +69,18 @@ test('common page: switching version updates sidebar + VersionLink, stays on pag
   // No marker stranded in the hidden group.
   await expect(page.locator('#starlight__sidebar .top-level > li[hidden] a[aria-current="page"]')).toHaveCount(0);
 });
+
+test('alpaquita common page: switching version toggles sidebar group, stays on page', async ({ page }) => {
+  await page.goto('alpaquita/how-to/apk-guide/');
+  const url = page.url();
+
+  await pickVersion(page, '25 (LTS)');
+
+  expect(page.url()).toBe(url);
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '25 (LTS)' })).toBeVisible();
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: 'Stream' })).toBeHidden();
+
+  const current = page.locator('#starlight__sidebar .top-level > li:not([hidden]) a[aria-current="page"]');
+  await expect(current).toHaveAttribute('href', /\/how-to\/apk-guide\/$/);
+  await expect(current).toBeVisible();
+});
