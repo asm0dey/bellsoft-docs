@@ -1,4 +1,5 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
+import { PRODUCT_VERSIONS } from './lib/swapVersion.mjs';
 
 type Heading = { depth: number; slug: string; text: string };
 type TocItem = Heading & { children: TocItem[] };
@@ -55,11 +56,50 @@ function partialBasename(slug: string): string | null {
   return tail ? `${section}-${tail}` : null;
 }
 
+// Pagefind indexes every rendered page, so a partial shared across versions
+// gets indexed once per version — duplicate search hits all pointing at stale
+// URLs. Dedup by partial: keep only the NEWEST version that renders each
+// partial (registry order, index 0 = latest) and mark the rest pagefind:false.
+// Pages unique to an older version (no newer wrapper for that partial) stay
+// indexed. Non-partial pages (install-guide, release-notes, all of alpaquita)
+// are real per-version content and untouched.
+const REDUNDANT_SLUGS: Set<string> = (() => {
+  const keys = Object.keys(
+    import.meta.glob('./content/docs/**/*.{md,mdx}', { eager: false })
+  );
+  // group key `${product}::${basename}` -> [{ slug, rank }]
+  const groups = new Map<string, { slug: string; rank: number }[]>();
+  for (const key of keys) {
+    const slug = key.replace('./content/docs/', '').replace(/\.mdx?$/, '');
+    const [product, version] = slug.split('/');
+    const versions = PRODUCT_VERSIONS[product];
+    if (!versions) continue;
+    const rank = versions.findIndex((v) => v.slug === version);
+    if (rank < 0) continue; // not a version page (shared/landing)
+    const base = partialBasename(slug);
+    if (!base || !partials[`./partials/${base}.mdx`]) continue; // not partial-backed
+    const gkey = `${product}::${base}`;
+    (groups.get(gkey) ?? groups.set(gkey, []).get(gkey)!).push({ slug, rank });
+  }
+  const redundant = new Set<string>();
+  for (const entries of groups.values()) {
+    const newest = Math.min(...entries.map((e) => e.rank));
+    for (const e of entries) if (e.rank > newest) redundant.add(e.slug);
+  }
+  return redundant;
+})();
+
 export const onRequest = defineRouteMiddleware((context) => {
   const route = context.locals.starlightRoute;
   if (!route?.toc) return; // splash pages etc. have no ToC
 
   const slug = (route.entry as { slug?: string })?.slug ?? route.id;
+
+  // Drop redundant older-version copies of shared partials from the search index.
+  if (REDUNDANT_SLUGS.has(slug)) {
+    (route.entry.data as { pagefind?: boolean }).pagefind = false;
+  }
+
   const base = partialBasename(slug);
   if (!base) return;
 
