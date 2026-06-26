@@ -30,7 +30,6 @@ export default defineConfig({
         // `text`-tagged blocks are command output, not a language — no badge for them.
         plugins: [pluginLanguageBadge({ excludeLanguages: ['text'] })],
       },
-      routeMiddleware: './src/toc-partials.ts',
       components: {
         Sidebar: './src/components/VersionSwitcher.astro',
         TableOfContents: './src/components/TableOfContents.astro',

@@ -70,15 +70,6 @@ export function swapVersion(pathname, slug) {
   return pathname.replace(PREFIX, `/$1/${slug}$3`);
 }
 
-// The first content page of a product version — where the version dropdown
-// navigates when switched from a shared/landing page (which has no version
-// segment to swap). Alpaquita's install guide lives under `/general/`; JDK and
-// NIK have it at the version root.
-export function entryPathOf(product, slug) {
-  if (product === 'alpaquita') return `/alpaquita/${slug}/general/install-guide/`;
-  return `/${product}/${slug}/install-guide/`;
-}
-
 // The version slug whose label matches a sidebar group label, or null. A
 // version group's config label is `<version label> (LTS)`, so match at a word
 // boundary (exact, or label followed by a space) — a plain `includes` would let
