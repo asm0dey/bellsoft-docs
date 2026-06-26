@@ -1,0 +1,13 @@
+---
+import { productOf, defaultVersionOf, versionPagePath, stripBase, withBase } from '../lib/swapVersion.mjs';
+
+// `to` is a version-specific page key, e.g. "install-guide" or "release-notes".
+const { to } = Astro.props;
+const path = stripBase(Astro.url.pathname, import.meta.env.BASE_URL);
+const product = productOf(path);
+const slug = defaultVersionOf(product);
+// Build-time href points at the latest version: valid, no-JS-safe, and the
+// links-validator can resolve it. Client JS upgrades it to the active version.
+const href = withBase(versionPagePath(product, slug, to), import.meta.env.BASE_URL);
+---
+<a href={href} data-vlink={to} data-vproduct={product}><slot /></a>
