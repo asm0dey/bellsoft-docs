@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "starlight-links-validator": "^0.24.1"
+    "starlight-links-validator": "^0.25.0"
   }
 }

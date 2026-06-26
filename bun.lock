@@ -13,7 +13,7 @@
       },
       "devDependencies": {
         "@playwright/test": "^1.61.1",
-        "starlight-links-validator": "^0.24.1",
+        "starlight-links-validator": "^0.25.0",
       },
     },
   },
@@ -64,23 +64,23 @@
 
     "@babel/types": ["@babel/types@7.29.7", "", { "dependencies": { "@babel/helper-string-parser": "^7.29.7", "@babel/helper-validator-identifier": "^7.29.7" } }, "sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA=="],
 
-    "@bruits/satteri-darwin-arm64": ["@bruits/satteri-darwin-arm64@0.9.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-tRpKRsiWxyh+Q5cjLwqj+baqI9htIcKqpDcftygA08bB/4nocZsneq+CVLmqT1/njG2Gq+ET12JHECz52ybiPQ=="],
+    "@bruits/satteri-darwin-arm64": ["@bruits/satteri-darwin-arm64@0.9.3", "", { "os": "darwin", "cpu": "arm64" }, "sha512-dRUZZrdwh1asfTOyM1nDNmzolhnHtlIFpqYrl1Tdd3YVcaebKmrfJgGL7NAoGPjbEwYmZxaugrxA0uzw83c0dw=="],
 
-    "@bruits/satteri-darwin-x64": ["@bruits/satteri-darwin-x64@0.9.2", "", { "os": "darwin", "cpu": "x64" }, "sha512-oLSI0+Upq3Nd1brOdRSl044TMKgy7S6cF4sM7a9/Ms6/IADvuey+9yG3GBXxLGAzSYzR0/hh7PPSP1QBfsBKwA=="],
+    "@bruits/satteri-darwin-x64": ["@bruits/satteri-darwin-x64@0.9.3", "", { "os": "darwin", "cpu": "x64" }, "sha512-wgNCTRp2hPSpNMGFv5A4+6+VXgRJIlBZ7XKb3iwjV8YjRWNIjzE5zV2fUeYynyZYVRkuJ9aYFqQmWhc1e5H+UQ=="],
 
-    "@bruits/satteri-linux-arm64-gnu": ["@bruits/satteri-linux-arm64-gnu@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-G+G6uYscRc4VUTNgZgS6SSfTHh04q/d5WiH66Jg39eftMzTAsT5cLSEHDTvDpleUT6BMNHdunx927WbddDgw7A=="],
+    "@bruits/satteri-linux-arm64-gnu": ["@bruits/satteri-linux-arm64-gnu@0.9.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-A/pWy8Jb/PhDYc2/JFuYh06gFJcsfBUBDl81YydGYBrL/Z4nItDfhNDNOibyeSN/lKKDRlycIHEIajjErk00sQ=="],
 
-    "@bruits/satteri-linux-arm64-musl": ["@bruits/satteri-linux-arm64-musl@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-wRaKSHCRXwzAZwlieCiv3u8pWEE2t9FmhZ0X59YZvHCGin56YUBOTyEQqSOrRfXs6fhUb8ylprisGYJC6J8mFQ=="],
+    "@bruits/satteri-linux-arm64-musl": ["@bruits/satteri-linux-arm64-musl@0.9.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-L6YxmyOSickzo4pE5WmZfNTJnjX0MtgKOsuwQfNZECTx9Ir5vl2B37EIwnxe2AybuPPHl+FqVQtthNDUdH4Vgg=="],
 
-    "@bruits/satteri-linux-x64-gnu": ["@bruits/satteri-linux-x64-gnu@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-hxEq3g/kS3tm3GKc2aRYnLMFI5IjxYzcd2sCwEH2C0V+m9TTAf+7Snt/+AZZklpxDOBrI+zthJHip9xnk9uM3g=="],
+    "@bruits/satteri-linux-x64-gnu": ["@bruits/satteri-linux-x64-gnu@0.9.3", "", { "os": "linux", "cpu": "x64" }, "sha512-RgH6GPihg9Lzs2yHUsMjqiLxfLyOdmBty8sg9pBY9B4CBnvdOzvg8vklqN+C4qrEEdA9TwpbDpHr1AshLKyRpw=="],
 
-    "@bruits/satteri-linux-x64-musl": ["@bruits/satteri-linux-x64-musl@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-ZSu+a07Efn8sOeA1k9ZM9CO9J3sAeG37Sf2YYxi/unFGgkFe+Y8MHDQlUNtngpC8pkYIjkojkLFT6v1yiHNxOg=="],
+    "@bruits/satteri-linux-x64-musl": ["@bruits/satteri-linux-x64-musl@0.9.3", "", { "os": "linux", "cpu": "x64" }, "sha512-BeWhVORjNTIomePznUKiMbHZTqC0j7sMXZFsISmbX+po5d33KLkqBqKh6K332CHJ8KUmCWx16FfPjwsoysttQg=="],
 
-    "@bruits/satteri-wasm32-wasi": ["@bruits/satteri-wasm32-wasi@0.9.2", "", { "dependencies": { "@emnapi/core": "1.11.1", "@emnapi/runtime": "1.11.1", "@napi-rs/wasm-runtime": "^1.1.5" }, "cpu": "none" }, "sha512-Q/d7OIwXb5UGaiKUuPp2E6Bm41xD3sW8ts5L6l2m0Wi9uu9WKsv7CDc1ge6AVd6OC6g4nlSKWECFfPa7MkJchg=="],
+    "@bruits/satteri-wasm32-wasi": ["@bruits/satteri-wasm32-wasi@0.9.3", "", { "dependencies": { "@emnapi/core": "1.11.1", "@emnapi/runtime": "1.11.1", "@napi-rs/wasm-runtime": "^1.1.6" }, "cpu": "none" }, "sha512-dFNcOHKWV2cztCPnYTn7kZ9D7kNOt8N239z5ysFkNHLxJrfK7zaKIXQbfXYN32C+JoVFqAcTIOeWH2+VnsCOHg=="],
 
-    "@bruits/satteri-win32-arm64-msvc": ["@bruits/satteri-win32-arm64-msvc@0.9.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-QeaVjw+2IZeDRU7dU0KFlECTAwbL4fRUIXxZYQc4a16ejPzwizChEsKzoUBduyOJSDjyzvZxAmcdUYsSOUmR9A=="],
+    "@bruits/satteri-win32-arm64-msvc": ["@bruits/satteri-win32-arm64-msvc@0.9.3", "", { "os": "win32", "cpu": "arm64" }, "sha512-VnwjBHiAra/PNNEza8eSZdQiG4A3PtTJJwUDtOPAc6iTs0BWZwZX8+OPUZE7//yQCBhgvEMcI8vpwsAwCb6qGQ=="],
 
-    "@bruits/satteri-win32-x64-msvc": ["@bruits/satteri-win32-x64-msvc@0.9.2", "", { "os": "win32", "cpu": "x64" }, "sha512-+hVrOLFtGgXakKO38F6afcc9/uuWvRGghPmiA6/ez5XGnWaM9VjQxqvogam5aOa7Nvl4V65P8Vpj5RsLzYeO8g=="],
+    "@bruits/satteri-win32-x64-msvc": ["@bruits/satteri-win32-x64-msvc@0.9.3", "", { "os": "win32", "cpu": "x64" }, "sha512-Dsoe4reWe69MyILmMwU6iISIceTW7YIFqbyym7haf9DhUvqkYfMAyp7GMM21JzV0SpG9A2BwzFVP7iq9mmxrpA=="],
 
     "@capsizecss/unpack": ["@capsizecss/unpack@4.0.1", "", { "dependencies": { "fontkitten": "^1.0.3" } }, "sha512-CuNiSqg7+e1cO/GjffyMOm5Tt2jUF9CWHHnvQ/UkqvtkGfHdgwEC0wpmq7fkN3gxwpRnrAN0WzO3vREKmNolMQ=="],
 
@@ -832,7 +832,7 @@
 
     "rolldown": ["rolldown@1.1.3", "", { "dependencies": { "@oxc-project/types": "=0.137.0", "@rolldown/pluginutils": "^1.0.0" }, "optionalDependencies": { "@rolldown/binding-android-arm64": "1.1.3", "@rolldown/binding-darwin-arm64": "1.1.3", "@rolldown/binding-darwin-x64": "1.1.3", "@rolldown/binding-freebsd-x64": "1.1.3", "@rolldown/binding-linux-arm-gnueabihf": "1.1.3", "@rolldown/binding-linux-arm64-gnu": "1.1.3", "@rolldown/binding-linux-arm64-musl": "1.1.3", "@rolldown/binding-linux-ppc64-gnu": "1.1.3", "@rolldown/binding-linux-s390x-gnu": "1.1.3", "@rolldown/binding-linux-x64-gnu": "1.1.3", "@rolldown/binding-linux-x64-musl": "1.1.3", "@rolldown/binding-openharmony-arm64": "1.1.3", "@rolldown/binding-wasm32-wasi": "1.1.3", "@rolldown/binding-win32-arm64-msvc": "1.1.3", "@rolldown/binding-win32-x64-msvc": "1.1.3" }, "bin": { "rolldown": "./bin/cli.mjs" } }, "sha512-1F1eEtUBtFvcGm1HQ9TiUIUHPQG7mSAODrhIzjxoUEFuo8OcbrGLiVLkevNgj84TE4lnHvnumwFjhJO5Eu135g=="],
 
-    "satteri": ["satteri@0.9.2", "", { "dependencies": { "@types/estree-jsx": "^1.0.5", "@types/hast": "^3.0.4", "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3" }, "optionalDependencies": { "@bruits/satteri-darwin-arm64": "0.9.2", "@bruits/satteri-darwin-x64": "0.9.2", "@bruits/satteri-linux-arm64-gnu": "0.9.2", "@bruits/satteri-linux-arm64-musl": "0.9.2", "@bruits/satteri-linux-x64-gnu": "0.9.2", "@bruits/satteri-linux-x64-musl": "0.9.2", "@bruits/satteri-wasm32-wasi": "0.9.2", "@bruits/satteri-win32-arm64-msvc": "0.9.2", "@bruits/satteri-win32-x64-msvc": "0.9.2" } }, "sha512-IDJTE5SzEg9PqtdZEToQ3bjlfQ/zM+/HNaBFrwPdZbtk9IL1RWVFvzR8EMIrC0JYybJNKZS8FL45GNSAMX/6Xg=="],
+    "satteri": ["satteri@0.9.3", "", { "dependencies": { "@types/estree-jsx": "^1.0.5", "@types/hast": "^3.0.4", "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3" }, "optionalDependencies": { "@bruits/satteri-darwin-arm64": "0.9.3", "@bruits/satteri-darwin-x64": "0.9.3", "@bruits/satteri-linux-arm64-gnu": "0.9.3", "@bruits/satteri-linux-arm64-musl": "0.9.3", "@bruits/satteri-linux-x64-gnu": "0.9.3", "@bruits/satteri-linux-x64-musl": "0.9.3", "@bruits/satteri-wasm32-wasi": "0.9.3", "@bruits/satteri-win32-arm64-msvc": "0.9.3", "@bruits/satteri-win32-x64-msvc": "0.9.3" } }, "sha512-2XfBh89LCnBMFkNOeVKkBLelAZcIA17VLHsgJum1tJ2fXiPZDN/TDXv4ku46rFOQXYd41LJ0kiZh5gPqExcCsg=="],
 
     "sax": ["sax@1.6.0", "", {}, "sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA=="],
 
@@ -854,7 +854,7 @@
 
     "space-separated-tokens": ["space-separated-tokens@2.0.2", "", {}, "sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q=="],
 
-    "starlight-links-validator": ["starlight-links-validator@0.24.1", "", { "dependencies": { "@types/picomatch": "^4.0.2", "github-slugger": "^2.0.0", "hast-util-from-html": "^2.0.3", "is-absolute-url": "^5.0.0", "mdast-util-mdx-jsx": "^3.2.0", "mdast-util-to-hast": "^13.2.1", "picomatch": "^4.0.3", "terminal-link": "^5.0.0", "unist-util-visit": "^5.1.0", "yaml": "^2.8.3" }, "peerDependencies": { "@astrojs/starlight": ">=0.38.0", "astro": ">=6.0.0" } }, "sha512-nATZ0xMLYnmO1YDBGEy9PdjF/WxhbKR7/gQo0dFs5UELcorKLPXcNLM62xbqII7g0AF7/D9wSzD4qSwIGTu8sw=="],
+    "starlight-links-validator": ["starlight-links-validator@0.25.1", "", { "dependencies": { "@astrojs/markdown-satteri": "^0.3.2", "@types/picomatch": "^4.0.2", "github-slugger": "^2.0.0", "hast-util-from-html": "^2.0.3", "is-absolute-url": "^5.0.0", "mdast-util-mdx-jsx": "^3.2.0", "mdast-util-to-hast": "^13.2.1", "picomatch": "^4.0.3", "satteri": "^0.9.3", "terminal-link": "^5.0.0", "unist-util-visit": "^5.1.0", "yaml": "^2.8.3" }, "peerDependencies": { "@astrojs/starlight": ">=0.41.0", "astro": ">=7.0.2" } }, "sha512-49F1JRvaJmvKSnM/jPFTjDVVwDJBUJ78jZE+fOResTRwYSa8MzPQzsJlSS1FeolsdqAat1evAu//WgIm65uyzw=="],
 
     "starlight-sidebar-topics": ["starlight-sidebar-topics@0.8.0", "", { "dependencies": { "picomatch": "^4.0.3" }, "peerDependencies": { "@astrojs/starlight": ">=0.38.0" } }, "sha512-hE8+w2vNL13h6cq3UJGl05milJQ3+1BSlhaV5V4a993YzYczU6uLAj6jfUDKQ2mmgkdVWp8/UNDF4Je/rQXNQw=="],
 
@@ -950,6 +950,10 @@
 
     "zwitch": ["zwitch@2.0.4", "", {}, "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="],
 
+    "@astrojs/markdown-satteri/satteri": ["satteri@0.9.2", "", { "dependencies": { "@types/estree-jsx": "^1.0.5", "@types/hast": "^3.0.4", "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3" }, "optionalDependencies": { "@bruits/satteri-darwin-arm64": "0.9.2", "@bruits/satteri-darwin-x64": "0.9.2", "@bruits/satteri-linux-arm64-gnu": "0.9.2", "@bruits/satteri-linux-arm64-musl": "0.9.2", "@bruits/satteri-linux-x64-gnu": "0.9.2", "@bruits/satteri-linux-x64-musl": "0.9.2", "@bruits/satteri-wasm32-wasi": "0.9.2", "@bruits/satteri-win32-arm64-msvc": "0.9.2", "@bruits/satteri-win32-x64-msvc": "0.9.2" } }, "sha512-IDJTE5SzEg9PqtdZEToQ3bjlfQ/zM+/HNaBFrwPdZbtk9IL1RWVFvzR8EMIrC0JYybJNKZS8FL45GNSAMX/6Xg=="],
+
+    "@astrojs/starlight/satteri": ["satteri@0.9.2", "", { "dependencies": { "@types/estree-jsx": "^1.0.5", "@types/hast": "^3.0.4", "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3" }, "optionalDependencies": { "@bruits/satteri-darwin-arm64": "0.9.2", "@bruits/satteri-darwin-x64": "0.9.2", "@bruits/satteri-linux-arm64-gnu": "0.9.2", "@bruits/satteri-linux-arm64-musl": "0.9.2", "@bruits/satteri-linux-x64-gnu": "0.9.2", "@bruits/satteri-linux-x64-musl": "0.9.2", "@bruits/satteri-wasm32-wasi": "0.9.2", "@bruits/satteri-win32-arm64-msvc": "0.9.2", "@bruits/satteri-win32-x64-msvc": "0.9.2" } }, "sha512-IDJTE5SzEg9PqtdZEToQ3bjlfQ/zM+/HNaBFrwPdZbtk9IL1RWVFvzR8EMIrC0JYybJNKZS8FL45GNSAMX/6Xg=="],
+
     "@img/sharp-freebsd-wasm32/@img/sharp-wasm32": ["@img/sharp-wasm32@0.35.2", "", { "dependencies": { "@emnapi/runtime": "^1.11.1" } }, "sha512-Mrv4JQNYVQ94xH+jzZ9r+gowleN8mv2FTgKT+PI6bx5C0G8TdNYndu161pg2i7uoBwxy2ImPMHrJOM2LZef7Bw=="],
 
     "@img/sharp-webcontainers-wasm32/@img/sharp-wasm32": ["@img/sharp-wasm32@0.35.2", "", { "dependencies": { "@emnapi/runtime": "^1.11.1" } }, "sha512-Mrv4JQNYVQ94xH+jzZ9r+gowleN8mv2FTgKT+PI6bx5C0G8TdNYndu161pg2i7uoBwxy2ImPMHrJOM2LZef7Bw=="],
@@ -971,6 +975,42 @@
     "parse-entities/@types/unist": ["@types/unist@2.0.11", "", {}, "sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA=="],
 
     "vite/fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-darwin-arm64": ["@bruits/satteri-darwin-arm64@0.9.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-tRpKRsiWxyh+Q5cjLwqj+baqI9htIcKqpDcftygA08bB/4nocZsneq+CVLmqT1/njG2Gq+ET12JHECz52ybiPQ=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-darwin-x64": ["@bruits/satteri-darwin-x64@0.9.2", "", { "os": "darwin", "cpu": "x64" }, "sha512-oLSI0+Upq3Nd1brOdRSl044TMKgy7S6cF4sM7a9/Ms6/IADvuey+9yG3GBXxLGAzSYzR0/hh7PPSP1QBfsBKwA=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-linux-arm64-gnu": ["@bruits/satteri-linux-arm64-gnu@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-G+G6uYscRc4VUTNgZgS6SSfTHh04q/d5WiH66Jg39eftMzTAsT5cLSEHDTvDpleUT6BMNHdunx927WbddDgw7A=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-linux-arm64-musl": ["@bruits/satteri-linux-arm64-musl@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-wRaKSHCRXwzAZwlieCiv3u8pWEE2t9FmhZ0X59YZvHCGin56YUBOTyEQqSOrRfXs6fhUb8ylprisGYJC6J8mFQ=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-linux-x64-gnu": ["@bruits/satteri-linux-x64-gnu@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-hxEq3g/kS3tm3GKc2aRYnLMFI5IjxYzcd2sCwEH2C0V+m9TTAf+7Snt/+AZZklpxDOBrI+zthJHip9xnk9uM3g=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-linux-x64-musl": ["@bruits/satteri-linux-x64-musl@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-ZSu+a07Efn8sOeA1k9ZM9CO9J3sAeG37Sf2YYxi/unFGgkFe+Y8MHDQlUNtngpC8pkYIjkojkLFT6v1yiHNxOg=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-wasm32-wasi": ["@bruits/satteri-wasm32-wasi@0.9.2", "", { "dependencies": { "@emnapi/core": "1.11.1", "@emnapi/runtime": "1.11.1", "@napi-rs/wasm-runtime": "^1.1.5" }, "cpu": "none" }, "sha512-Q/d7OIwXb5UGaiKUuPp2E6Bm41xD3sW8ts5L6l2m0Wi9uu9WKsv7CDc1ge6AVd6OC6g4nlSKWECFfPa7MkJchg=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-win32-arm64-msvc": ["@bruits/satteri-win32-arm64-msvc@0.9.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-QeaVjw+2IZeDRU7dU0KFlECTAwbL4fRUIXxZYQc4a16ejPzwizChEsKzoUBduyOJSDjyzvZxAmcdUYsSOUmR9A=="],
+
+    "@astrojs/markdown-satteri/satteri/@bruits/satteri-win32-x64-msvc": ["@bruits/satteri-win32-x64-msvc@0.9.2", "", { "os": "win32", "cpu": "x64" }, "sha512-+hVrOLFtGgXakKO38F6afcc9/uuWvRGghPmiA6/ez5XGnWaM9VjQxqvogam5aOa7Nvl4V65P8Vpj5RsLzYeO8g=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-darwin-arm64": ["@bruits/satteri-darwin-arm64@0.9.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-tRpKRsiWxyh+Q5cjLwqj+baqI9htIcKqpDcftygA08bB/4nocZsneq+CVLmqT1/njG2Gq+ET12JHECz52ybiPQ=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-darwin-x64": ["@bruits/satteri-darwin-x64@0.9.2", "", { "os": "darwin", "cpu": "x64" }, "sha512-oLSI0+Upq3Nd1brOdRSl044TMKgy7S6cF4sM7a9/Ms6/IADvuey+9yG3GBXxLGAzSYzR0/hh7PPSP1QBfsBKwA=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-linux-arm64-gnu": ["@bruits/satteri-linux-arm64-gnu@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-G+G6uYscRc4VUTNgZgS6SSfTHh04q/d5WiH66Jg39eftMzTAsT5cLSEHDTvDpleUT6BMNHdunx927WbddDgw7A=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-linux-arm64-musl": ["@bruits/satteri-linux-arm64-musl@0.9.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-wRaKSHCRXwzAZwlieCiv3u8pWEE2t9FmhZ0X59YZvHCGin56YUBOTyEQqSOrRfXs6fhUb8ylprisGYJC6J8mFQ=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-linux-x64-gnu": ["@bruits/satteri-linux-x64-gnu@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-hxEq3g/kS3tm3GKc2aRYnLMFI5IjxYzcd2sCwEH2C0V+m9TTAf+7Snt/+AZZklpxDOBrI+zthJHip9xnk9uM3g=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-linux-x64-musl": ["@bruits/satteri-linux-x64-musl@0.9.2", "", { "os": "linux", "cpu": "x64" }, "sha512-ZSu+a07Efn8sOeA1k9ZM9CO9J3sAeG37Sf2YYxi/unFGgkFe+Y8MHDQlUNtngpC8pkYIjkojkLFT6v1yiHNxOg=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-wasm32-wasi": ["@bruits/satteri-wasm32-wasi@0.9.2", "", { "dependencies": { "@emnapi/core": "1.11.1", "@emnapi/runtime": "1.11.1", "@napi-rs/wasm-runtime": "^1.1.5" }, "cpu": "none" }, "sha512-Q/d7OIwXb5UGaiKUuPp2E6Bm41xD3sW8ts5L6l2m0Wi9uu9WKsv7CDc1ge6AVd6OC6g4nlSKWECFfPa7MkJchg=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-win32-arm64-msvc": ["@bruits/satteri-win32-arm64-msvc@0.9.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-QeaVjw+2IZeDRU7dU0KFlECTAwbL4fRUIXxZYQc4a16ejPzwizChEsKzoUBduyOJSDjyzvZxAmcdUYsSOUmR9A=="],
+
+    "@astrojs/starlight/satteri/@bruits/satteri-win32-x64-msvc": ["@bruits/satteri-win32-x64-msvc@0.9.2", "", { "os": "win32", "cpu": "x64" }, "sha512-+hVrOLFtGgXakKO38F6afcc9/uuWvRGghPmiA6/ez5XGnWaM9VjQxqvogam5aOa7Nvl4V65P8Vpj5RsLzYeO8g=="],
 
     "astro/sharp/@img/sharp-darwin-arm64": ["@img/sharp-darwin-arm64@0.34.5", "", { "optionalDependencies": { "@img/sharp-libvips-darwin-arm64": "1.2.4" }, "os": "darwin", "cpu": "arm64" }, "sha512-imtQ3WMJXbMY4fxb/Ndp6HBTNVtWCUI0WdobyheGf5+ad6xX8VIDO8u2xE4qc/fr08CKG/7dDseFtn6M6g/r3w=="],
 
