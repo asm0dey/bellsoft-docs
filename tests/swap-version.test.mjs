@@ -10,6 +10,9 @@ import {
   stripBase,
   withBase,
   entryPathOf,
+  versionSlugForGroupLabel,
+  resolveActiveVersion,
+  versionPagePath,
 } from '../src/lib/swapVersion.mjs';
 
 test('entryPathOf returns the version entry page (alpaquita lives under /general/)', () => {
@@ -153,4 +156,35 @@ test('PRODUCT_VERSIONS holds the showcase registry', () => {
     ['25.0.3b11', '21.0.6b10']
   );
   assert.equal(PRODUCT_VERSIONS['liberica-jdk'][0].label, '25.0.3+11');
+});
+
+test('versionSlugForGroupLabel matches version group labels at a boundary', () => {
+  assert.equal(versionSlugForGroupLabel('liberica-jdk', '25.0.3+11 (LTS)'), '25.0.3b11');
+  assert.equal(versionSlugForGroupLabel('liberica-jdk', '21.0.6+10 (LTS)'), '21.0.6b10');
+  assert.equal(versionSlugForGroupLabel('liberica-jdk', '25.0.3+11'), '25.0.3b11');
+  // Non-version groups and partial-prefix false matches return null.
+  assert.equal(versionSlugForGroupLabel('liberica-jdk', 'How To'), null);
+  assert.equal(versionSlugForGroupLabel('liberica-jdk', '25.0.3+1'), null);
+  assert.equal(versionSlugForGroupLabel('nope', '25.0.3+11 (LTS)'), null);
+});
+
+test('resolveActiveVersion prefers URL, then stored, then latest', () => {
+  // URL has a version -> use it (ignores stored).
+  assert.equal(
+    resolveActiveVersion('liberica-jdk', '/liberica-jdk/21.0.6b10/install-guide/', '25.0.3b11'),
+    '21.0.6b10'
+  );
+  // Common page (no version) -> valid stored wins.
+  assert.equal(
+    resolveActiveVersion('liberica-jdk', '/liberica-jdk/how-to/use-ide/', '21.0.6b10'),
+    '21.0.6b10'
+  );
+  // No/invalid stored -> latest (index 0).
+  assert.equal(resolveActiveVersion('liberica-jdk', '/liberica-jdk/how-to/use-ide/', null), '25.0.3b11');
+  assert.equal(resolveActiveVersion('liberica-jdk', '/liberica-jdk/how-to/use-ide/', 'bogus'), '25.0.3b11');
+});
+
+test('versionPagePath builds a version-specific page path', () => {
+  assert.equal(versionPagePath('liberica-jdk', '25.0.3b11', 'install-guide'), '/liberica-jdk/25.0.3b11/install-guide/');
+  assert.equal(versionPagePath('liberica-nik', '21.0.6b10', 'release-notes'), '/liberica-nik/21.0.6b10/release-notes/');
 });
