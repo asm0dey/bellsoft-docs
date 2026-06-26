@@ -51,3 +51,26 @@ test('product switcher and active-version-only sidebar render together', async (
   await expect(sidebar.getByText('25.0.3+11 (LTS)')).toBeVisible();
   await expect(sidebar.getByText('21.0.6+10 (LTS)')).toHaveCount(0);
 });
+
+test('common page: switching version updates sidebar + VersionLink, stays on page', async ({ page }) => {
+  await page.goto('liberica-jdk/how-to/use-ide/');
+
+  const url = page.url();
+
+  // A VersionLink in the body points at the latest version by default.
+  const vlink = page.locator('a[data-vlink="install-guide"]').first();
+  await expect(vlink).toHaveAttribute('href', /\/25\.0\.3b11\/install-guide\//);
+
+  // Switch to 21.0.6+10 via the picker.
+  await pickVersion(page, '21.0.6+10');
+
+  // Still on the same common page (no navigation).
+  expect(page.url()).toBe(url);
+
+  // VersionLink now points at the chosen version.
+  await expect(vlink).toHaveAttribute('href', /\/21\.0\.6b10\/install-guide\//);
+
+  // Sidebar shows the 21.x group and hides the 25.x group.
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '21.0.6+10' })).toBeVisible();
+  await expect(page.locator('#starlight__sidebar .top-level > li', { hasText: '25.0.3+11' })).toBeHidden();
+});
